@@ -16,44 +16,6 @@ import java.io.IOException
 @SpringBootApplication
 open class MundaneAssignmentPoliceApplication
 
-fun testPDFBox() {
-	PDDocument.load(File("/home/dio/projects/kotlin/mundane-assignment-police/src/test/pdf.pdf")).use { document ->
-		val ap: AccessPermission = document.getCurrentAccessPermission()
-		if (!ap.canExtractContent()) {
-			throw IOException("You do not have permission to extract text")
-		}
-		val stripper = PDFTextStripper()
-
-		// This example uses sorting, but in some cases it is more useful to switch it off,
-		// e.g. in some files with columns where the PDF content stream respects the
-		// column order.
-		stripper.sortByPosition = true
-		for (p in 1..document.getNumberOfPages()) {
-			// Set the page interval to extract. If you don't, then all pages would be extracted.
-			stripper.startPage = p
-			stripper.endPage = p
-
-			// let the magic happen
-			val text = stripper.getText(document)
-
-			// do some nice output with a header
-			val pageStr = String.format("page %d:", p)
-			println(pageStr)
-			for (i in 0 until pageStr.length) {
-				print("-")
-			}
-			println()
-			println(text.trim { it <= ' ' })
-			println()
-
-			// If the extracted text is empty or gibberish, please try extracting text
-			// with Adobe Reader first before asking for help. Also read the FAQ
-			// on the website:
-			// https://pdfbox.apache.org/2.0/faq.html#text-extraction
-		}
-	}
-}
-
 @Throws(IOException::class)
 fun getImagesFromPDF(document: PDDocument): List<RenderedImage>? {
 	val images: MutableList<RenderedImage> = ArrayList()

@@ -22,8 +22,8 @@ class RouterController {
 		if (multipartFile.originalFilename == null) {
 			return null
 		}
-		val fileName: String = StringUtils.cleanPath(multipartFile.originalFilename!!)
+		val fileName = StringUtils.cleanPath(multipartFile.originalFilename!!)
 		FileUploadUtil.saveFile("build", fileName, multipartFile)
-		return RedirectView("/", true)
+		return RedirectView("/#/viewPDF?pdfName=$fileName", true)
 	}
 }
