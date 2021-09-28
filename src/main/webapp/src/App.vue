@@ -6,7 +6,7 @@
 		</div>
 		<router-view/>
 
-		<form action="/pdf/upload"
+		<form action="/api/uploadPDF"
 			object="${pdf}" method="post"
 			enctype="multipart/form-data"
 			>
@@ -16,8 +16,6 @@
 			<input type="file" name="pdf" accept="application/pdf" />
 
 			</div>
-
-			<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
 
 			<input type="submit">
 		</form>

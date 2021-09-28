@@ -11,19 +11,6 @@ import java.io.IOException
 
 @Controller
 class RouterController {
-
 	@GetMapping("/")
 	fun home() = "forward:/app/index.html"
-
-	@PostMapping("/pdf/upload")
-	fun uploadPDF(
-		@RequestParam("pdf") multipartFile: MultipartFile
-	): RedirectView? {
-		if (multipartFile.originalFilename == null) {
-			return null
-		}
-		val fileName = StringUtils.cleanPath(multipartFile.originalFilename!!)
-		FileUploadUtil.saveFile("build", fileName, multipartFile)
-		return RedirectView("/#/viewPDF?pdfName=$fileName", true)
-	}
 }
