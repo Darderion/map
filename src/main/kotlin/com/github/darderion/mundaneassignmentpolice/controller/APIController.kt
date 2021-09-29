@@ -9,29 +9,30 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.servlet.view.RedirectView
-import java.awt.image.RenderedImage
+import mu.KotlinLogging
+
+const val pdfFolder = "build/"
+
+private val logger = KotlinLogging.logger {}
 
 @RestController
 class APIController {
 	@GetMapping("/api/viewPDF")
-	fun getPDFText(@RequestParam pdfName: String): String {
-		return PDFBox.getText("build/$pdfName")
-	}
+	fun getPDFText(@RequestParam pdfName: String) =
+		PDFBox.getText("$pdfFolder$pdfName").also { logger.info("ViewPDF(pdfName = $pdfName)") }
 
 	@GetMapping("/api/viewPDFImages")
-	fun getPDFImages(@RequestParam pdfName: String): List<String> {
-		return PDFBox.getImagesFromPDF("build/$pdfName")
-	}
+	fun getPDFImages(@RequestParam pdfName: String) =
+		PDFBox.getImagesFromPDF("$pdfFolder$pdfName").also { logger.info("ViewPDFImages(pdfName = $pdfName)") }
 
 	@PostMapping("/api/uploadPDF")
-	fun uploadPDF(
-		@RequestParam("pdf") multipartFile: MultipartFile
-	): RedirectView? {
+	fun uploadPDF(@RequestParam("pdf") multipartFile: MultipartFile): RedirectView? {
 		if (multipartFile.originalFilename == null) {
 			return null
 		}
 		val fileName = StringUtils.cleanPath(multipartFile.originalFilename!!)
-		FileUploadUtil.saveFile("build", fileName, multipartFile)
+		FileUploadUtil.saveFile(pdfFolder, fileName, multipartFile)
+		logger.info("UploadPDF(pdfName = $fileName)")
 		return RedirectView("/#/viewPDF?pdfName=$fileName", true)
 	}
 }
