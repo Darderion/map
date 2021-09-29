@@ -17,13 +17,15 @@ private val logger = KotlinLogging.logger {}
 
 @RestController
 class APIController {
+	val pdfBox = PDFBox()
+
 	@GetMapping("/api/viewPDF")
 	fun getPDFText(@RequestParam pdfName: String) =
-		PDFBox.getText("$pdfFolder$pdfName").also { logger.info("ViewPDF(pdfName = $pdfName)") }
+		pdfBox.getText("$pdfFolder$pdfName").also { logger.info("ViewPDF(pdfName = $pdfName)") }
 
 	@GetMapping("/api/viewPDFImages")
 	fun getPDFImages(@RequestParam pdfName: String) =
-		PDFBox.getImagesFromPDF("$pdfFolder$pdfName").also { logger.info("ViewPDFImages(pdfName = $pdfName)") }
+		pdfBox.getImages("$pdfFolder$pdfName").toList().also { logger.info("ViewPDFImages(pdfName = $pdfName)") }
 
 	@PostMapping("/api/uploadPDF")
 	fun uploadPDF(@RequestParam("pdf") multipartFile: MultipartFile): RedirectView? {

@@ -11,65 +11,62 @@ import java.io.File
 import java.io.IOException
 
 class PDFBox {
-	companion object {
-		val recentDocuments: HashMap<String, PDDocument> = hashMapOf()
+	val recentDocuments: HashMap<String, PDDocument> = hashMapOf()
 
-		private fun getDocument(fileName: String): PDDocument {
-			if (!recentDocuments.contains(fileName)) {
-				recentDocuments[fileName] = PDDocument.load(File(fileName))
-			}
-			val document = recentDocuments[fileName]!!
+	private fun getDocument(fileName: String): PDDocument {
+		if (!recentDocuments.contains(fileName)) {
+			recentDocuments[fileName] = PDDocument.load(File(fileName))
+		}
+		val document = recentDocuments[fileName]!!
 
-			val accessPermission = document.currentAccessPermission
-			if (!accessPermission.canExtractContent()) {
-				throw IOException("You do not have permission to open '$fileName' file")
-			}
-
-			return document
+		val accessPermission = document.currentAccessPermission
+		if (!accessPermission.canExtractContent()) {
+			throw IOException("You do not have permission to open '$fileName' file")
 		}
 
-		/**
-		 * Returns html representation of pdf's text content
-		 * @param fileName pdf's filename
-		 * @return html text content
-		 */
-		fun getText(fileName: String): String {
-			val document = getDocument(fileName)
+		return document
+	}
 
-			val stripper = PDFTextStripper()
-			stripper.sortByPosition = true
+	/**
+	 * Returns html representation of pdf's text content
+	 * @param fileName pdf's filename
+	 * @return html text content
+	 */
+	fun getText(fileName: String): String {
+		val document = getDocument(fileName)
+		val stripper = PDFTextStripper()
+		stripper.sortByPosition = true
 
-			// Set the page interval to extract. If you don't, then all pages would be extracted.
-			// stripper.startPage = 1
-			// stripper.endPage = 100
+		val text = stripper.getText(document).trim { it <= ' ' }
 
-			// let the magic happen
-			val text = stripper.getText(document).trim { it <= ' ' }
+		return text.replace("\n", "<br>")
+	}
 
-			return text.replace("\n", "<br>")
+	/**
+	 * Returns images from PDF in base64 string format
+	 * @param fileName pdf's filename
+	 * @return oredered set of images in base64 string format
+	 */
+	fun getImages(fileName: String): LinkedHashSet<String> {
+		val document = getDocument(fileName)
+
+		val images: MutableList<RenderedImage> = ArrayList()
+		for (page in document.pages) {
+			images.addAll(getImagesFromResources(page.resources))
 		}
+		return linkedSetOf(*images.map(::imgToBase64String).toTypedArray())
+	}
 
-		fun getImagesFromPDF(fileName: String): List<String> {
-			val document = getDocument(fileName)
-
-			val images: MutableList<RenderedImage> = ArrayList()
-			for (page in document.pages) {
-				images.addAll(getImagesFromResources(page.resources))
+	private fun getImagesFromResources(resources: PDResources): List<RenderedImage> {
+		val images: MutableList<RenderedImage> = ArrayList()
+		for (xObjectName in resources.xObjectNames) {
+			val xObject = resources.getXObject(xObjectName)
+			if (xObject is PDFormXObject) {
+				images.addAll(getImagesFromResources(xObject.resources))
+			} else if (xObject is PDImageXObject) {
+				images.add(xObject.image)
 			}
-			return images.map(::imgToBase64String)
 		}
-
-		private fun getImagesFromResources(resources: PDResources): List<RenderedImage> {
-			val images: MutableList<RenderedImage> = ArrayList()
-			for (xObjectName in resources.xObjectNames) {
-				val xObject = resources.getXObject(xObjectName)
-				if (xObject is PDFormXObject) {
-					images.addAll(getImagesFromResources(xObject.resources))
-				} else if (xObject is PDImageXObject) {
-					images.add(xObject.image)
-				}
-			}
-			return images
-		}
+		return images
 	}
 }
