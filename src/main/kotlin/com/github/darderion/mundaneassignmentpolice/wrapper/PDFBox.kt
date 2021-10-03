@@ -32,14 +32,33 @@ class PDFBox {
 	 * @param fileName pdf's filename
 	 * @return html text content
 	 */
-	fun getText(fileName: String): String {
+	fun getText(fileName: String) = getPDF(fileName).toHTMLString()
+
+	/**
+	 * Returns PDFDocument object
+	 * @param fileName pdf's filename
+	 * @return PDFDocument
+	 */
+	fun getPDF(fileName: String): PDFDocument {
+		val pdfLines: MutableList<PDFText> = mutableListOf()
+
 		val document = getDocument(fileName)
 		val stripper = PDFTextStripper()
-		stripper.sortByPosition = true
 
-		val text = stripper.getText(document).trim { it <= ' ' }
+		document.pages.forEachIndexed { index, pdPage ->
+			stripper.startPage = index + 1
+			stripper.endPage = stripper.startPage
 
-		return text.replace("\n", "<br>")
+			pdfLines.addAll(
+				stripper.getText(document)
+					.split("\n")
+					.mapIndexed {
+							lineIndex, lineText -> PDFText(lineIndex, index, lineText)
+					}
+			)
+		}
+
+		return PDFDocument(fileName, pdfLines)
 	}
 
 	/**
