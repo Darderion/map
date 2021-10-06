@@ -1,6 +1,5 @@
 package com.github.darderion.mundaneassignmentpolice
 
-import com.github.darderion.mundaneassignmentpolice.wrapper.PDFBox
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 
