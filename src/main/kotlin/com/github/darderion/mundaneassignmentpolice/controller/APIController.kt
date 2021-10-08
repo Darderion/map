@@ -1,5 +1,6 @@
 package com.github.darderion.mundaneassignmentpolice.controller
 
+import com.github.darderion.mundaneassignmentpolice.checker.Checker
 import com.github.darderion.mundaneassignmentpolice.utils.FileUploadUtil
 import com.github.darderion.mundaneassignmentpolice.wrapper.PDFBox
 import org.springframework.util.StringUtils
@@ -22,6 +23,14 @@ class APIController {
 	@GetMapping("/api/viewPDF")
 	fun getPDFText(@RequestParam pdfName: String) =
 		pdfBox.getText("$pdfFolder$pdfName").also { logger.info("ViewPDF(pdfName = $pdfName)") }
+
+	@GetMapping("/api/viewPDFLines")
+	fun getPDFLines(@RequestParam pdfName: String) =
+		pdfBox.getLines("$pdfFolder$pdfName").also { logger.info("ViewPDFLines(pdfName = $pdfName)") }
+
+	@GetMapping("/api/viewRuleViolations")
+	fun getRulesViolations(@RequestParam pdfName: String) =
+		Checker().getRuleViolations("$pdfFolder$pdfName").also { logger.info("ViewRuleViolations(pdfName = $pdfName)") }
 
 	@GetMapping("/api/viewPDFImages")
 	fun getPDFImages(@RequestParam pdfName: String) =

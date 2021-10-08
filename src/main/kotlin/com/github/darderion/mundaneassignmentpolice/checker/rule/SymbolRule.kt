@@ -3,7 +3,7 @@ package com.github.darderion.mundaneassignmentpolice.checker.rule
 import com.github.darderion.mundaneassignmentpolice.checker.Direction
 import com.github.darderion.mundaneassignmentpolice.checker.Direction.*
 import com.github.darderion.mundaneassignmentpolice.checker.RuleViolation
-import com.github.darderion.mundaneassignmentpolice.wrapper.PDFDocument
+import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFDocument
 
 /**
  * Rule that looks for closest symbol that is not IGNORED
@@ -11,23 +11,21 @@ import com.github.darderion.mundaneassignmentpolice.wrapper.PDFDocument
  * 		If REQUIRED_SYMBOLS is not empty and that symbol is not REQUIRED then a rule violation is detected
  */
 class SymbolRule(
-	val symbol: Char = ' ',
-	val ignoredNeighbors: MutableList<Char> = mutableListOf(),
-	val disallowedNeighbors: MutableList<Char> = mutableListOf(),
-	var requiredNeighbors: MutableList<Char> = mutableListOf(),
-	var direction: Direction = Direction.BIDIRECTIONAL,
-	val neighborhoodSize: Int = 1,
-	val name: String
+	private val symbol: Char,
+	private val ignoredNeighbors: MutableList<Char>,
+	private val disallowedNeighbors: MutableList<Char>,
+	private val requiredNeighbors: MutableList<Char>,
+	private val direction: Direction,
+	private val neighborhoodSize: Int,
+	private val name: String
 ) {
 	fun process(document: PDFDocument): List<RuleViolation> {
 		val rulesViolations: MutableList<RuleViolation> = mutableListOf()
 
-		document.text.drop(1).dropLast(1).forEachIndexed { previousIndex, pdfText ->
-			val index = previousIndex + 1
+		document.text.forEachIndexed { index, pdfText ->
 			pdfText.content.indicesOf(symbol.toString()).forEach {
-				val symbolIndex = it +
-						document.getTextFromLines(index - neighborhoodSize, previousIndex).length +
-						neighborhoodSize
+				val symbolIndex = it + document.getTextFromLines(index - neighborhoodSize, index - 1).length +
+						2*neighborhoodSize.coerceAtMost(index)
 				val text = document.getTextFromLines(index - neighborhoodSize, index + neighborhoodSize)
 
 				val sideTexts = mutableListOf(
@@ -47,7 +45,6 @@ class SymbolRule(
 
 				if (neighbors.any { disallowedNeighbors.contains(it) } ||
 					(requiredNeighbors.isNotEmpty() && neighbors.any { !requiredNeighbors.contains(it) })) {
-					println(text)
 					rulesViolations.add(RuleViolation(pdfText.line, pdfText.page, name))
 				}
 			}

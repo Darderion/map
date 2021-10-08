@@ -1,8 +1,6 @@
 package com.github.darderion.mundaneassignmentpolice.checker.rule
 
 import com.github.darderion.mundaneassignmentpolice.checker.Direction
-import com.github.darderion.mundaneassignmentpolice.checker.RuleViolation
-import com.github.darderion.mundaneassignmentpolice.wrapper.PDFDocument
 import java.util.regex.Pattern
 
 // Extension method
@@ -14,15 +12,15 @@ fun CharSequence.indicesOf(input: String): List<Int> =
 		.toCollection(mutableListOf())	// collect the result as list
 
 class SymbolRuleBuilder {
-	var symbol: Char = ' '
-	var ignoredNeighbors: MutableList<Char> = mutableListOf()
-	var disallowedNeighbors: MutableList<Char> = mutableListOf()
-	var requiredNeighbors: MutableList<Char> = mutableListOf()
-	var direction: Direction = Direction.BIDIRECTIONAL
-	var neighborhoodSize = 1
-	var name: String = "Rule name"
+	private var symbol: Char = ' '
+	private var ignoredNeighbors: MutableList<Char> = mutableListOf()
+	private var disallowedNeighbors: MutableList<Char> = mutableListOf()
+	private var requiredNeighbors: MutableList<Char> = mutableListOf()
+	private var direction: Direction = Direction.BIDIRECTIONAL
+	private var neighborhoodSize: Int = 1
+	private var name: String = "Rule name"
 
-	fun ifSymbol(symbol: Char) = this.also { this.symbol = symbol }
+	fun symbol(symbol: Char) = this.also { this.symbol = symbol }
 
 	fun called(name: String) = this.also { this.name = name }
 

@@ -8,39 +8,39 @@ import io.kotest.matchers.ints.shouldBeExactly
 class SymbolRuleTests: StringSpec({
 	"Symbol rule should detect incorrect symbols ? in links" {
 		SymbolRuleBuilder()
-			.ifSymbol('?')
+			.symbol('?')
 			.ignoringAdjusting(*" ,0123456789".toCharArray())
 			.shouldNotHaveNeighbor(*"[]".toCharArray())
 			.getRule()
 			.process(PDFBox().getPDF("src/test/cw1.pdf")).count() shouldBeExactly 4
 	}
 	"Symbol rule should detect incorrect usage of - symbol" {
-		val shortdash = '-'
+		val shortDash = '-'
 
 		SymbolRuleBuilder()
-			.ifSymbol(shortdash)
+			.symbol(shortDash)
 			.shouldHaveNeighbor(*"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".toCharArray())
 			.shouldHaveNeighbor(*"абвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ".toCharArray())
 			.getRule().process(PDFBox().getPDF("src/test/cw1.pdf")).count() shouldBeExactly 2
 	}
 	"Symbol rule should detect incorrect usage of -- symbol" {
-		val mediumdash = '–'
+		val mediumDash = '–'
 
 		SymbolRuleBuilder()
-			.ifSymbol(mediumdash)
+			.symbol(mediumDash)
 			.shouldHaveNeighbor(*"0123456789".toCharArray())
 			.getRule().process(PDFBox().getPDF("src/test/cw1.pdf")).count() shouldBeExactly 3
 	}
 	"Symbol rule should detect incorrect usage of --- symbol" {
-		val longdash = '—'
+		val longDash = '—'
 
 		SymbolRuleBuilder()
-			.ifSymbol(longdash)
+			.symbol(longDash)
 			.shouldHaveNeighbor(' ')
 			.getRule().process(PDFBox().getPDF("src/test/cw1.pdf")).count() shouldBeExactly 1
 
 		SymbolRuleBuilder()
-			.ifSymbol(longdash)
+			.symbol(longDash)
 			.ignoringAdjusting(' ')
 			.shouldNotHaveNeighbor(*"0123456789".toCharArray())
 			.getRule().process(PDFBox().getPDF("src/test/cw1.pdf")).count() shouldBeExactly 2

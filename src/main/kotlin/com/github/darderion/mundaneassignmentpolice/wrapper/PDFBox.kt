@@ -1,6 +1,8 @@
 package com.github.darderion.mundaneassignmentpolice.wrapper
 
 import com.github.darderion.mundaneassignmentpolice.utils.imgToBase64String
+import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFDocument
+import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFText
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.pdmodel.PDResources
 import org.apache.pdfbox.pdmodel.graphics.form.PDFormXObject
@@ -8,7 +10,6 @@ import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject
 import org.apache.pdfbox.text.PDFTextStripper
 import java.awt.image.RenderedImage
 import java.io.File
-import java.io.IOException
 
 class PDFBox {
 	val recentDocuments: HashMap<String, PDDocument> = hashMapOf()
@@ -21,7 +22,7 @@ class PDFBox {
 
 		val accessPermission = document.currentAccessPermission
 		if (!accessPermission.canExtractContent()) {
-			throw IOException("You do not have permission to open '$fileName' file")
+			throw Error("You do not have permission to open '$fileName' file")
 		}
 
 		return document
@@ -35,6 +36,13 @@ class PDFBox {
 	fun getText(fileName: String) = getPDF(fileName).toHTMLString()
 
 	/**
+	 * Returns lines of pdf's text content
+	 * @param fileName pdf's filename
+	 * @return lines of text content
+	 */
+	fun getLines(fileName: String) = getPDF(fileName).text
+
+	/**
 	 * Returns PDFDocument object
 	 * @param fileName pdf's filename
 	 * @return PDFDocument
@@ -45,7 +53,9 @@ class PDFBox {
 		val document = getDocument(fileName)
 		val stripper = PDFTextStripper()
 
+		var lineIndex = 0
 		document.pages.forEachIndexed { index, pdPage ->
+			lineIndex++
 			stripper.startPage = index + 1
 			stripper.endPage = stripper.startPage
 
@@ -53,7 +63,7 @@ class PDFBox {
 				stripper.getText(document)
 					.split("\n")
 					.mapIndexed {
-							lineIndex, lineText -> PDFText(lineIndex, index, lineText)
+							lineIndex, lineText -> PDFText(lineIndex, index, lineIndex, lineText)
 					}
 			)
 		}
