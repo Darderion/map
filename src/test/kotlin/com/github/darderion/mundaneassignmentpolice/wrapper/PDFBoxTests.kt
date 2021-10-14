@@ -9,6 +9,12 @@ class PDFBoxTests: StringSpec({
 		val pdfBox = PDFBox()
 
 		pdfBox.getText("src/test/pdf.pdf") shouldInclude "Lorem ipsum"
+
+		// Stripper.getText != TextStripper.getText
+		/*
+		Maecenastinciduntestefciturligulaeuismod,sitametornareestvulputate.Row1Row2Row3Row4024681012Column1Column2Column3
+		Maecenastinciduntestefficiturligulaeuismod,sitametornareestvulputate.
+		 */
 	}
 	"getImages should return correct number of images" {
 		val pdfBox = PDFBox()

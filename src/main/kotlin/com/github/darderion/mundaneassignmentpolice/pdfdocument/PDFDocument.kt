@@ -1,6 +1,8 @@
 package com.github.darderion.mundaneassignmentpolice.pdfdocument
 
-class PDFDocument(val name: String, val text: List<PDFText>) {
+import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Text
+
+class PDFDocument(val name: String, val text: List<Text>) {
 	override fun toString() = "PDF: $name\n" +
 			text.joinToString("\n") { it.toString() }
 
