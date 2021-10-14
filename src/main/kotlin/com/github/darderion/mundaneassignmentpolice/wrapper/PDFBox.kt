@@ -58,61 +58,65 @@ class PDFBox {
 		val pdfText: MutableList<Text> = mutableListOf()
 
 		val document = getDocument(fileName)
-		val stripper = PDFStripper()
-		val textStripper = PDFTextStripper()
+		val stripper = PDFStripper()			// Stripper with additional information
+		val textStripper = PDFTextStripper()	// Text stripper
 
 		val strippers = listOf(stripper, textStripper)
 
-		var lineIndex = 0
-
 		var area = PDFArea.TABLE_OF_CONTENT // TODO: Add text areas
 
-		document.pages.forEachIndexed { index, pdPage ->
-			lineIndex++
-
+		for((lineIndex, pageIndex) in (0..document.pages.count).withIndex()) {
+			// For each page
 			strippers.forEach {
-				it.startPage = index + 1
+				it.startPage = pageIndex + 1
 				it.endPage = it.startPage
 			}
 
 			val text = textStripper.getText(document) + '\n'
 
+			stripper.symbols.clear()
 			val dummy: Writer = OutputStreamWriter(ByteArrayOutputStream())
 			stripper.writeText(document, dummy)
 
-			var font: Font? = null
-			var word = ""
-
-			var symb = Symbol(" ", Font(0.0f))
+			var font: Font?
+			var word: String
+			var symb: Symbol
 			val words: MutableList<Word> = mutableListOf()
+			var contentIndex: Int
+			var contentItem: String
+			var coordinates: Pair<Float, Float> = Pair(0.0f, 0.0f)
 
-			val symbols = " \n"
+			var stripperIndex = 0
 
 			pdfText.addAll(text.split('\n').mapIndexed { line, content ->
+				// For each line
 				words.clear()
-				println("Content: ${content.filterNot { it == ' ' }}")
-				println("Symbols: ${stripper.symbols.joinToString(",")}")
-				println()
-				var contentIndex = 0
-				var contentItem: String
+				word = ""
+				font = null
+				contentIndex = 0
+
+				if (content.isNotEmpty()) {
+					coordinates = stripper.symbols[stripperIndex].position
+				}
+
 				while (contentIndex < content.length) {
+					// For each symbol
 					contentItem = if (content.hasSurrogatePairAt(contentIndex)) {
 						"${content[contentIndex]}${content[contentIndex + 1]}"
 					} else {
 						"${content[contentIndex]}"
 					}
 					contentIndex += contentItem.length
-					println("Char: $contentItem")
-					if (!symbols.contains(contentItem)) {
-						symb = stripper.symbols.first()
-					}
-					if (font == null) font = symb.font
-					if (symbols.contains(contentItem)) {
+
+					if (contentItem == " ") {
 						words.add(Word(word, font!!))
+						words.add(Word.spaceCharacter)
 						font = null
 						word = ""
-						if (contentItem == " ") words.add(Word.spaceCharacter)
 					} else {
+						symb = stripper.symbols[stripperIndex]
+						if (font == null) font = symb.font
+
 						if (symb.font != font) {
 							words.add(Word(word, font!!))
 							font = symb.font
@@ -120,26 +124,13 @@ class PDFBox {
 						} else {
 							word += symb
 						}
-						stripper.symbols.removeAt(0)
+						stripperIndex++
 					}
 				}
 				if (font == null && word.isEmpty()) font = Font(0.0f)
 				words.add(Word(word, font!!))
-				word = ""
-				font = null
 
-				Text(line, index, lineIndex, words.toList(), area)
-
-				/*
-				// Add text lines
-				pdfLines.addAll(
-					textStripper.getText(document)
-						.split("\n")
-						.mapIndexed {
-								lineIndex, lineText -> Line(lineIndex, index, lineIndex, lineText)
-						}
-				)
-				 */
+				Text(line, pageIndex, lineIndex, words.toList(), area, coordinates)
 			})
 		}
 

@@ -46,9 +46,4 @@ class SymbolRuleTests: StringSpec({
 			.shouldNotHaveNeighbor(*"0123456789".toCharArray())
 			.getRule().process(PDFBox().getPDF("src/test/cw1.pdf")).count() shouldBeExactly 2
 	}
-	"SomeText" {
-		PDFBox().getPDF("src/test/cw1.pdf").toTextList().forEach(::println)
-
-		"1" shouldInclude "2"
-	}
 })
