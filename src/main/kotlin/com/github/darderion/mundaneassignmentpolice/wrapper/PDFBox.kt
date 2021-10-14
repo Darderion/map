@@ -65,7 +65,7 @@ class PDFBox {
 
 		var lineIndex = 0
 
-		var area = PDFArea.TABLE_OF_CONTENT
+		var area = PDFArea.TABLE_OF_CONTENT // TODO: Add text areas
 
 		document.pages.forEachIndexed { index, pdPage ->
 			lineIndex++
@@ -80,10 +80,10 @@ class PDFBox {
 			val dummy: Writer = OutputStreamWriter(ByteArrayOutputStream())
 			stripper.writeText(document, dummy)
 
-			var font: Font? = stripper.symbols.first().font
+			var font: Font? = null
 			var word = ""
 
-			var symb: Symbol = Symbol(" ", Font(0.0f))
+			var symb = Symbol(" ", Font(0.0f))
 			val words: MutableList<Word> = mutableListOf()
 
 			val symbols = " \n"
@@ -93,17 +93,25 @@ class PDFBox {
 				println("Content: ${content.filterNot { it == ' ' }}")
 				println("Symbols: ${stripper.symbols.joinToString(",")}")
 				println()
-				content.forEach {
-					println("Char: $it")
-					if (!symbols.contains(it)) {
+				var contentIndex = 0
+				var contentItem: String
+				while (contentIndex < content.length) {
+					contentItem = if (content.hasSurrogatePairAt(contentIndex)) {
+						"${content[contentIndex]}${content[contentIndex + 1]}"
+					} else {
+						"${content[contentIndex]}"
+					}
+					contentIndex += contentItem.length
+					println("Char: $contentItem")
+					if (!symbols.contains(contentItem)) {
 						symb = stripper.symbols.first()
 					}
 					if (font == null) font = symb.font
-					if (symbols.contains(it)) {
+					if (symbols.contains(contentItem)) {
 						words.add(Word(word, font!!))
 						font = null
 						word = ""
-						if (it == ' ') words.add(Word.spaceCharacter)
+						if (contentItem == " ") words.add(Word.spaceCharacter)
 					} else {
 						if (symb.font != font) {
 							words.add(Word(word, font!!))
