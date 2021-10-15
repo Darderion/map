@@ -1,6 +1,10 @@
 package com.github.darderion.mundaneassignmentpolice.checker.rule
 
 import com.github.darderion.mundaneassignmentpolice.checker.Direction
+import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFArea
+import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFRegion
+import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFRegion.Companion.EVERYWHERE
+import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFRegion.Companion.NOWHERE
 import java.util.regex.Pattern
 
 // Extension method
@@ -19,6 +23,7 @@ class SymbolRuleBuilder {
 	private var direction: Direction = Direction.BIDIRECTIONAL
 	private var neighborhoodSize: Int = 1
 	private var name: String = "Rule name"
+	private var region: PDFRegion = EVERYWHERE
 
 	fun symbol(symbol: Char) = this.also { this.symbol = symbol }
 
@@ -36,6 +41,10 @@ class SymbolRuleBuilder {
 
 	fun fromBothSides() = this.also { direction = Direction.BIDIRECTIONAL }
 
+	infix fun inArea(area: PDFArea) = this.also { region = NOWHERE.except(area) }
+
+	infix fun inArea(region: PDFRegion) = this.also { this.region = region }
+
 	fun getRule() = SymbolRule(
 		symbol,
 		ignoredNeighbors,
@@ -43,6 +52,7 @@ class SymbolRuleBuilder {
 		requiredNeighbors,
 		direction,
 		neighborhoodSize,
+		region,
 		name
 	)
 }

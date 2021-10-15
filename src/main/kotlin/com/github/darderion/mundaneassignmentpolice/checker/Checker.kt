@@ -1,6 +1,8 @@
 package com.github.darderion.mundaneassignmentpolice.checker
 
 import com.github.darderion.mundaneassignmentpolice.checker.rule.SymbolRuleBuilder
+import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFArea.*
+import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFRegion.Companion.EVERYWHERE
 import com.github.darderion.mundaneassignmentpolice.wrapper.PDFBox
 
 class Checker {
@@ -21,6 +23,7 @@ class Checker {
 			.shouldHaveNeighbor(*"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".toCharArray())
 			.shouldHaveNeighbor(*"абвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ".toCharArray())
 			.called("Incorrect usage of '-' symbol")
+			.inArea(EVERYWHERE.except(BIBLIOGRAPHY, FOOTNOTE))
 
 		val shortDashRuleLeft = shortDashRules
 			.fromLeft()
@@ -37,6 +40,7 @@ class Checker {
 			.symbol(mediumDash)
 			.shouldHaveNeighbor(*"0123456789".toCharArray())
 			.called("Incorrect usage of '--' symbol")
+			.inArea(EVERYWHERE.except(BIBLIOGRAPHY, FOOTNOTE))
 			.getRule()
 
 		val longDash = '—'
@@ -46,6 +50,7 @@ class Checker {
 			.ignoringAdjusting(' ')
 			.shouldNotHaveNeighbor(*"0123456789".toCharArray())
 			.called("Incorrect usage of '---' symbol")
+			.inArea(EVERYWHERE.except(BIBLIOGRAPHY, FOOTNOTE))
 			.getRule()
 
 		return listOf(

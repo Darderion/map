@@ -1,7 +1,11 @@
 
 <template>
 	<div class="about">
-		<a v-for="ruleViolation in this.pdfRuleViolations" :href="`#pdfLine${ruleViolation.line}-${ruleViolation.page}`" :key="ruleViolation.toString() + (new Date()).getTime()">{{ruleViolation.message}} --> Line {{ruleViolation.line}}, page {{ruleViolation.page}}<br></a>
+		<Keypress key-event="keyup" :key-code="69" @success="switchToRulesView" />
+		<Keypress key-event="keyup" :key-code="83" @success="switchToAreasView" />
+		<div id="ruleViolationsDiv">
+			<a v-for="ruleViolation in this.pdfRuleViolations" :href="`#pdfLine${ruleViolation.line}-${ruleViolation.page}`" :key="ruleViolation.toString() + (new Date()).getTime()">{{ruleViolation.message}} --> Line {{ruleViolation.line}}, page {{ruleViolation.page}}<br></a>
+		</div>
 		Text:
 		<div v-for="text in this.pdfLines" :key="text.toString() + (new Date()).getTime()" :id="`pdfLine${text.line}-${text.page}`" v-html="text.content"></div>
 		Images:
@@ -16,8 +20,13 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 
 import PDFText from '../classes/PDFText'
 import RuleViolation from '../classes/RuleViolation'
+import { ViewMode } from '../classes/ViewMode'
 
-@Component
+@Component({
+	components: {
+		Keypress: () => import('vue-keypress')
+	},
+})
 export default class ViewPDF extends Vue {
 	@Prop() private pdfName!: string;
 	@Prop() private pdfText!: string
@@ -28,11 +37,31 @@ export default class ViewPDF extends Vue {
 	private receivedLines = false
 	private receivedRuleViolations = false
 
+	private viewMode: ViewMode = ViewMode.Rules
+
 	updatePDFView() {
 		if (this.receivedLines && this.receivedRuleViolations) {
-			this.pdfRuleViolations.forEach(it => {
-				document.getElementById(`pdfLine${it.line}-${it.page}`)!.style.backgroundColor = 'red'
+			this.pdfLines.forEach(it => {
+				document.getElementById(`pdfLine${it.line}-${it.page}`)!.style.backgroundColor = 'white'
+				document.getElementById(`pdfLine${it.line}-${it.page}`)!.style.color = 'black'
 			})
+			if (this.viewMode == ViewMode.Rules) {
+				this.pdfRuleViolations.forEach(it => {
+					document.getElementById(`pdfLine${it.line}-${it.page}`)!.style.backgroundColor = 'red'
+				})
+			}
+			if (this.viewMode == ViewMode.Areas) {
+				this.pdfLines.forEach(it => {
+				document.getElementById(`pdfLine${it.line}-${it.page}`)!.style.color = 'white'
+					document.getElementById(`pdfLine${it.line}-${it.page}`)!.style.backgroundColor =
+						(it.area == 'BIBLIOGRAPHY') ? '#522' :
+						(it.area == 'TABLE_OF_CONTENT') ? '#225' :
+						(it.area == 'SECTION') ? '#252' :
+						(it.area == 'FOOTNOTE') ? '#822' :
+						(it.area == 'PAGE_INDEX') ? '#555' :
+						(it.area == 'TITLE_PAGE') ? '#255' : 'White'
+				})
+			}
 		}
 	}
 
@@ -57,6 +86,16 @@ export default class ViewPDF extends Vue {
 	setPDFRuleViolations(text: string) {
 		this.pdfRuleViolations = JSON.parse(text)
 		this.receivedRuleViolations = true
+		this.updatePDFView()
+	}
+
+	switchToRulesView() {
+		this.viewMode = ViewMode.Rules
+		this.updatePDFView()
+	}
+
+	switchToAreasView() {
+		this.viewMode = ViewMode.Areas
 		this.updatePDFView()
 	}
 

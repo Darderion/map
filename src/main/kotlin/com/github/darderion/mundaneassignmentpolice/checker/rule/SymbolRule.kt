@@ -4,6 +4,8 @@ import com.github.darderion.mundaneassignmentpolice.checker.Direction
 import com.github.darderion.mundaneassignmentpolice.checker.Direction.*
 import com.github.darderion.mundaneassignmentpolice.checker.RuleViolation
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFDocument
+import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFRegion
+import com.github.darderion.mundaneassignmentpolice.pdfdocument.inside
 
 /**
  * Rule that looks for closest symbol that is not IGNORED
@@ -17,16 +19,17 @@ class SymbolRule(
 	private val requiredNeighbors: MutableList<Char>,
 	private val direction: Direction,
 	private val neighborhoodSize: Int,
+	private val region: PDFRegion,
 	private val name: String
 ) {
 	fun process(document: PDFDocument): List<RuleViolation> {
 		val rulesViolations: MutableList<RuleViolation> = mutableListOf()
 
-		document.text.forEachIndexed { index, pdfText ->
+		document.text.filter { it.area!! inside region }.forEachIndexed { index, pdfText ->
 			pdfText.content.indicesOf(symbol.toString()).forEach {
-				val symbolIndex = it + document.getTextFromLines(index - neighborhoodSize, index - 1).length +
+				val symbolIndex = it + document.getTextFromLines(index - neighborhoodSize, index - 1, region).length +
 						2*neighborhoodSize.coerceAtMost(index)
-				val text = document.getTextFromLines(index - neighborhoodSize, index + neighborhoodSize)
+				val text = document.getTextFromLines(index - neighborhoodSize, index + neighborhoodSize, region)
 
 				val sideTexts = mutableListOf(
 					text.slice(IntRange(0, symbolIndex - 1)).reversed(),

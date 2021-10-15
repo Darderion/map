@@ -2,9 +2,12 @@ package com.github.darderion.mundaneassignmentpolice.pdfdocument
 
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Text
 
-class PDFDocument(val name: String, val text: List<Text>) {
+class PDFDocument(val name: String, text: List<Text>) {
 	override fun toString() = "PDF: $name\n" +
 			text.joinToString("\n") { it.toString() }
+
+	val text: List<Text>
+		get() = areas.text
 
 	val areas: PDFStructure = PDFStructure(text)
 
@@ -12,12 +15,13 @@ class PDFDocument(val name: String, val text: List<Text>) {
 
 	fun toTextList() = text.map { it.content }
 
-	fun getTextFromLines(fromIndex: Int, toIndex: Int) = text.filterIndexed { index, pdfText ->
+	fun getTextFromLines(fromIndex: Int, toIndex: Int, region: PDFRegion) = text.filter { it.area!! inside region }
+		.filterIndexed { index, pdfText ->
 		index in fromIndex..toIndex
 	}.joinToString("\n ") { it.content }
 
 	fun print() {
-		text.map { "${it.area} | ${it.content}" }.forEach(::println)
+		text.map { "${it.area} | ${it.text.joinToString("--") { "${it.font.size}-${it.text}"}}" }.forEach(::println)
 	}
 
 	/*

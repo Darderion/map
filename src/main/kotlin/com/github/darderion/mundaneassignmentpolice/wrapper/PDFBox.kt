@@ -132,8 +132,6 @@ class PDFBox {
 			})
 		}
 
-		document.close()
-
 		return PDFDocument(fileName, pdfText)
 	}
 

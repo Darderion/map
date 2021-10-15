@@ -25,6 +25,9 @@ class PDFStructure(val text: List<Text>) {
 					}
 				}
 				SECTION -> {
+					if (floatEquals(it.text.first().font.size, FOOTNOTE_FONT_SIZE)) {
+
+					}
 					if (isFootnote(it)) {
 						area = FOOTNOTE
 					} else {
