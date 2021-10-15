@@ -4,6 +4,7 @@ import com.github.darderion.mundaneassignmentpolice.checker.rule.SymbolRuleBuild
 import com.github.darderion.mundaneassignmentpolice.wrapper.PDFBox
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.ints.shouldBeExactly
+import io.kotest.matchers.string.shouldInclude
 
 class SymbolRuleTests: StringSpec({
 	"Symbol rule should detect incorrect symbols ? in links" {
@@ -12,7 +13,7 @@ class SymbolRuleTests: StringSpec({
 			.ignoringAdjusting(*" ,0123456789".toCharArray())
 			.shouldNotHaveNeighbor(*"[]".toCharArray())
 			.getRule()
-			.process(PDFBox().getPDF("src/test/cw1.pdf")).count() shouldBeExactly 4
+			.process(PDFBox().getPDF("src/test/cw1.pdf").also { it.text.forEach(::println) }).count() shouldBeExactly 4
 	}
 	"Symbol rule should detect incorrect usage of - symbol" {
 		val shortDash = '-'
