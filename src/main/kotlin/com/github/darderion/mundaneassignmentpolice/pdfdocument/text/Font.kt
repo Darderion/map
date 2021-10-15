@@ -1,8 +1,6 @@
 package com.github.darderion.mundaneassignmentpolice.pdfdocument.text
 
-import kotlin.math.abs
-
-fun floatEquals(a: Float, b: Float) = abs(a - b) < 0.0000001
+import com.github.darderion.mundaneassignmentpolice.utils.floatEquals
 
 class Font(val size: Float) {
 	override fun equals(other: Any?) = this === other ||

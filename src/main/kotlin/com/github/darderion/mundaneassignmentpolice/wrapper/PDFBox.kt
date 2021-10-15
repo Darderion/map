@@ -63,8 +63,6 @@ class PDFBox {
 
 		val strippers = listOf(stripper, textStripper)
 
-		var area = PDFArea.TABLE_OF_CONTENT // TODO: Add text areas
-
 		for((lineIndex, pageIndex) in (0..document.pages.count).withIndex()) {
 			// For each page
 			strippers.forEach {
@@ -130,7 +128,7 @@ class PDFBox {
 				if (font == null && word.isEmpty()) font = Font(0.0f)
 				words.add(Word(word, font!!))
 
-				Text(line, pageIndex, lineIndex, words.toList(), area, coordinates)
+				Text(line, pageIndex, lineIndex, words.toList(), coordinates)
 			})
 		}
 
@@ -142,7 +140,7 @@ class PDFBox {
 	/**
 	 * Returns images from PDF in base64 string format
 	 * @param fileName pdf's filename
-	 * @return oredered set of images in base64 string format
+	 * @return ordered set of images in base64 string format
 	 */
 	fun getImages(fileName: String): LinkedHashSet<String> {
 		val document = getDocument(fileName)
