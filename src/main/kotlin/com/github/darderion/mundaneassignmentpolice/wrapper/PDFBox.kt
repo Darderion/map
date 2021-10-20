@@ -1,12 +1,11 @@
 package com.github.darderion.mundaneassignmentpolice.wrapper
 
-import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFArea
-import com.github.darderion.mundaneassignmentpolice.utils.imgToBase64String
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFDocument
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Font
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Symbol
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Text
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Word
+import com.github.darderion.mundaneassignmentpolice.utils.imgToBase64String
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.pdmodel.PDResources
 import org.apache.pdfbox.pdmodel.graphics.form.PDFormXObject
@@ -107,7 +106,7 @@ class PDFBox {
 					contentIndex += contentItem.length
 
 					if (contentItem == " ") {
-						words.add(Word(word, font!!))
+						words.add(Word(word, font?: Font(0.0f)))
 						words.add(Word.spaceCharacter)
 						font = null
 						word = ""

@@ -9,49 +9,45 @@ class PDFStructure(val text: List<Text>) {
 		var area = TITLE_PAGE
 		var sectionTitle: String? = null
 		text.forEach {
-			when(area) {
+			// For each line
+			area = when(area) {
 				TITLE_PAGE -> {
 					if (it.content == TABLE_OF_CONTENT_TITLE) {
-						area = TABLE_OF_CONTENT
-					}
+						TABLE_OF_CONTENT
+					} else area
 				}
 				TABLE_OF_CONTENT -> {
 					if (sectionTitle == null && it.content != TABLE_OF_CONTENT_TITLE && it.content.isNotEmpty()) {
 						sectionTitle = it.text.first().text
+						area
 					} else {
 						if (sectionTitle != null && it.line == 0 && it.content == sectionTitle) {
-							area = SECTION
-						}
+							SECTION
+						} else area
 					}
 				}
 				SECTION -> {
-					if (floatEquals(it.text.first().font.size, FOOTNOTE_FONT_SIZE)) {
-
-					}
 					if (isFootnote(it)) {
-						area = FOOTNOTE
+						FOOTNOTE
 					} else {
 						if (it.content == BIBLIOGRAPHY_TITLE) {
-							area = BIBLIOGRAPHY
-						}
+							BIBLIOGRAPHY
+						} else area
 					}
 				}
 				FOOTNOTE -> {
 					if (it.line == 0) {
-						area = if (it.content == BIBLIOGRAPHY_TITLE) {
+						if (it.content == BIBLIOGRAPHY_TITLE) {
 							BIBLIOGRAPHY
 						} else {
 							SECTION
 						}
-					}
+					} else area
 				}
+				else -> area
 			}
 
-			it.area = if (area != TITLE_PAGE &&
-				it.line == (text.filter { line ->
-					line.page == it.page && line.content.isNotEmpty()
-				}.maxOfOrNull { it.line } ?: -1)
-			) {
+			it.area = if (isPageIndex(text, it, area)) {
 				PAGE_INDEX
 			} else {
 				area
@@ -60,15 +56,20 @@ class PDFStructure(val text: List<Text>) {
 	}
 
 	companion object {
-		const val TABLE_OF_CONTENT_TITLE = "Оглавление"
-		const val BIBLIOGRAPHY_TITLE = "Список литературы"
+		private const val TABLE_OF_CONTENT_TITLE = "Оглавление"
+		private const val BIBLIOGRAPHY_TITLE = "Список литературы"
 
 		private const val FOOTNOTE_FONT_SIZE = 6.9738
 
-		fun isFootnote(line: Text) = line.content.isNotEmpty() &&
+		private fun isFootnote(line: Text) = line.content.isNotEmpty() &&
 				line.text.first().text.isNotEmpty() &&
 				floatEquals(line.text.first().font.size, FOOTNOTE_FONT_SIZE) &&
 				line.text.first().text.first().isDigit() &&
 				line.text.first().text.filterNot { it.isDigit() }.isEmpty()
+
+		private fun isPageIndex(text: List<Text>, line: Text, area: PDFArea) = area != TITLE_PAGE &&
+				line.line == (text.filter { textLine ->
+			textLine.page == line.page && textLine.content.isNotEmpty()
+		}.maxOfOrNull { it.line } ?: -1)
 	}
 }

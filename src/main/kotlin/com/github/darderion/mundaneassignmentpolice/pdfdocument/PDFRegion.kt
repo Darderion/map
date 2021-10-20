@@ -5,7 +5,12 @@ infix fun PDFArea.inside(region: PDFRegion) = region.contains(this)
 class PDFRegion private constructor(areas: Set<PDFArea>) {
 	private val areas: MutableSet<PDFArea>
 
-	fun except(vararg areas: PDFArea): PDFRegion {
+	/**
+	 * Method that either adds or removes areas from region depending on if they were already in region or not
+	 * @param areas List of areas to either add or remove from region
+	 * @return PDFRegion
+	 */
+	fun except(vararg areas: PDFArea) = this.also {
 		areas.toSet().forEach {
 			if (this.areas.contains(it)) {
 				this.areas.remove(it)
@@ -13,7 +18,6 @@ class PDFRegion private constructor(areas: Set<PDFArea>) {
 				this.areas.add(it)
 			}
 		}
-		return this
 	}
 
 	init {

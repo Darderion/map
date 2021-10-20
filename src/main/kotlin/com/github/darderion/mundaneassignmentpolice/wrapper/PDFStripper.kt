@@ -17,9 +17,11 @@ class PDFStripper: PDFTextStripper() {
 		for (text: TextPosition in textPositions) {
 			val symbol = text.unicode
 			if (symbol != null && symbol != " ") {
-				symbols.add(
-					Symbol(symbol, Font(text.fontSize), text.xDirAdj to text.yDirAdj)
-				)
+				symbol.forEach {
+					symbols.add(
+						Symbol(it, Font(text.fontSize), text.xDirAdj to text.yDirAdj)
+					)
+				}
 			}
 			/*
 			words.add(text.unicode + " [(X=" + text.xDirAdj + ",Y=" +

@@ -2,23 +2,32 @@ package com.github.darderion.mundaneassignmentpolice.wrapper
 
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.ints.shouldBeExactly
+import io.kotest.matchers.string.shouldContain
 import io.kotest.matchers.string.shouldInclude
+import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFArea.*
+import io.kotest.core.test.TestCase
+import io.kotest.matchers.shouldBe
 
 class PDFBoxTests: StringSpec({
 	"getText should return text from PDF" {
-		val pdfBox = PDFBox()
-
 		pdfBox.getText("src/test/pdf.pdf") shouldInclude "Lorem ipsum"
-
-		// Stripper.getText != TextStripper.getText
-		/*
-		Maecenastinciduntestefciturligulaeuismod,sitametornareestvulputate.Row1Row2Row3Row4024681012Column1Column2Column3
-		Maecenastinciduntestefficiturligulaeuismod,sitametornareestvulputate.
-		 */
 	}
 	"getImages should return correct number of images" {
-		val pdfBox = PDFBox()
-
 		pdfBox.getImages("src/test/pdf.pdf").count() shouldBeExactly 1
 	}
-})
+	"getText should process surrogate pair symbols" {
+		pdfBox.getText("src/test/UTF-16.pdf")
+	}
+	"getText should process ligature symbols" {
+		pdfBox.getText("src/test/cw1.pdf") shouldContain "ffi"
+	}
+}) {
+	override fun beforeEach(testCase: TestCase) {
+		super.beforeEach(testCase)
+		pdfBox = PDFBox()
+	}
+
+	private companion object {
+		var pdfBox = PDFBox()
+	}
+}
