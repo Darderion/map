@@ -20,6 +20,7 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 
 import PDFText from '../classes/PDFText'
 import RuleViolation from '../classes/RuleViolation'
+import Section from '../classes/Section'
 import { ViewMode } from '../classes/ViewMode'
 
 @Component({
@@ -33,6 +34,7 @@ export default class ViewPDF extends Vue {
 	@Prop() private pdfImages!: string[]
 	@Prop() private pdfLines!: PDFText[]
 	@Prop() private pdfRuleViolations!: RuleViolation[]
+	@Prop() private pdfSections: Section[] = []
 
 	private receivedLines = false
 	private receivedRuleViolations = false
@@ -56,7 +58,8 @@ export default class ViewPDF extends Vue {
 					document.getElementById(`pdfLine${it.line}-${it.page}`)!.style.backgroundColor =
 						(it.area == 'BIBLIOGRAPHY') ? '#522' :
 						(it.area == 'TABLE_OF_CONTENT') ? '#225' :
-						(it.area == 'SECTION') ? '#252' :
+						(it.area == 'SECTION') ?
+						(this.pdfSections.filter(section => section.titleIndex == it.documentIndex).length == 1 ? '#252' : `#${(this.pdfSections.filter(section => section.sectionIndex <= it.documentIndex).length * 2) % 10}00`) :
 						(it.area == 'FOOTNOTE') ? '#822' :
 						(it.area == 'PAGE_INDEX') ? '#555' :
 						(it.area == 'TITLE_PAGE') ? '#255' : 'White'
@@ -113,6 +116,11 @@ export default class ViewPDF extends Vue {
 			
 		fetch(`api/viewPDFImages?pdfName=${this.pdfName}`)
 			.then((response) => response.text().then(this.setPDFImages));
+
+		fetch(`api/viewPDFSections?pdfName=${this.pdfName}`)
+			.then((response) => response.text().then(text => {
+				this.pdfSections = JSON.parse(text)
+			}));
 	}
 }
 

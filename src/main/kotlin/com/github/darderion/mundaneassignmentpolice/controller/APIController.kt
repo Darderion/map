@@ -24,6 +24,11 @@ class APIController {
 	fun getPDFText(@RequestParam pdfName: String) =
 		pdfBox.getText("$pdfFolder$pdfName").also { logger.info("ViewPDF(pdfName = $pdfName)") }
 
+	@GetMapping("/api/viewPDFSections")
+	fun getPDFSections(@RequestParam pdfName: String) =
+		pdfBox.getPDF("$pdfFolder$pdfName").also { logger.info("ViewPDFSections(pdfName = $pdfName)") }
+			.areas!!.sections
+
 	@GetMapping("/api/viewPDFLines")
 	fun getPDFLines(@RequestParam pdfName: String) =
 		pdfBox.getLines("$pdfFolder$pdfName").also { logger.info("ViewPDFLines(pdfName = $pdfName)") }
