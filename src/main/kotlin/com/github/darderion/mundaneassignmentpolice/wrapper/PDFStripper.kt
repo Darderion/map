@@ -1,11 +1,11 @@
 package com.github.darderion.mundaneassignmentpolice.wrapper
 
+import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Coordinate
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Font
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Symbol
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Word
 import org.apache.pdfbox.text.PDFTextStripper
 import org.apache.pdfbox.text.TextPosition
-
 
 class PDFStripper: PDFTextStripper() {
 	val symbols: MutableList<Symbol> = mutableListOf()
@@ -19,7 +19,7 @@ class PDFStripper: PDFTextStripper() {
 			if (symbol != null && symbol != " ") {
 				symbol.forEach {
 					symbols.add(
-						Symbol(it, Font(text.fontSize), text.xDirAdj to text.yDirAdj)
+						Symbol(it, Font(text.fontSize), Coordinate(text.xDirAdj to text.yDirAdj))
 					)
 				}
 			}

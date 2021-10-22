@@ -1,10 +1,7 @@
 package com.github.darderion.mundaneassignmentpolice.wrapper
 
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFDocument
-import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Font
-import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Symbol
-import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Text
-import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Word
+import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.*
 import com.github.darderion.mundaneassignmentpolice.utils.imgToBase64String
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.pdmodel.PDResources
@@ -62,7 +59,8 @@ class PDFBox {
 
 		val strippers = listOf(stripper, textStripper)
 
-		for((lineIndex, pageIndex) in (0..document.pages.count).withIndex()) {
+		var lineIndex = 0
+		for(pageIndex in (0..document.pages.count)) {
 			// For each page
 			strippers.forEach {
 				it.startPage = pageIndex + 1
@@ -81,12 +79,13 @@ class PDFBox {
 			val words: MutableList<Word> = mutableListOf()
 			var contentIndex: Int
 			var contentItem: String
-			var coordinates: Pair<Float, Float> = Pair(0.0f, 0.0f)
+			var coordinates = Coordinate(0, 0)
 
 			var stripperIndex = 0
 
 			pdfText.addAll(text.split('\n').mapIndexed { line, content ->
 				// For each line
+				lineIndex++
 				words.clear()
 				word = ""
 				font = null
@@ -130,6 +129,8 @@ class PDFBox {
 				Text(line, pageIndex, lineIndex, words.toList(), coordinates)
 			})
 		}
+
+		document.close()
 
 		return PDFDocument(fileName, pdfText)
 	}

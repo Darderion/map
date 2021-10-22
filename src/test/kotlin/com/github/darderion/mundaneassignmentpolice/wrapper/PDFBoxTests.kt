@@ -1,12 +1,10 @@
 package com.github.darderion.mundaneassignmentpolice.wrapper
 
 import io.kotest.core.spec.style.StringSpec
+import io.kotest.core.test.TestCase
 import io.kotest.matchers.ints.shouldBeExactly
 import io.kotest.matchers.string.shouldContain
 import io.kotest.matchers.string.shouldInclude
-import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFArea.*
-import io.kotest.core.test.TestCase
-import io.kotest.matchers.shouldBe
 
 class PDFBoxTests: StringSpec({
 	"getText should return text from PDF" {

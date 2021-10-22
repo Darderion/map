@@ -4,7 +4,7 @@ import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFArea
 
 class Text(val line: Int, val page: Int, val documentIndex: Int,
 		   val text: List<Word>,
-		   val position: Pair<Float, Float>
+		   val position: Coordinate
 ) {
 	val content: String
 	get() = text.joinToString("") { it.text }

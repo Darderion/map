@@ -1,15 +1,17 @@
 package com.github.darderion.mundaneassignmentpolice.pdfdocument
 
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Text
+import java.lang.Exception
 
-class PDFDocument(val name: String, text: List<Text>) {
+class PDFDocument(val name: String, val text: List<Text>) {
 	override fun toString() = "PDF: $name\n" +
 			text.joinToString("\n") { it.toString() }
 
-	val text: List<Text>
-		get() = areas.text
-
-	val areas: PDFStructure = PDFStructure(text)
+	val areas: PDFStructure? = try {
+		PDFStructure(text)
+	} catch (e: Exception) {
+		null
+	}
 
 	fun toHTMLString() = text.joinToString("<br>") { it.content }
 
