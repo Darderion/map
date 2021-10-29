@@ -2,12 +2,13 @@ package com.github.darderion.mundaneassignmentpolice.pdfdocument
 
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Text
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFArea.*
+import com.github.darderion.mundaneassignmentpolice.pdfdocument.list.PDFList
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Section
 import com.github.darderion.mundaneassignmentpolice.utils.floatEquals
 import java.util.*
 
 class PDFStructure(text: List<Text>) {
-	val lists: List<PDFList<String>> = listOf()
+	val lists: List<PDFList<Text>>
 	val sections: List<Section>
 	val tableOfContents: PDFList<String>
 
@@ -72,9 +73,7 @@ class PDFStructure(text: List<Text>) {
 				.dropLastWhile { it == ' ' || it == '.' }			// THIS FILTER ASSUMES THAT DOCUMENT CONTAINS
 			}														//	LESS THAN 100 PAGES
 
-		val sectionsTitlesWithIndexes = listOf("1. ${sectionsTitles[0]}") + sectionsTitles.drop(1).dropLast(1) + "${
-			sectionsTitles.map { "${it[0]}${it[1]}".filter { it.isDigit() } }.filter { it.isNotEmpty() }.maxOf { it.toInt() } + 2
-		}. ${sectionsTitles[sectionsTitles.count() - 1]}"
+		val sectionsTitlesWithIndexes = sectionsTitles.map { if (it.contains('.')) it else ". $it" }
 		
 		val sectionText = text.filter { it.area == SECTION }
 
@@ -112,6 +111,22 @@ class PDFStructure(text: List<Text>) {
 
 			stack.peek().nodes.add(PDFList(item))
 		}
+
+		lists = PDFList.getLists(text.filter { line ->
+			line.area == SECTION && !isSectionTitle(line) && line.content.isNotEmpty()
+		})
+
+		if (text.none { it.area == SECTION			}) throw Error("No content section in PDF")
+		if (text.none { it.area == TABLE_OF_CONTENT	}) throw Error("No TABLE_OF_CONTENT in PDF")
+		if (text.none { it.area == BIBLIOGRAPHY		}) throw Error("No BIBLIOGRAPHY in PDF")
+	}
+
+	private fun isSectionTitle(line: Text) = sections.any {
+		(if (it.sectionIndex == it.titleIndex + 2)
+			line.documentIndex == it.titleIndex + 1
+		else
+			false) ||
+				line.documentIndex == it.titleIndex
 	}
 
 	companion object {

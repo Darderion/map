@@ -48,7 +48,7 @@ class SymbolRule(
 
 				if (neighbors.any { disallowedNeighbors.contains(it) } ||
 					(requiredNeighbors.isNotEmpty() && neighbors.any { !requiredNeighbors.contains(it) })) {
-					rulesViolations.add(RuleViolation(pdfText.line, pdfText.page, name))
+					rulesViolations.add(RuleViolation(listOf(pdfText), name))
 				}
 			}
 		}

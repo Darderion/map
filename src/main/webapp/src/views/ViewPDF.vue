@@ -44,22 +44,28 @@ export default class ViewPDF extends Vue {
 	updatePDFView() {
 		if (this.receivedLines && this.receivedRuleViolations) {
 			this.pdfLines.forEach(it => {
+				if (!document.getElementById(`pdfLine${it.line}-${it.page}`)) {
+					console.log(it.line + " " + it.page)
+				}
 				document.getElementById(`pdfLine${it.line}-${it.page}`)!.style.backgroundColor = 'white'
 				document.getElementById(`pdfLine${it.line}-${it.page}`)!.style.color = 'black'
 			})
 			if (this.viewMode == ViewMode.Rules) {
 				this.pdfRuleViolations.forEach(it => {
-					document.getElementById(`pdfLine${it.line}-${it.page}`)!.style.backgroundColor = 'red'
+					it.lines.forEach(it => {
+						document.getElementById(`pdfLine${it.line}-${it.page}`)!.style.backgroundColor = 'red'
+					})
 				})
 			}
 			if (this.viewMode == ViewMode.Areas) {
+				console.log(this.pdfLines)
 				this.pdfLines.forEach(it => {
 				document.getElementById(`pdfLine${it.line}-${it.page}`)!.style.color = 'white'
 					document.getElementById(`pdfLine${it.line}-${it.page}`)!.style.backgroundColor =
 						(it.area == 'BIBLIOGRAPHY') ? '#522' :
 						(it.area == 'TABLE_OF_CONTENT') ? '#225' :
-						(it.area == 'SECTION') ?
-						(this.pdfSections.filter(section => section.titleIndex == it.documentIndex).length == 1 ? '#252' : `#${(this.pdfSections.filter(section => section.sectionIndex <= it.documentIndex).length * 2) % 10}00`) :
+						(it.area == 'SECTION') ? '#252' :
+						// (this.pdfSections.filter(section => section.titleIndex == it.documentIndex).length == 1 ? '#252' : `#${(this.pdfSections.filter(section => section.sectionIndex <= it.documentIndex).length * 2) % 10}00`) :
 						(it.area == 'FOOTNOTE') ? '#822' :
 						(it.area == 'PAGE_INDEX') ? '#555' :
 						(it.area == 'TITLE_PAGE') ? '#255' : 'White'

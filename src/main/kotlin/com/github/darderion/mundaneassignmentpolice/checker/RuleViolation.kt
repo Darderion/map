@@ -1,5 +1,7 @@
 package com.github.darderion.mundaneassignmentpolice.checker
 
-class RuleViolation(val line: Int, val page: Int, val message: String) {
-	override fun toString() = "[$line, p.$page] --> '$message'"
+import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Text
+
+data class RuleViolation(val lines: List<Text>, val message: String) {
+	// override fun toString() = if (lines.count() == 1) "[${lines.first().line}, p.${lines.first().page}] --> '$message'" else ""
 }

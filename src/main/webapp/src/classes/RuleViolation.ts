@@ -1,12 +1,12 @@
 
+import PDFText from "./PDFText";
+
 export default class RuleViolation {
-	line: Number;
-	page: Number;
+	lines: PDFText[]
 	message: String;
 
-	constructor(line: Number, page: Number, message: String) {
-		this.line = line
-		this.page = page
+	constructor(lines: PDFText[], message: String) {
+		this.lines = lines
 		this.message = message
 	}
 }

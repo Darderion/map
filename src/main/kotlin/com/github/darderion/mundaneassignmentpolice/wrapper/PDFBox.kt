@@ -18,10 +18,14 @@ class PDFBox {
 	val recentDocuments: HashMap<String, PDDocument> = hashMapOf()
 
 	private fun getDocument(fileName: String): PDDocument {
+		/*
 		if (!recentDocuments.contains(fileName)) {
 			recentDocuments[fileName] = PDDocument.load(File(fileName))
 		}
 		val document = recentDocuments[fileName]!!
+		 */
+
+		val document = PDDocument.load(File(fileName))
 
 		val accessPermission = document.currentAccessPermission
 		if (!accessPermission.canExtractContent()) {
@@ -91,10 +95,6 @@ class PDFBox {
 				font = null
 				contentIndex = 0
 
-				if (content.isNotEmpty()) {
-					coordinates = stripper.symbols[stripperIndex].position
-				}
-
 				while (contentIndex < content.length) {
 					// For each symbol
 					contentItem = if (content.hasSurrogatePairAt(contentIndex)) {
@@ -105,7 +105,7 @@ class PDFBox {
 					contentIndex += contentItem.length
 
 					if (contentItem == " ") {
-						words.add(Word(word, font?: Font(0.0f)))
+						words.add(Word(word, font?: Font(0.0f), coordinates))
 						words.add(Word.spaceCharacter)
 						font = null
 						word = ""
@@ -114,19 +114,22 @@ class PDFBox {
 						if (font == null) font = symb.font
 
 						if (symb.font != font) {
-							words.add(Word(word, font!!))
+							words.add(Word(word, font!!, coordinates))
 							font = symb.font
 							word = symb.toString()
 						} else {
+							if (word.isEmpty()) {
+								coordinates = stripper.symbols[stripperIndex].position
+							}
 							word += symb
 						}
 						stripperIndex++
 					}
 				}
 				if (font == null && word.isEmpty()) font = Font(0.0f)
-				words.add(Word(word, font!!))
+				words.add(Word(word, font!!, coordinates))
 
-				Text(line, pageIndex, lineIndex, words.toList(), coordinates)
+				Text(line, pageIndex, lineIndex, words.toList())
 			})
 		}
 

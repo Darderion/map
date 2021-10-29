@@ -1,6 +1,7 @@
 package com.github.darderion.mundaneassignmentpolice.pdfdocument
 
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFArea.*
+import com.github.darderion.mundaneassignmentpolice.pdfdocument.list.PDFList
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Section
 import com.github.darderion.mundaneassignmentpolice.wrapper.PDFBox
 import io.kotest.core.spec.style.StringSpec
@@ -15,6 +16,9 @@ class PDFDocumentTests: StringSpec({
 	}
 	"PDFDocument should contain TABLE_OF_CONTENT's lines" {
 		PDFDocument("pdf.pdf", lines).text.any { it.area == TABLE_OF_CONTENT } shouldBe true
+	}
+	"PDFDocument's areas should not be initialized if PDF doesn't contain TABLE_OF_CONTENT" {
+		PDFBox().getPDF("src/test/pdf.pdf").areas shouldBe null
 	}
 	"PDFDocument should contain SECTION's lines" {
 		PDFDocument("pdf.pdf", lines).text.any { it.area == SECTION } shouldBe true
