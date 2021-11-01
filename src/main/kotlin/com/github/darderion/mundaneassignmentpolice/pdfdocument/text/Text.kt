@@ -2,7 +2,7 @@ package com.github.darderion.mundaneassignmentpolice.pdfdocument.text
 
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFArea
 
-class Text(val line: Int, val page: Int, val documentIndex: Int,
+data class Text(val line: Int, val page: Int, val documentIndex: Int,
 		   val text: List<Word>, var area: PDFArea? = null
 ) {
 	val content: String

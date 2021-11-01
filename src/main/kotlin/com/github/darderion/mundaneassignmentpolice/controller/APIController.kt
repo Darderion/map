@@ -14,8 +14,6 @@ import mu.KotlinLogging
 
 const val pdfFolder = "build/"
 
-private val logger = KotlinLogging.logger {}
-
 @RestController
 class APIController {
 	val pdfBox = PDFBox()
@@ -50,5 +48,9 @@ class APIController {
 		FileUploadUtil.saveFile(pdfFolder, fileName, multipartFile)
 		logger.info("UploadPDF(pdfName = $fileName)")
 		return RedirectView("/#/viewPDF?pdfName=$fileName", true)
+	}
+
+	private companion object {
+		private val logger = KotlinLogging.logger {}
 	}
 }

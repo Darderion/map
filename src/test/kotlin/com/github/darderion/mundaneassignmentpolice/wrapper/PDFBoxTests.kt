@@ -1,5 +1,6 @@
 package com.github.darderion.mundaneassignmentpolice.wrapper
 
+import com.github.darderion.mundaneassignmentpolice.TestsConfiguration.Companion.resourceFolder
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.core.test.TestCase
 import io.kotest.matchers.ints.shouldBeExactly
@@ -8,16 +9,16 @@ import io.kotest.matchers.string.shouldInclude
 
 class PDFBoxTests: StringSpec({
 	"getText should return text from PDF" {
-		pdfBox.getText("src/test/pdf.pdf") shouldInclude "Lorem ipsum"
+		pdfBox.getText(filePathPDF) shouldInclude "Lorem ipsum"
 	}
 	"getImages should return correct number of images" {
-		pdfBox.getImages("src/test/pdf.pdf").count() shouldBeExactly 1
+		pdfBox.getImages(filePathPDF).count() shouldBeExactly 1
 	}
 	"getText should process surrogate pair symbols" {
-		pdfBox.getText("src/test/UTF-16.pdf")
+		pdfBox.getText(filePathUTF)
 	}
 	"getText should process ligature symbols" {
-		pdfBox.getText("src/test/cw1.pdf") shouldContain "ffi"
+		pdfBox.getText(filePathPDF) shouldContain "ffi"
 	}
 }) {
 	override fun beforeEach(testCase: TestCase) {
@@ -26,6 +27,9 @@ class PDFBoxTests: StringSpec({
 	}
 
 	private companion object {
+		const val filePathPDF = "${resourceFolder}wrapper/PDFBoxTestsCW.pdf"
+		const val filePathUTF = "${resourceFolder}wrapper/PDFBoxTestsUTF.pdf"
+
 		var pdfBox = PDFBox()
 	}
 }

@@ -25,6 +25,13 @@ data class PDFList<T>(val value: MutableList<T> = mutableListOf(), val nodes: Mu
 	}
 
 	companion object {
+		/**
+		 * Get a list of all <ENUMERATE> and <ITEMIZE> lists from a PDF
+		 * This only works if the deepest sublist of a list is no deeper than SUB-SUB-SUB-list
+		 * This method can't process nested lists of different types
+		 * @param lines Text lines
+		 * @return List of <ENUMERATE> and <ITEMIZE> lists
+		 */
 		fun getLists(lines: List<Text>): List<PDFList<Text>> {
 			// Adding a line to process a text that has no lines after a list
 			val lines = lines + Text(-1, -1, -1, listOf(Word("NOT A LIST ITEM", Font(0.0f), Coordinate(1000, -1))))
@@ -54,8 +61,8 @@ data class PDFList<T>(val value: MutableList<T> = mutableListOf(), val nodes: Mu
 								lists.add(stack.first())
 								stack.clear()
 							}
-						} else {
-							while (!(	stack.isEmpty() ||
+						} else {							//		lorem	OR		lorem	OR		...	lorem	OR		... lorem
+							while (!(	stack.isEmpty() ||	//	lorem			2. lorem		lorem				2. lorem
 										previousPosition hasSameXAs line.drop(2).position ||
 										previousPosition hasSameXAs line.position)) {
 								previousList = stack.pop()

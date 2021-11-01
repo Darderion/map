@@ -7,6 +7,7 @@ import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFArea.*
 import com.github.darderion.mundaneassignmentpolice.wrapper.PDFBox
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.ints.shouldBeExactly
+import com.github.darderion.mundaneassignmentpolice.TestsConfiguration.Companion.resourceFolder
 
 class SymbolRuleTests: StringSpec({
 	"Symbol rule should detect incorrect symbols ? in links" {
@@ -15,7 +16,7 @@ class SymbolRuleTests: StringSpec({
 			.ignoringAdjusting(*" ,0123456789".toCharArray())
 			.shouldNotHaveNeighbor(*"[]".toCharArray())
 			.getRule()
-			.process(PDFBox().getPDF("src/test/cw1.pdf").also { it.text.forEach(::println) }).count() shouldBeExactly 4
+			.process(PDFBox().getPDF(filePath)).count() shouldBeExactly 4
 	}
 	"Symbol rule should detect incorrect usage of - symbol" {
 		val shortDash = '-'
@@ -24,7 +25,7 @@ class SymbolRuleTests: StringSpec({
 			.symbol(shortDash)
 			.shouldHaveNeighbor(*"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".toCharArray())
 			.shouldHaveNeighbor(*"абвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ".toCharArray())
-			.getRule().process(PDFBox().getPDF("src/test/cw1.pdf")).count() shouldBeExactly 2
+			.getRule().process(PDFBox().getPDF(filePath)).count() shouldBeExactly 2
 	}
 	"Symbol rule should detect incorrect usage of -- symbol" {
 		val mediumDash = '–'
@@ -32,7 +33,7 @@ class SymbolRuleTests: StringSpec({
 		SymbolRuleBuilder()
 			.symbol(mediumDash)
 			.shouldHaveNeighbor(*"0123456789".toCharArray())
-			.getRule().process(PDFBox().getPDF("src/test/cw1.pdf")).count() shouldBeExactly 3
+			.getRule().process(PDFBox().getPDF(filePath)).count() shouldBeExactly 3
 	}
 	"Symbol rule should detect incorrect usage of --- symbol" {
 		val longDash = '—'
@@ -40,13 +41,13 @@ class SymbolRuleTests: StringSpec({
 		SymbolRuleBuilder()
 			.symbol(longDash)
 			.shouldHaveNeighbor(' ')
-			.getRule().process(PDFBox().getPDF("src/test/cw1.pdf")).count() shouldBeExactly 1
+			.getRule().process(PDFBox().getPDF(filePath)).count() shouldBeExactly 1
 
 		SymbolRuleBuilder()
 			.symbol(longDash)
 			.ignoringAdjusting(' ')
 			.shouldNotHaveNeighbor(*"0123456789".toCharArray())
-			.getRule().process(PDFBox().getPDF("src/test/cw1.pdf")).count() shouldBeExactly 2
+			.getRule().process(PDFBox().getPDF(filePath)).count() shouldBeExactly 2
 	}
 	"Symbol rule should only search for rule violations in its region" {
 		val mediumDash = '–'
@@ -57,8 +58,12 @@ class SymbolRuleTests: StringSpec({
 
 		for(area in PDFArea.values()) {
 			symbolBuilder.inArea(PDFRegion.NOWHERE.except(area))
-				.getRule().process(PDFBox().getPDF("src/test/cw1.pdf")).count() shouldBeExactly
+				.getRule().process(PDFBox().getPDF(filePath)).count() shouldBeExactly
 					if (area == SECTION) 3 else 0
 		}
 	}
-})
+}) {
+	private companion object {
+		const val filePath = "${resourceFolder}checker/SymbolRuleTests.pdf"
+	}
+}

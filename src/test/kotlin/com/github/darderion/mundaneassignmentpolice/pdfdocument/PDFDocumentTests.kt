@@ -6,31 +6,32 @@ import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Section
 import com.github.darderion.mundaneassignmentpolice.wrapper.PDFBox
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
+import com.github.darderion.mundaneassignmentpolice.TestsConfiguration.Companion.resourceFolder
 
 class PDFDocumentTests: StringSpec({
 	"PDFDocument should contain TITLE_PAGE's lines" {
-		PDFDocument("pdf.pdf", lines).text.any { it.area == TITLE_PAGE } shouldBe true
+		PDFDocument(text = lines).text.any { it.area == TITLE_PAGE } shouldBe true
 	}
 	"PDFDocument should contain PAGE_INDEX's lines" {
-		PDFDocument("pdf.pdf", lines).text.any { it.area == PAGE_INDEX } shouldBe true
+		PDFDocument(text = lines).text.any { it.area == PAGE_INDEX } shouldBe true
 	}
 	"PDFDocument should contain TABLE_OF_CONTENT's lines" {
-		PDFDocument("pdf.pdf", lines).text.any { it.area == TABLE_OF_CONTENT } shouldBe true
+		PDFDocument(text = lines).text.any { it.area == TABLE_OF_CONTENT } shouldBe true
 	}
 	"PDFDocument's areas should not be initialized if PDF doesn't contain TABLE_OF_CONTENT" {
-		PDFBox().getPDF("src/test/pdf.pdf").areas shouldBe null
+		PDFBox().getPDF(filePathPDF).areas shouldBe null
 	}
 	"PDFDocument should contain SECTION's lines" {
-		PDFDocument("pdf.pdf", lines).text.any { it.area == SECTION } shouldBe true
+		PDFDocument(text = lines).text.any { it.area == SECTION } shouldBe true
 	}
 	"PDFDocument should contain FOOTNOTE's lines" {
-		PDFDocument("pdf.pdf", lines).text.any { it.area == FOOTNOTE } shouldBe true
+		PDFDocument(text = lines).text.any { it.area == FOOTNOTE } shouldBe true
 	}
 	"PDFDocument should contain BIBLIOGRAPHY's lines" {
-		PDFDocument("pdf.pdf", lines).text.any { it.area == BIBLIOGRAPHY } shouldBe true
+		PDFDocument(text = lines).text.any { it.area == BIBLIOGRAPHY } shouldBe true
 	}
 	"PDFDocument should contain sections with section's title, section's index and section's content index" {
-		val document = PDFDocument("pdf.pdf", lines)
+		val document = PDFDocument(text = lines)
 
 		val sections = document.areas!!.sections
 
@@ -41,7 +42,7 @@ class PDFDocumentTests: StringSpec({
 		}
 	}
 	"PDFDocument should contain PDFList with sections' titles" {
-		val document = PDFDocument("pdf.pdf", lines)
+		val document = PDFDocument(text = lines)
 
 		val sections = document.areas!!.tableOfContents
 
@@ -81,7 +82,10 @@ class PDFDocumentTests: StringSpec({
 	}
 }) {
 	private companion object {
-		private val lines = PDFBox().getLines("src/test/cw1.pdf")
+		const val filePathCW = "${resourceFolder}pdfdocument/PDFDocumentTestsCW.pdf"
+		const val filePathPDF = "${resourceFolder}pdfdocument/PDFDocumentTestsPDF.pdf"
+
+		private val lines = PDFBox().getLines(filePathCW)
 
 		private val contentSections = listOf(
 			Section("Introduction",													55),
