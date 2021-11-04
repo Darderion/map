@@ -13,6 +13,8 @@ class PDFBoxTests: StringSpec({
 	}
 	"getImages should return correct number of images" {
 		pdfBox.getImages(filePathPDF).count() shouldBeExactly 1
+
+		pdfBox.getImages(filePathUTF).count() shouldBeExactly 0
 	}
 	"getText should process surrogate pair symbols" {
 		pdfBox.getText(filePathUTF)

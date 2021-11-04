@@ -7,10 +7,10 @@ import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Text
 
 class ListRuleBuilder {
 	private var region: PDFRegion = PDFRegion.EVERYWHERE
-	private val predicates: MutableList<(list: PDFList<Text>) -> Boolean> = mutableListOf()
+	private val predicates: MutableList<(list: PDFList<Text>) -> List<Text>> = mutableListOf()
 	private var name: String = "Rule name"
 
-	fun disallow(predicate: (list: PDFList<Text>) -> Boolean) = this.also { predicates.add(predicate) }
+	fun disallow(predicate: (list: PDFList<Text>) -> List<Text>) = this.also { predicates.add(predicate) }
 
 	infix fun inArea(area: PDFArea) = this.also { region = PDFRegion.NOWHERE.except(area) }
 

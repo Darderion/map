@@ -10,18 +10,38 @@ data class PDFList<T>(val value: MutableList<T> = mutableListOf(), val nodes: Mu
 	constructor(item: T): this(mutableListOf(item))
 	constructor(item: T, nodes: List<PDFList<T>>): this(mutableListOf(item), nodes.toMutableList())
 
-	fun print() {
-		nodes.forEach { it.printWithText() }
+	fun <Item> map(map: (value: T) -> Item): PDFList<Item> = PDFList(value.map { map(it) }.toMutableList(), nodes.map { it.map(map) }.toMutableList())
+
+	override fun toString() = nodes.joinToString("\n") { it.toStringWithText() }
+
+	fun text() = value.joinToString("\n")
+
+	fun getText(): List<T> {
+		val list = mutableListOf<T>()
+		value.forEach { list.add(it) }
+		nodes.forEach { list.addAll(it.getText()) }
+		return list
 	}
 
-	private fun printWithText(listCount: Int = 1) {
+	private fun toStringWithText(listCount: Int = 1, map: ((value: T) -> String)? = null): String {
+		var line = ""
 		value.forEach {
-			for (i in 0 until listCount) print("->")
-			println(it)
+			for (i in 0 until listCount) line += "->"
+			line += "${
+				if (map == null) it.toString() else map(it)
+			}\n"
 		}
 		nodes.forEach {
-			it.printWithText(listCount + 1)
+			line += it.toStringWithText(listCount + 1, map)
 		}
+		return line
+	}
+
+	fun getSublists(): List<PDFList<T>> {
+		val sublists = mutableListOf(this)
+		sublists.addAll(this.nodes.map { it.getSublists() }.flatten())
+
+		return sublists
 	}
 
 	companion object {
