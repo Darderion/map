@@ -4,15 +4,16 @@ import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFDocument
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.*
 import com.github.darderion.mundaneassignmentpolice.utils.imgToBase64String
 import org.apache.pdfbox.pdmodel.PDDocument
+import org.apache.pdfbox.pdmodel.PDPageContentStream
 import org.apache.pdfbox.pdmodel.PDResources
+import org.apache.pdfbox.pdmodel.font.PDFont
+import org.apache.pdfbox.pdmodel.font.PDType1Font
 import org.apache.pdfbox.pdmodel.graphics.form.PDFormXObject
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject
 import org.apache.pdfbox.text.PDFTextStripper
 import java.awt.image.RenderedImage
-import java.io.ByteArrayOutputStream
-import java.io.File
-import java.io.OutputStreamWriter
-import java.io.Writer
+import java.io.*
+
 
 class PDFBox {
 	val recentDocuments: HashMap<String, PDDocument> = hashMapOf()
@@ -48,6 +49,37 @@ class PDFBox {
 	 * @return lines of text content
 	 */
 	fun getLines(fileName: String) = getPDF(fileName).text
+
+	private fun editPDF(document: PDDocument, page: Int, functionBody: (contentStream: PDPageContentStream) -> Unit): PDDocument {
+		try {
+			val contentStream = PDPageContentStream(
+				document,
+				document.documentCatalog.pages[page],
+				PDPageContentStream.AppendMode.APPEND,
+				true
+			)
+			functionBody(contentStream)
+			contentStream.close()
+		} catch (e: IOException) {
+			e.printStackTrace()
+		}
+		return document
+	}
+
+	fun addText(document: PDDocument, page: Int, text: String, position: Coordinate) = editPDF(document, page) {
+		val font: PDFont = PDType1Font.HELVETICA_BOLD
+		it.beginText()
+		it.setFont(font, 12f)
+		it.moveTextPositionByAmount(position.x, position.y)
+		it.drawString(text)
+		it.endText()
+	}
+
+	fun addLine(document: PDDocument, page: Int, position: Coordinate, width: Int) = editPDF(document, page) {
+		it.moveTo(position.x, position.y)
+		it.lineTo(position.x + width, position.y)
+		it.stroke()
+	}
 
 	/**
 	 * Returns PDFDocument object

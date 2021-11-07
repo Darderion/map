@@ -24,7 +24,7 @@ class ListRuleTests: StringSpec({
 			.disallow {
 				if (it.nodes.count() == 1) it.getText() else listOf()
 			}.getRule()
-			.process(PDFBox().getPDF(filePathSection)).count() shouldBeExactly 2
+			.process(PDFBox().getPDF(filePathSection)).count() shouldBeExactly 3
 	}
 }) {
 	private companion object {

@@ -1,11 +1,14 @@
 package com.github.darderion.mundaneassignmentpolice.wrapper
 
 import com.github.darderion.mundaneassignmentpolice.TestsConfiguration.Companion.resourceFolder
+import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Coordinate
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.core.test.TestCase
 import io.kotest.matchers.ints.shouldBeExactly
 import io.kotest.matchers.string.shouldContain
 import io.kotest.matchers.string.shouldInclude
+import org.apache.pdfbox.pdmodel.PDDocument
+import java.io.File
 
 class PDFBoxTests: StringSpec({
 	"getText should return text from PDF" {

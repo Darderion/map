@@ -83,7 +83,7 @@ data class PDFList<T>(val value: MutableList<T> = mutableListOf(), val nodes: Mu
 							}
 						} else {							//		lorem	OR		lorem	OR		...	lorem	OR		... lorem
 							while (!(	stack.isEmpty() ||	//	lorem			2. lorem		lorem				2. lorem
-										previousPosition hasSameXAs line.drop(2).position ||
+										(isListItem(line) && previousPosition hasSameXAs line.drop(2).position) ||
 										previousPosition hasSameXAs line.position)) {
 								previousList = stack.pop()
 								if (stack.isNotEmpty()) {
