@@ -27,6 +27,14 @@ Supported mistakes that can be caught:
 <!-- USAGE EXAMPLES -->
 ## Usage
 
+* Docker:
+    * `$ docker build -t map .`
+    * `$ docker run --rm -it -p 8080:8080 map:latest`
+* Maven:
+    * `$ mvn package`
+    * `$ cd target`
+    * `$ java -jar mundane-assignment-police-0.0.1-SNAPSHOT.jar`
+
 1. Upload your PDF file
 2. Review mistakes
 
