@@ -1,8 +1,10 @@
 package com.github.darderion.mundaneassignmentpolice.checker
 
+import com.github.darderion.mundaneassignmentpolice.checker.rule.ListRuleBuilder
 import com.github.darderion.mundaneassignmentpolice.checker.rule.SymbolRuleBuilder
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFArea.*
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFRegion.Companion.EVERYWHERE
+import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFRegion.Companion.NOWHERE
 import com.github.darderion.mundaneassignmentpolice.wrapper.PDFBox
 
 class Checker {
@@ -53,12 +55,19 @@ class Checker {
 			.inArea(EVERYWHERE.except(BIBLIOGRAPHY, FOOTNOTE))
 			.getRule()
 
+		val listRule = ListRuleBuilder()
+			.inArea(NOWHERE.except(TABLE_OF_CONTENT, SECTION))
+			.disallow {
+				if (it.nodes.count() == 1) it.nodes.first().getText() else listOf()
+			}.getRule()
+
 		return listOf(
 			litlinkRule,
 			shortDashRuleLeft,
 			shortDashRuleRight,
 			mediumDashRule,
-			longDashRule
+			longDashRule,
+			listRule
 		).map {
 			it.process(document)
 		}.flatten()

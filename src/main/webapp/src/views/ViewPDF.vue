@@ -4,7 +4,7 @@
 		<Keypress key-event="keyup" :key-code="69" @success="switchToRulesView" />
 		<Keypress key-event="keyup" :key-code="83" @success="switchToAreasView" />
 		<div id="ruleViolationsDiv">
-			<a v-for="ruleViolation in this.pdfRuleViolations" :href="`#pdfLine${ruleViolation.line}-${ruleViolation.page}`" :key="ruleViolation.toString() + (new Date()).getTime()">{{ruleViolation.message}} --> Line {{ruleViolation.line}}, page {{ruleViolation.page}}<br></a>
+			<a v-for="ruleViolation in this.pdfRuleViolations" :href="`#pdfLine${ruleViolation.lines[0].line}-${ruleViolation.lines[0].page}`" :key="ruleViolation.toString() + (new Date()).getTime()">{{ruleViolation.message}} --> Line {{ruleViolation.lines[0].line}}, page {{ruleViolation.lines[0].page}}<br></a>
 		</div>
 		Text:
 		<div v-for="text in this.pdfLines" :key="text.toString() + (new Date()).getTime()" :id="`pdfLine${text.line}-${text.page}`" v-html="text.content"></div>
@@ -28,6 +28,7 @@ import { ViewMode } from '../classes/ViewMode'
 		Keypress: () => import('vue-keypress')
 	},
 })
+
 export default class ViewPDF extends Vue {
 	@Prop() private pdfName!: string;
 	@Prop() private pdfText!: string
@@ -51,6 +52,7 @@ export default class ViewPDF extends Vue {
 				document.getElementById(`pdfLine${it.line}-${it.page}`)!.style.color = 'black'
 			})
 			if (this.viewMode == ViewMode.Rules) {
+				console.log(this.pdfRuleViolations)
 				this.pdfRuleViolations.forEach(it => {
 					it.lines.forEach(it => {
 						document.getElementById(`pdfLine${it.line}-${it.page}`)!.style.backgroundColor = 'red'
@@ -60,7 +62,7 @@ export default class ViewPDF extends Vue {
 			if (this.viewMode == ViewMode.Areas) {
 				console.log(this.pdfLines)
 				this.pdfLines.forEach(it => {
-				document.getElementById(`pdfLine${it.line}-${it.page}`)!.style.color = 'white'
+					document.getElementById(`pdfLine${it.line}-${it.page}`)!.style.color = 'white'
 					document.getElementById(`pdfLine${it.line}-${it.page}`)!.style.backgroundColor =
 						(it.area == 'BIBLIOGRAPHY') ? '#522' :
 						(it.area == 'TABLE_OF_CONTENT') ? '#225' :

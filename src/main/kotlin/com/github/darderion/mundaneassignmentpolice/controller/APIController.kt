@@ -4,13 +4,11 @@ import com.github.darderion.mundaneassignmentpolice.checker.Checker
 import com.github.darderion.mundaneassignmentpolice.utils.FileUploadUtil
 import com.github.darderion.mundaneassignmentpolice.wrapper.PDFBox
 import org.springframework.util.StringUtils
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.servlet.view.RedirectView
 import mu.KotlinLogging
+import org.springframework.web.bind.annotation.*
+import java.io.File
 
 const val pdfFolder = "build/"
 
@@ -49,6 +47,10 @@ class APIController {
 		logger.info("UploadPDF(pdfName = $fileName)")
 		return RedirectView("/#/viewPDF?pdfName=$fileName", true)
 	}
+
+	@GetMapping("api/getPDF")
+	@ResponseBody
+	fun getPDF(@RequestParam("pdfName") fileName: String) = File(fileName).readBytes()
 
 	private companion object {
 		private val logger = KotlinLogging.logger {}

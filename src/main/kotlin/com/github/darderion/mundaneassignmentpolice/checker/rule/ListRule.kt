@@ -10,10 +10,10 @@ import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Text
 
 class ListRule(
 	val predicates: List<(list: PDFList<Text>) -> List<Text>>,
-	val area: PDFRegion,
-	private val name: String
-	) {
-	fun process(document: PDFDocument): List<RuleViolation> {
+	area: PDFRegion,
+	name: String
+	): Rule(area, name) {
+	override fun process(document: PDFDocument): List<RuleViolation> {
 		val rulesViolations: MutableSet<RuleViolation> = mutableSetOf()
 
 		val lists = mutableListOf<PDFList<Text>>()

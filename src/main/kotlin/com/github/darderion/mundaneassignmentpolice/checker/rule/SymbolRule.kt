@@ -19,17 +19,17 @@ class SymbolRule(
 	private val requiredNeighbors: MutableList<Char>,
 	private val direction: Direction,
 	private val neighborhoodSize: Int,
-	private val region: PDFRegion,
-	private val name: String
-) {
-	fun process(document: PDFDocument): List<RuleViolation> {
+	area: PDFRegion,
+	name: String
+): Rule(area, name) {
+	override fun process(document: PDFDocument): List<RuleViolation> {
 		val rulesViolations: MutableList<RuleViolation> = mutableListOf()
 
-		document.text.filter { it.area!! inside region }.forEachIndexed { index, pdfText ->
+		document.text.filter { it.area!! inside area }.forEachIndexed { index, pdfText ->
 			pdfText.content.indicesOf(symbol.toString()).forEach {
-				val symbolIndex = it + document.getTextFromLines(index - neighborhoodSize, index - 1, region).length +
+				val symbolIndex = it + document.getTextFromLines(index - neighborhoodSize, index - 1, area).length +
 						2*neighborhoodSize.coerceAtMost(index)
-				val text = document.getTextFromLines(index - neighborhoodSize, index + neighborhoodSize, region)
+				val text = document.getTextFromLines(index - neighborhoodSize, index + neighborhoodSize, area)
 
 				val sideTexts = mutableListOf(
 					text.slice(IntRange(0, symbolIndex - 1)).reversed(),
