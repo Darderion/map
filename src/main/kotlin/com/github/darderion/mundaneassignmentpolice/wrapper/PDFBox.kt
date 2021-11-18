@@ -17,6 +17,7 @@ import java.io.*
 
 class PDFBox {
 	val recentDocuments: HashMap<String, PDDocument> = hashMapOf()
+	val recentDocumentsSizes: HashMap<String, Int> = hashMapOf()
 
 	private fun getDocument(fileName: String): PDDocument {
 		/*
@@ -168,6 +169,13 @@ class PDFBox {
 		document.close()
 
 		return PDFDocument(fileName, pdfText)
+	}
+
+	fun getPDFSize(fileName: String): Int {
+		if (!recentDocumentsSizes.contains(fileName)) {
+			recentDocumentsSizes[fileName] = PDDocument.load(File(fileName)).numberOfPages
+		}
+		return recentDocumentsSizes[fileName]!!
 	}
 
 	/**

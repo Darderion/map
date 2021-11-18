@@ -1,12 +1,12 @@
 
 export default class PDFText {
-	line: Number;
-	page: Number;
-	documentIndex: Number;
-	content: String;
-	area: String;
+	line: number;
+	page: number;
+	documentIndex: number;
+	content: string;
+	area: string;
 
-	constructor(line: Number, page: Number, documentIndex: Number, content: String, area: String) {
+	constructor(line: number, page: number, documentIndex: number, content: string, area: string) {
 		this.line = line
 		this.page = page
 		this.documentIndex = documentIndex

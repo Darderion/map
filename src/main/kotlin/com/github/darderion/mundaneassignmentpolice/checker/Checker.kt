@@ -11,6 +11,8 @@ class Checker {
 	fun getRuleViolations(pdfName: String): List<RuleViolation> {
 		val document = PDFBox().getPDF(pdfName)
 
+		if (document.areas == null) return listOf()
+
 		val litlinkRule = SymbolRuleBuilder()
 			.symbol('?')
 			.ignoringAdjusting(*" ,0123456789".toCharArray())

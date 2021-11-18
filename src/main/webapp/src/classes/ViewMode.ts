@@ -1,4 +1,4 @@
 
 export enum ViewMode {
-	Rules, Areas
+	Rules, Areas, Text
 }
