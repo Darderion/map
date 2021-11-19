@@ -10,7 +10,7 @@
 				<li><router-link :to="`/viewPDFTextErrors?pdfName=${this.$store.getters.getPdfName}`">Highlight errors</router-link></li>
 			</ul>
 		</li>
-		<li><a href="">Rules' violations</a></li>
+		<li><router-link :to="`/viewRulesViolations?pdfName=${this.$store.getters.getPdfName}`">Rules' violations</router-link></li>
 		<li><router-link to="/about">About</router-link></li>
 	</ul>
 </template>

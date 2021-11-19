@@ -42,6 +42,13 @@ export default class AppComponent extends Vue {
 						pages: numPages
 					})
 				});
+			fetch(`api/viewRuleViolations?pdfName=${this.$store.getters.getPdfName}`)
+				.then(response => response.json())
+				.then(ruleViolations => {
+					this.$store.commit('setRuleViolations', {
+						ruleViolations
+					})
+				});
 		}
 	}
 }

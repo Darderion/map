@@ -1,13 +1,6 @@
 
 <template>
 	<div class="about">
-		<Keypress key-event="keyup" :key-code="69" @success="switchToRulesView" />
-		<Keypress key-event="keyup" :key-code="83" @success="switchToAreasView" />
-		<!--
-		<div id="ruleViolationsDiv">
-			<a v-for="ruleViolation in this.pdfRuleViolations" :href="`#pdfLine${ruleViolation.lines[0].line}-${ruleViolation.lines[0].page}`" :key="ruleViolation.toString() + (new Date()).getTime()">{{ruleViolation.message}} > Line {{ruleViolation.lines[0].line}}, page {{ruleViolation.lines[0].page}}<br></a>
-		</div>
-		-->
 		Text:
 		<div v-for="text in this.pdfLines" :key="text.toString() + (new Date()).getTime()" :id="`pdfLine${text.line}-${text.page}`" v-html="text.content"></div>
 		Images:
@@ -27,7 +20,6 @@ import { ViewMode } from '../classes/ViewMode'
 
 @Component({
 	components: {
-		Keypress: () => import('vue-keypress')
 	},
 })
 
@@ -79,8 +71,6 @@ export default class PDFTextComponent extends Vue {
 	}
 
 	updated() {
-		console.log(this.viewModeName)
-		console.log(this.viewMode)
 		this.updatePDFView()
 	}
 
@@ -101,16 +91,6 @@ export default class PDFTextComponent extends Vue {
 	setPDFRuleViolations(text: string) {
 		this.pdfRuleViolations = JSON.parse(text)
 		this.receivedRuleViolations = true
-		this.updatePDFView()
-	}
-
-	switchToRulesView() {
-		this.viewMode = ViewMode.Rules
-		this.updatePDFView()
-	}
-
-	switchToAreasView() {
-		this.viewMode = ViewMode.Areas
 		this.updatePDFView()
 	}
 

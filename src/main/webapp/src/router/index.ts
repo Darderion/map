@@ -48,6 +48,12 @@ const routes: Array<RouteConfig> = [
 		component: () => import('../views/ViewPDFTextSections.vue'),
 		props: (route) => ({ pdfName: route.query.pdfName })
 	},
+	{
+		path: '/viewRulesViolations',
+		name: 'ViewRulesViolations',
+		component: () => import('../views/ViewRulesViolations.vue'),
+		props: (route) => ({ pdfName: route.query.pdfName })
+	},
 ];
 
 const router = new VueRouter({
