@@ -25,9 +25,6 @@ import pdf from 'vue-pdf'
 })
 
 export default class UploadFileComponent extends Vue {
-	@Prop() setPdfName!: (name: string) => void
-	@Prop() setNumPages!: (pages: number) => void
-
 	mounted() {
 		const actualBtn = document.getElementById('actual-btn') as HTMLInputElement
 
@@ -40,19 +37,23 @@ export default class UploadFileComponent extends Vue {
 				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 				// @ts-ignore: Object is possibly 'null'.
 				fileChosen.textContent = actualBtn!.files[0].name
+				this.$store.commit('setPdfName', {
 				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 				// @ts-ignore: Object is possibly 'null'.
-				this.setPdfName(actualBtn!.files[0]!.name)
+					name: actualBtn!.files[0]!.name
+				})
 				fetch(`api/getPDFSize?pdfName=${this.$route.query.pdfName}`)
 					.then(numPages => {
-						this.setNumPages(Number(numPages))
+						this.$store.commit('setNumPages', {
+							pages: Number(numPages)
+						})
 					});
 				})
 		}
 
-		actualBtn.onchange = function() {
-		  const uploadFileButton = document.getElementById("uploadFileComponent") as HTMLFormElement
-		  uploadFileButton.submit()
+		actualBtn.onchange = _ => {
+			const uploadFileButton = document.getElementById("uploadFileComponent") as HTMLFormElement
+			uploadFileButton.submit()
 		};
 	}
 }

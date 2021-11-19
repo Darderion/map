@@ -1,6 +1,6 @@
 <template>
 	<div id="app">
-		<NavbarComponent :setPdfName="setPdfName" :getPdfName="getPdfName" :getNumPages="getNumPages" :setNumPages="setNumPages"/>
+		<NavbarComponent/>
 		<router-view/>
 	</div>
 </template>
@@ -20,44 +20,38 @@ import pdf from 'vue-pdf'
 })
 
 export default class AppComponent extends Vue {
-	@Prop() private pdfName = ""
-	numPages = 0
-
 	updatePdfName() {
-		this.setPdfName(this.$route.query.pdfName? (this.$route.query.pdfName as string): "")
-		fetch(`api/getPDFSize?pdfName=${this.$route.query.pdfName}`)
+		// this.$store.dispatch("setPdfName", this.$route.query.pdfName? (this.$route.query.pdfName as string): "")
+		fetch(`api/getPDFSize?pdfName=${this.$store.getters.getPdfName}`)
 			.then(numPages => {
-				this.numPages = Number(numPages)
+				this.$store.commit('setNumPages', {
+					pages: numPages
+				})
 			});
 	}
 
-	setPdfName(name: string) {
-		this.pdfName = name
-	}
-
-	setNumPages(pages: number) {
-		this.numPages = pages
-	}
-
-	getNumPages(): number {
-		return this.numPages
-	}
-
-	getPdfName(): string {
-		return this.pdfName
-	}
-
-	printPdfName(): void {
-		console.log(this.pdfName)
-	}
-
 	updated() {
-		this.updatePdfName()
+		this.$store.commit('setPdfName', {
+			name: this.$route.query.pdfName
+		})
+		if (this.$store.getters.getNumPages == 0) {
+			fetch(`api/getPDFSize?pdfName=${this.$store.getters.getPdfName}`)
+				.then(response => response.json())
+				.then(numPages => {
+					this.$store.commit('setNumPages', {
+						pages: numPages
+					})
+				});
+		}
 	}
 }
 </script>
 
 <style lang="scss">
+body {
+	background-color: #abc;
+}
+
 #app {
 	font-family: Avenir, Helvetica, Arial, sans-serif;
 	-webkit-font-smoothing: antialiased;

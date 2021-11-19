@@ -1,7 +1,7 @@
 
 <template>
 	<div class="about">
-		<PDFComponent :pdfURL="`api/viewPDF.pdf?pdfName=${this.pdfName}`"></PDFComponent>
+		<PDFComponent :pdfURL="`api/viewPDF.pdf?pdfName=${this.$store.getters.getPdfName}`"></PDFComponent>
 	</div>
 </template>
 
@@ -19,6 +19,5 @@ import PDFComponent from '../components/PDFComponent.vue'
 })
 
 export default class ViewPDF extends Vue {
-	@Prop() private pdfName!: string;
 }
 </script>

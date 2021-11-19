@@ -16,6 +16,20 @@ const routes: Array<RouteConfig> = [
 		name: 'About',
 		component: About,
 	},
+	/*
+	{
+		path: '/viewPDFText',
+		name: 'ViewPDFText',
+		component: () => import('../views/ViewPDFText.vue'),
+		props: (route) => ({ pdfName: route.query.pdfName })
+	},
+	*/
+	{
+		path: '/viewPDF',
+		name: 'ViewPDF',
+		component: () => import('../views/ViewPDF.vue'),
+		props: (route) => ({ pdfName: route.query.pdfName })
+	},
 	{
 		path: '/viewPDFText',
 		name: 'ViewPDFText',
@@ -23,9 +37,15 @@ const routes: Array<RouteConfig> = [
 		props: (route) => ({ pdfName: route.query.pdfName })
 	},
 	{
-		path: '/viewPDF',
-		name: 'ViewPDF',
-		component: () => import('../views/ViewPDF.vue'),
+		path: '/viewPDFTextErrors',
+		name: 'ViewPDFTextErrors',
+		component: () => import('../views/ViewPDFTextErrors.vue'),
+		props: (route) => ({ pdfName: route.query.pdfName })
+	},
+	{
+		path: '/viewPDFTextSections',
+		name: 'ViewPDFTextSections',
+		component: () => import('../views/ViewPDFTextSections.vue'),
 		props: (route) => ({ pdfName: route.query.pdfName })
 	},
 ];

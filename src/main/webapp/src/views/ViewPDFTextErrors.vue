@@ -1,7 +1,7 @@
 
 <template>
 	<div class="about">
-		<PDFTextComponent :viewModeName="`Text`"/>
+		<PDFTextComponent :viewModeName="`Errors`"/>
 	</div>
 </template>
 

@@ -3,9 +3,9 @@ import PDFText from "./PDFText";
 
 export default class RuleViolation {
 	lines: PDFText[]
-	message: String;
+	message: string;
 
-	constructor(lines: PDFText[], message: String) {
+	constructor(lines: PDFText[], message: string) {
 		this.lines = lines
 		this.message = message
 	}

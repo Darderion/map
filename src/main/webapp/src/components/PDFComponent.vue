@@ -2,7 +2,7 @@
 <template>
 	<div>
 		<pdf
-			v-for="i in Number(this.$route.query.numPages)"
+			v-for="i in this.$store.getters.getNumPages"
 			:key="i"
 			:src="pdfURL"
 			:page="i"
@@ -24,9 +24,11 @@ import pdf from 'vue-pdf'
 
 export default class PDFComponent extends Vue {
 	@Prop() private pdfURL!: string
-	numPages = Number(
-		this.$route.query.numPages?
-		this.$route.query.numPages: 0
-	)
 }
 </script>
+
+<style scoped>
+span {
+	margin-bottom: 8px;
+}
+</style>

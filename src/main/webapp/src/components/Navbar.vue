@@ -1,8 +1,8 @@
 
 <template>
 	<div id="navbar">
-		<UploadFileComponent id="uploadFileComponent" :setPdfName="setPdfName" :setNumPages="setNumPages"/>
-		<MenuComponent id="menuComponent" :getPdfName="getPdfName" :getNumPages="getNumPages"/>
+		<UploadFileComponent id="uploadFileComponent"/>
+		<MenuComponent id="menuComponent"/>
 	</div>
 </template>
 
@@ -20,10 +20,6 @@ import MenuComponent from './Menu.vue'
 })
 
 export default class NavbarComponent extends Vue {
-	@Prop() setPdfName!: (name: string) => void
-	@Prop() setNumPages!: (pages: number) => void
-	@Prop() getPdfName!: () => string
-	@Prop() getNumPages!: () => number
 }
 </script>
 

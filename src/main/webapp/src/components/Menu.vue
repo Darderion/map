@@ -1,13 +1,13 @@
 <template>
 	<ul class="menu cf">
 		<li><router-link to="/">Home</router-link></li>
-		<li><router-link :to="`/viewPDF?pdfName=${getPdfName()}&numPages=${getNumPages()}`">View PDF</router-link></li>
+		<li><router-link :to="`/viewPDF?pdfName=${this.$store.getters.getPdfName}&numPages=${this.$store.getters.getNumPages}`">View PDF</router-link></li>
 		<li>
-			<router-link :to="`/viewPDFText?pdfName=${getPdfName()}`">View as text</router-link>
+			<router-link :to="`/viewPDFText?pdfName=${this.$store.getters.getPdfName}`">View as text</router-link>
 			<ul class="submenu">
-				<li><router-link :to="`/viewPDFText?pdfName=${getPdfName()}`">Plain</router-link></li>
-				<li><router-link :to="`/viewPDFText?pdfName=${getPdfName()}&viewMode=Sections`" @click.native="InlineButtonClickHandler">Highlight sections</router-link></li>
-				<li><router-link :to="`/viewPDFText?pdfName=${getPdfName()}&viewMode=Errors`">Highlight errors</router-link></li>
+				<li><router-link :to="`/viewPDFText?pdfName=${this.$store.getters.getPdfName}`">Plain</router-link></li>
+				<li><router-link :to="`/viewPDFTextSections?pdfName=${this.$store.getters.getPdfName}`" @click.native="InlineButtonClickHandler">Highlight sections</router-link></li>
+				<li><router-link :to="`/viewPDFTextErrors?pdfName=${this.$store.getters.getPdfName}`">Highlight errors</router-link></li>
 			</ul>
 		</li>
 		<li><a href="">Rules' violations</a></li>
@@ -25,8 +25,6 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 })
 
 export default class MenuComponent extends Vue {
-	@Prop() getPdfName!: () => string
-	@Prop() getNumPages!: () => number
 }
 </script>
 
