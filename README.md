@@ -15,6 +15,7 @@ Supported mistakes that can be caught:
 * Incorrect usage of <span style="background-color: #222; color: #55c">⠀--⠀</span>
 * Incorrect usage of <span style="background-color: #222; color: #55c">⠀---⠀</span>
 * Litlinks <span style="background-color: #222; color: #b55">⠀[?]⠀</span>
+* Lists that only contain a single item
 
 ### Built With
 
@@ -33,7 +34,7 @@ Supported mistakes that can be caught:
 * Maven:
   * `$ bash buildscript.sh`
   * `$ cd target`
-  * `$ java -jar mundane-assignment-police-0.0.1-SNAPSHOT.jar`
+  * `$ java -jar app.jar`
 
 1. Upload your PDF file
 2. Review mistakes
