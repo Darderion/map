@@ -11,6 +11,7 @@ import org.apache.pdfbox.pdmodel.font.PDType1Font
 import org.apache.pdfbox.pdmodel.graphics.form.PDFormXObject
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject
 import org.apache.pdfbox.text.PDFTextStripper
+import java.awt.Color
 import java.awt.image.RenderedImage
 import java.io.*
 
@@ -19,7 +20,7 @@ class PDFBox {
 	val recentDocuments: HashMap<String, PDDocument> = hashMapOf()
 	val recentDocumentsSizes: HashMap<String, Int> = hashMapOf()
 
-	private fun getDocument(fileName: String): PDDocument {
+	fun getDocument(fileName: String): PDDocument {
 		/*
 		if (!recentDocuments.contains(fileName)) {
 			recentDocuments[fileName] = PDDocument.load(File(fileName))
@@ -79,6 +80,7 @@ class PDFBox {
 	fun addLine(document: PDDocument, page: Int, position: Coordinate, width: Int) = editPDF(document, page) {
 		it.moveTo(position.x, position.y)
 		it.lineTo(position.x + width, position.y)
+		it.setStrokingColor(Color.RED)
 		it.stroke()
 	}
 

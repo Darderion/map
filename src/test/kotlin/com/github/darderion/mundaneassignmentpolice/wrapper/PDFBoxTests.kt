@@ -1,6 +1,7 @@
 package com.github.darderion.mundaneassignmentpolice.wrapper
 
 import com.github.darderion.mundaneassignmentpolice.TestsConfiguration.Companion.resourceFolder
+import com.github.darderion.mundaneassignmentpolice.pdfdocument.Annotations
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Coordinate
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.core.test.TestCase

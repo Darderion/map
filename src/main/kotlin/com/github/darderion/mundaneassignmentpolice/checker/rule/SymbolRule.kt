@@ -15,6 +15,7 @@ import com.github.darderion.mundaneassignmentpolice.pdfdocument.inside
 class SymbolRule(
 	private val symbol: Char,
 	private val ignoredNeighbors: MutableList<Char>,
+	private val ignoredIndexes: MutableList<Int>,
 	private val disallowedNeighbors: MutableList<Char>,
 	private val requiredNeighbors: MutableList<Char>,
 	private val direction: Direction,
@@ -27,28 +28,30 @@ class SymbolRule(
 
 		document.text.filter { it.area!! inside area }.forEachIndexed { index, pdfText ->
 			pdfText.content.indicesOf(symbol.toString()).forEach {
-				val symbolIndex = it + document.getTextFromLines(index - neighborhoodSize, index - 1, area).length +
-						2*neighborhoodSize.coerceAtMost(index)
-				val text = document.getTextFromLines(index - neighborhoodSize, index + neighborhoodSize, area)
+				if (!ignoredIndexes.contains(it)) {
+					val symbolIndex = it + document.getTextFromLines(index - neighborhoodSize, index - 1, area).length +
+							2 * neighborhoodSize.coerceAtMost(index)
+					val text = document.getTextFromLines(index - neighborhoodSize, index + neighborhoodSize, area)
 
-				val sideTexts = mutableListOf(
-					text.slice(IntRange(0, symbolIndex - 1)).reversed(),
-					text.slice(IntRange(symbolIndex + 1, text.length - 1))
-				)
+					val sideTexts = mutableListOf(
+						text.slice(IntRange(0, symbolIndex - 1)).reversed(),
+						text.slice(IntRange(symbolIndex + 1, text.length - 1))
+					)
 
-				when(direction) {
-					LEFT -> sideTexts.removeAt(1)
-					RIGHT -> sideTexts.removeAt(0)
-				}
+					when (direction) {
+						LEFT -> sideTexts.removeAt(1)
+						RIGHT -> sideTexts.removeAt(0)
+					}
 
-				val neighbors = sideTexts
-					.map { it.filterNot { ignoredNeighbors.contains(it) } }	// Remove ignored symbols
-					.filter { it.isNotEmpty() }								// Remove empty lines
-					.map { it.first() }
+					val neighbors = sideTexts
+						.map { it.filterNot { ignoredNeighbors.contains(it) } }    // Remove ignored symbols
+						.filter { it.isNotEmpty() }                                // Remove empty lines
+						.map { it.first() }
 
-				if (neighbors.any { disallowedNeighbors.contains(it) } ||
-					(requiredNeighbors.isNotEmpty() && neighbors.any { !requiredNeighbors.contains(it) })) {
-					rulesViolations.add(RuleViolation(listOf(pdfText), name))
+					if (neighbors.any { disallowedNeighbors.contains(it) } ||
+						(requiredNeighbors.isNotEmpty() && neighbors.any { !requiredNeighbors.contains(it) })) {
+						rulesViolations.add(RuleViolation(listOf(pdfText), name))
+					}
 				}
 			}
 		}

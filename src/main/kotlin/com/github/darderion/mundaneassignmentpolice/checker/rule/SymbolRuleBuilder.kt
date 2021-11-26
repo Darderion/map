@@ -18,6 +18,7 @@ fun CharSequence.indicesOf(input: String): List<Int> =
 class SymbolRuleBuilder {
 	private var symbol: Char = ' '
 	private var ignoredNeighbors: MutableList<Char> = mutableListOf()
+	private var ignoredIndexes: MutableList<Int> = mutableListOf()
 	private var disallowedNeighbors: MutableList<Char> = mutableListOf()
 	private var requiredNeighbors: MutableList<Char> = mutableListOf()
 	private var direction: Direction = Direction.BIDIRECTIONAL
@@ -30,6 +31,8 @@ class SymbolRuleBuilder {
 	fun called(name: String) = this.also { this.name = name }
 
 	fun ignoringAdjusting(vararg symbols: Char) = this.also { ignoredNeighbors.addAll(symbols.toList()) }
+
+	fun ignoringIfIndex(index: Int) = this.also { ignoredIndexes.add(index) }
 
 	fun shouldNotHaveNeighbor(vararg symbols: Char) = this.also { disallowedNeighbors.addAll(symbols.toList()) }
 
@@ -48,6 +51,7 @@ class SymbolRuleBuilder {
 	fun getRule() = SymbolRule(
 		symbol,
 		ignoredNeighbors,
+		ignoredIndexes,
 		disallowedNeighbors,
 		requiredNeighbors,
 		direction,

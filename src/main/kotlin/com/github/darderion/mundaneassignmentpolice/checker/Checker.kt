@@ -31,11 +31,12 @@ class Checker {
 
 		val shortDashRuleLeft = shortDashRules
 			.fromLeft()
+			.shouldHaveNeighbor('.')
 			.getRule()
 
 		val shortDashRuleRight = shortDashRules
 			.fromRight()
-			.shouldHaveNeighbor('\n')
+			.shouldHaveNeighbor(*"\n0123456789".toCharArray())
 			.getRule()
 
 		val mediumDash = '–'
@@ -45,6 +46,7 @@ class Checker {
 			.shouldHaveNeighbor(*"0123456789".toCharArray())
 			.called("Incorrect usage of '--' symbol")
 			.inArea(EVERYWHERE.except(BIBLIOGRAPHY, FOOTNOTE))
+			.ignoringIfIndex(0)
 			.getRule()
 
 		val longDash = '—'
@@ -58,7 +60,8 @@ class Checker {
 			.getRule()
 
 		val listRule = ListRuleBuilder()
-			.inArea(NOWHERE.except(TABLE_OF_CONTENT, SECTION))
+			.inArea(NOWHERE.except(TABLE_OF_CONTENT))
+			.called("Only 1 subsection in a section")
 			.disallow {
 				if (it.nodes.count() == 1) it.nodes.first().getText() else listOf()
 			}.getRule()
@@ -72,6 +75,6 @@ class Checker {
 			listRule
 		).map {
 			it.process(document)
-		}.flatten()
+		}.flatten().toSet().toList()
 	}
 }

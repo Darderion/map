@@ -16,5 +16,7 @@ class ListRuleBuilder {
 
 	infix fun inArea(region: PDFRegion) = this.also { this.region = region }
 
+	fun called(name: String) = this.also { this.name = name }
+
 	fun getRule() = ListRule(predicates, region, name)
 }

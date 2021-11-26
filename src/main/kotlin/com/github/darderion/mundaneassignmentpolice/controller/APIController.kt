@@ -1,7 +1,9 @@
 package com.github.darderion.mundaneassignmentpolice.controller
 
 import com.github.darderion.mundaneassignmentpolice.checker.Checker
+import com.github.darderion.mundaneassignmentpolice.pdfdocument.Annotations
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Section
+import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Text
 import com.github.darderion.mundaneassignmentpolice.utils.FileUploadUtil
 import com.github.darderion.mundaneassignmentpolice.wrapper.PDFBox
 import org.springframework.util.StringUtils
@@ -53,6 +55,18 @@ class APIController {
 	@GetMapping("/api/viewPDF.pdf")
 	@ResponseBody
 	fun getPDF(@RequestParam("pdfName") fileName: String) = File("$pdfFolder$fileName").readBytes()
+
+	@GetMapping("/api/viewPDFRuleViolations.pdf")
+	@ResponseBody
+	fun getPDF(@RequestParam("pdfName") fileName: String,
+			   @RequestParam("page") page: Int,
+			   @RequestParam("line") line: Int
+	): ByteArray {
+		// File("$pdfFolder$fileName").readBytes()
+		val pdf = PDFBox().getPDF("$pdfFolder$fileName")
+		Annotations.underline(pdf, listOf(pdf.text.first { it.page == page && it.line == line }))
+		return File("${pdfFolder}ruleviolations/${fileName.replace(".pdf", "")}$line-${page}.pdf").readBytes()
+	}
 
 	@GetMapping("/api/getPDFSize")
 	fun getPDFSize(@RequestParam pdfName: String) = pdfBox.getPDFSize("$pdfFolder$pdfName")

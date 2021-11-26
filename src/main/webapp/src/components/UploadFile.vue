@@ -7,7 +7,7 @@
 		>
 		<div>
 			<label for="actual-btn">Choose File</label>
-			<span id="file-chosen">No file chosen</span>
+			<span id="file-chosen"></span>
 			<input type="file" name="pdf" accept="application/pdf" id="actual-btn" hidden/>
 		</div>
 	</form>

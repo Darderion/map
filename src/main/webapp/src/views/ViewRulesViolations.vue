@@ -5,9 +5,9 @@
 			<li v-for="ruleViolation in this.$store.getters.getRuleViolations"
 			:key="'rulesViolations'+ruleViolation.toString()">{{ruleViolation.message}} > Line {{ruleViolation.lines[0].line}}, page {{ruleViolation.lines[0].page}}</li>
 		</ul>
-		<div id="ruleViolation">
+		<div id="ruleViolation" v-if="curPage != -1">
 			<pdf
-				:src="`api/viewPDF.pdf?pdfName=${this.$store.getters.getPdfName}`"
+				:src="`api/viewPDFRuleViolations.pdf?pdfName=${this.$store.getters.getPdfName}&page=${curPage}&line=${curLine}`"
 				:page="curPage + 1"
 				style="display: inline-block; width: 100%"
 			></pdf>
@@ -33,7 +33,8 @@ export default class ViewRulesViolations extends Vue {
 	listElement = (document.getElementById('rulesViolations') as HTMLUListElement) ?
 		document.getElementById('rulesViolations') as HTMLUListElement: undefined
 
-	curPage = 0
+	curPage = -1
+	curLine = 0
 	
 	mounted() {
 		if (this.listElement == undefined) {
@@ -66,7 +67,13 @@ export default class ViewRulesViolations extends Vue {
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore: Object is possibly 'null'.
 		const page = Number(li.textContent.split(' ')[li.textContent.split(' ').length - 1])
+
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore: Object is possibly 'null'.
+		const lineText = li.textContent.split('Line ')[1].split(', page')[0]
+
 		this.curPage = page
+		this.curLine = Number(lineText)
 	}
 }
 </script>
