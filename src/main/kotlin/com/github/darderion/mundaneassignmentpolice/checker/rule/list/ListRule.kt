@@ -1,6 +1,7 @@
-package com.github.darderion.mundaneassignmentpolice.checker.rule
+package com.github.darderion.mundaneassignmentpolice.checker.rule.list
 
 import com.github.darderion.mundaneassignmentpolice.checker.RuleViolation
+import com.github.darderion.mundaneassignmentpolice.checker.rule.Rule
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFArea.SECTION
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFArea.TABLE_OF_CONTENT
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFDocument

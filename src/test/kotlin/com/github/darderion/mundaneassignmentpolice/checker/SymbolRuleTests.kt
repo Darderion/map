@@ -1,6 +1,6 @@
 package com.github.darderion.mundaneassignmentpolice.checker
 
-import com.github.darderion.mundaneassignmentpolice.checker.rule.SymbolRuleBuilder
+import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.SymbolRuleBuilder
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFArea
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFRegion
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFArea.*
@@ -8,6 +8,8 @@ import com.github.darderion.mundaneassignmentpolice.wrapper.PDFBox
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.ints.shouldBeExactly
 import com.github.darderion.mundaneassignmentpolice.TestsConfiguration.Companion.resourceFolder
+import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.and
+import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.or
 
 class SymbolRuleTests: StringSpec({
 	"Symbol rule should detect incorrect symbols ? in links" {
@@ -61,6 +63,33 @@ class SymbolRuleTests: StringSpec({
 				.getRule().process(PDFBox().getPDF(filePath)).count() shouldBeExactly
 					if (area == SECTION) 3 else 0
 		}
+	}
+	"Combined symbol rule should search for rule violations in its region" {
+		val longDash = '—'
+
+		(SymbolRuleBuilder()
+			.symbol(longDash)
+			.shouldHaveNeighbor(' ')
+			.getRule()
+				and
+				SymbolRuleBuilder()
+					.symbol(longDash)
+					.ignoringAdjusting(' ')
+					.shouldNotHaveNeighbor(*"0123456789".toCharArray())
+					.getRule())
+			.process(PDFBox().getPDF(filePath)).count() shouldBeExactly 2
+
+		(SymbolRuleBuilder()
+			.symbol(longDash)
+			.shouldHaveNeighbor(' ')
+			.getRule()
+				or
+				SymbolRuleBuilder()
+					.symbol(longDash)
+					.ignoringAdjusting(' ')
+					.shouldNotHaveNeighbor(*"0123456789".toCharArray())
+					.getRule())
+			.process(PDFBox().getPDF(filePath)).count() shouldBeExactly 1
 	}
 }) {
 	private companion object {

@@ -1,13 +1,25 @@
 package com.github.darderion.mundaneassignmentpolice.checker
 
-import com.github.darderion.mundaneassignmentpolice.checker.rule.ListRuleBuilder
-import com.github.darderion.mundaneassignmentpolice.checker.rule.SymbolRuleBuilder
+import com.github.darderion.mundaneassignmentpolice.checker.rule.list.ListRuleBuilder
+import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.SymbolRuleBuilder
+import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.and
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFArea.*
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFRegion.Companion.EVERYWHERE
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFRegion.Companion.NOWHERE
 import com.github.darderion.mundaneassignmentpolice.wrapper.PDFBox
+import java.util.*
 
 class Checker {
+	private val enLetters = "abcdefghijklmnopqrstuvwxyz"
+	private val enCapitalLetters = enLetters.uppercase(Locale.getDefault())
+	private val EN = enLetters + enCapitalLetters
+
+	private val rusLetters = "абвгдеёжзийклмнопрстуфхцчшщъыьэюя"
+	private val rusCapitalLetters = rusLetters.uppercase(Locale.getDefault())
+	private val RU = rusLetters + rusCapitalLetters
+
+	private val numbers = "0123456789"
+
 	fun getRuleViolations(pdfName: String): List<RuleViolation> {
 		val document = PDFBox().getPDF(pdfName)
 
@@ -15,35 +27,32 @@ class Checker {
 
 		val litlinkRule = SymbolRuleBuilder()
 			.symbol('?')
-			.ignoringAdjusting(*" ,0123456789".toCharArray())
+			.ignoringAdjusting(*" ,$numbers".toCharArray())
 			.shouldNotHaveNeighbor(*"[]".toCharArray())
 			.called("Symbol '?' in litlink")
 			.getRule()
 
 		val shortDash = '-'
 
+		// 3-way road
+		// one-sided battle
+
 		val shortDashRules = SymbolRuleBuilder()
 			.symbol(shortDash)
-			.shouldHaveNeighbor(*"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".toCharArray())
-			.shouldHaveNeighbor(*"абвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ".toCharArray())
+			.shouldHaveNeighbor(*EN.toCharArray())
+			.shouldHaveNeighbor(*RU.toCharArray())
 			.called("Incorrect usage of '-' symbol")
 			.inArea(EVERYWHERE.except(BIBLIOGRAPHY, FOOTNOTE))
 
-		val shortDashRuleLeft = shortDashRules
-			.fromLeft()
-			.shouldHaveNeighbor('.')
-			.getRule()
-
-		val shortDashRuleRight = shortDashRules
-			.fromRight()
-			.shouldHaveNeighbor(*"\n0123456789".toCharArray())
-			.getRule()
+		val shortDashRule = shortDashRules
+			.fromLeft().shouldHaveNeighbor(*numbers.toCharArray(), '.').getRule() and shortDashRules
+			.fromRight().shouldHaveNeighbor('\n').getRule()
 
 		val mediumDash = '–'
 
 		val mediumDashRule = SymbolRuleBuilder()
 			.symbol(mediumDash)
-			.shouldHaveNeighbor(*"0123456789".toCharArray())
+			.shouldHaveNeighbor(*numbers.toCharArray())
 			.called("Incorrect usage of '--' symbol")
 			.inArea(EVERYWHERE.except(BIBLIOGRAPHY, FOOTNOTE))
 			.ignoringIfIndex(0)
@@ -54,7 +63,7 @@ class Checker {
 		val longDashRule = SymbolRuleBuilder()
 			.symbol(longDash)
 			.ignoringAdjusting(' ')
-			.shouldNotHaveNeighbor(*"0123456789".toCharArray())
+			.shouldNotHaveNeighbor(*numbers.toCharArray())
 			.called("Incorrect usage of '---' symbol")
 			.inArea(EVERYWHERE.except(BIBLIOGRAPHY, FOOTNOTE))
 			.getRule()
@@ -68,8 +77,7 @@ class Checker {
 
 		return listOf(
 			litlinkRule,
-			shortDashRuleLeft,
-			shortDashRuleRight,
+			shortDashRule,
 			mediumDashRule,
 			longDashRule,
 			listRule

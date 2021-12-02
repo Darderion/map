@@ -6,7 +6,7 @@ import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFRegion
 
 abstract class Rule(
 	val area: PDFRegion,
-	protected val name: String
+	val name: String
 ) {
 	abstract fun process(document: PDFDocument): List<RuleViolation>
 }

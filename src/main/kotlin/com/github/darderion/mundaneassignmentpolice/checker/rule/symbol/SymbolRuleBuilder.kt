@@ -1,4 +1,4 @@
-package com.github.darderion.mundaneassignmentpolice.checker.rule
+package com.github.darderion.mundaneassignmentpolice.checker.rule.symbol
 
 import com.github.darderion.mundaneassignmentpolice.checker.Direction
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFArea
@@ -48,7 +48,7 @@ class SymbolRuleBuilder {
 
 	infix fun inArea(region: PDFRegion) = this.also { this.region = region }
 
-	fun getRule() = SymbolRule(
+	fun getRule() = BasicSymbolRule(
 		symbol,
 		ignoredNeighbors,
 		ignoredIndexes,
@@ -58,5 +58,5 @@ class SymbolRuleBuilder {
 		neighborhoodSize,
 		region,
 		name
-	)
+	) as SymbolRule
 }

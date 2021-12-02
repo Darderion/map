@@ -1,7 +1,6 @@
 package com.github.darderion.mundaneassignmentpolice.checker
 
-import com.github.darderion.mundaneassignmentpolice.checker.rule.ListRuleBuilder
-import com.github.darderion.mundaneassignmentpolice.checker.rule.SymbolRuleBuilder
+import com.github.darderion.mundaneassignmentpolice.checker.rule.list.ListRuleBuilder
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFArea.TABLE_OF_CONTENT
 import com.github.darderion.mundaneassignmentpolice.wrapper.PDFBox
 import io.kotest.core.spec.style.StringSpec

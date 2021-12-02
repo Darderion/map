@@ -1,4 +1,4 @@
-package com.github.darderion.mundaneassignmentpolice.checker.rule
+package com.github.darderion.mundaneassignmentpolice.checker.rule.list
 
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFArea
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.list.PDFList
