@@ -3,14 +3,13 @@ package com.github.darderion.mundaneassignmentpolice.controller
 import com.github.darderion.mundaneassignmentpolice.checker.Checker
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.Annotations
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Section
-import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Text
 import com.github.darderion.mundaneassignmentpolice.utils.FileUploadUtil
 import com.github.darderion.mundaneassignmentpolice.wrapper.PDFBox
+import mu.KotlinLogging
 import org.springframework.util.StringUtils
+import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.servlet.view.RedirectView
-import mu.KotlinLogging
-import org.springframework.web.bind.annotation.*
 import java.io.File
 
 const val pdfFolder = "build/"
@@ -47,6 +46,9 @@ class APIController {
 			return null
 		}
 		val fileName = StringUtils.cleanPath(multipartFile.originalFilename!!)
+
+		FileUploadUtil.removeRandomFile(pdfFolder, 10)
+
 		FileUploadUtil.saveFile(pdfFolder, fileName, multipartFile)
 		logger.info("UploadPDF(pdfName = $fileName)")
 		return RedirectView("/#/viewPDF?pdfName=$fileName&numPages=${pdfBox.getPDFSize("$pdfFolder$fileName")}", true)
@@ -62,6 +64,9 @@ class APIController {
 			   @RequestParam("page") page: Int?,
 			   @RequestParam("line") line: Int?
 	): ByteArray {
+		val directory = "${pdfFolder}ruleviolations/"
+		FileUploadUtil.removeRandomFile(directory, 10)
+
 		val pdf = PDFBox().getPDF("$pdfFolder$fileName")
 		val pdf2 = Annotations.underline(pdf,
 			if (page == null || line == null) {
@@ -70,6 +75,7 @@ class APIController {
 				listOf(pdf.text.first { it.page == page && it.line == line })
 		)
 		logger.info("File created: $pdf2")
+
 		return File("${pdfFolder}ruleviolations/${fileName.replace(".pdf", "")}$line-${page}.pdf").readBytes()
 	}
 
