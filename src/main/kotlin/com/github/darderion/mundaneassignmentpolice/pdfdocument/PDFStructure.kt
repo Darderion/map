@@ -12,6 +12,8 @@ class PDFStructure(text: List<Text>) {
 	val sections: List<Section>
 	val tableOfContents: PDFList<String>
 
+	private fun String.clearSymbols() = this.replace("-", "").replace(" ", "").replace(".", "")
+
 	init {
 		// Areas
 		var area = TITLE_PAGE
@@ -20,12 +22,12 @@ class PDFStructure(text: List<Text>) {
 			// For each line
 			area = when(area) {
 				TITLE_PAGE -> {
-					if (it.content == TABLE_OF_CONTENT_TITLE) {
+					if (TABLE_OF_CONTENT_TITLES.contains(it.content.trim())) {
 						TABLE_OF_CONTENT
 					} else area
 				}
 				TABLE_OF_CONTENT -> {
-					if (sectionTitle == null && it.content != TABLE_OF_CONTENT_TITLE && it.content.isNotEmpty()) {
+					if (sectionTitle == null && !TABLE_OF_CONTENT_TITLES.contains(it.content.trim()) && it.content.isNotEmpty()) {
 						sectionTitle = it.text.first().text
 						area
 					} else {
@@ -62,31 +64,77 @@ class PDFStructure(text: List<Text>) {
 			}
 		}
 
+		val sectionsWithoutIndexes = listOf<String>(
+			"Введение",
+			"Заключение",
+			"Приложение"
+		)
+
 		// Sections
-		val sectionsTitles = text
-			.filter { it.area == TABLE_OF_CONTENT }					// Only include lines from TABLE_OF_CONTENT
+		val tableOfContentsText = text.filter { it.area == TABLE_OF_CONTENT }
+
+		var curSectionTitle = ""
+		val sectionsTitlesLines = mutableListOf<String>()
+
+		tableOfContentsText											// Only include lines from TABLE_OF_CONTENT
 			.drop(1)												// Remove line with TABLE_OF_CONTENT_TITLE
 			.map { it.content }										// filter STRING values
 			.filter { it.isNotEmpty() }								//	remove empty lines
 			.dropLast(1)											//	remove line with BIBLIOGRAPHY_TITLE
-			.map { it.dropLast(2)								//	remove ' ' + NUMBER or NUMBER + NUMBER
+			.forEach {
+				if (it[it.length - 1].isDigit() || it[it.length - 2].isDigit()) {
+					sectionsTitlesLines.add(curSectionTitle + it)
+					curSectionTitle = ""
+				} else {
+					curSectionTitle += it + " "
+				}
+			}
+
+		val sectionsTitles = sectionsTitlesLines.map { it
+				.dropLast(2)										//	remove ' ' + NUMBER or NUMBER + NUMBER
 				.dropLastWhile { it == ' ' || it == '.' }			// THIS FILTER ASSUMES THAT DOCUMENT CONTAINS
-			}														//	LESS THAN 100 PAGES
+		}															//	LESS THAN 100 PAGES
 
 		val sectionsTitlesWithIndexes = sectionsTitles.map { if (it.contains('.')) it else ". $it" }
 		
-		val sectionText = text.filter { it.area == SECTION }
+		val sectionTextLines = text
+			.filter { it.area == SECTION }
+			.map { it.documentIndex to it.content.clearSymbols()
+			}.dropLast(1)
 
-		sections = sectionsTitles.map { section ->					// Sections: List<Pair<String, Int>>
-			section to sectionText									//	Section.first --> SectionTitle
-				.dropLast(1)										//	Section.second --> SectionIndex
-				.filterIndexed { index, text ->
-					section == text.content || section == "${text.content} ${sectionText[index + 1].content}"
-				}.first().documentIndex
-		}.map { section -> Section(section.first, section.second,	// Sections: List<Section>
-			sectionText.filter { it.documentIndex > section.second }[
-					if (section.first == sectionText.first { it.documentIndex == section.second }.content) 0 else 1
-				].documentIndex
+		val sectionText = listOf(
+			sectionTextLines,
+			sectionTextLines.dropLast(1).mapIndexed { index, pair ->
+				pair.first to pair.second + sectionTextLines[index + 1].second
+			}
+		).flatten()
+
+		val sectionsIndexed = sectionsTitles.map { section ->
+			val sectionItem = sectionText
+				.filter {
+					section.clearSymbols() == it.second
+				}
+			section to sectionItem.first().first
+			/*
+			if (sectionItem.isEmpty()) {
+				println("ERR: $section")
+				sectionText
+					.forEach {
+						println("${
+							section.clearSymbols()} -> '${it.second}'"
+						)
+					}
+			}
+			 */
+		}
+		// Sections: List<Pair<String, Int>>
+		//	Section.second --> SectionIndex
+		//	Section.first --> SectionTitle
+
+		sections = sectionsIndexed.map { section -> Section(section.first, section.second,	// Sections: List<Section>
+			sectionText.filter { it.first > section.second }[
+					if (section.first.clearSymbols() == sectionText.first { it.first == section.second }.second) 0 else 1
+				].first
 		) }
 
 		tableOfContents = PDFList("TABLE_OF_CONTENTS")
@@ -130,7 +178,7 @@ class PDFStructure(text: List<Text>) {
 	}
 
 	companion object {
-		private const val TABLE_OF_CONTENT_TITLE = "Оглавление"
+		private val TABLE_OF_CONTENT_TITLES = listOf("Оглавление", "Содержание")
 		private const val BIBLIOGRAPHY_TITLE = "Список литературы"
 
 		private const val FOOTNOTE_FONT_SIZE = 6.9738

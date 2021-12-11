@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.servlet.view.RedirectView
 import java.io.File
+import kotlin.math.abs
+import kotlin.random.Random
 
 const val pdfFolder = "build/"
 
@@ -45,7 +47,8 @@ class APIController {
 		if (multipartFile.originalFilename == null) {
 			return null
 		}
-		val fileName = StringUtils.cleanPath(multipartFile.originalFilename!!)
+		// val fileName = StringUtils.cleanPath(multipartFile.originalFilename!!)
+		val fileName = (abs(Random.nextInt() % 10000)).toString()
 
 		FileUploadUtil.removeRandomFile(pdfFolder, 10)
 

@@ -10,7 +10,9 @@ export default new Vuex.Store({
 	state: {
 		pdfName: "",
 		pages: 0,
-		ruleViolations: []
+		ruleViolations: [],
+		noErrorsFound: false,
+		noAreaErrorsFound: false
 	},
 	mutations: {
 		setPdfName(state, payload) {
@@ -21,10 +23,22 @@ export default new Vuex.Store({
 		},
 		setRuleViolations(state, payload) {
 			state.ruleViolations = payload.ruleViolations
+		},
+		updateContainsErrors(state, payload) {
+			state.noErrorsFound = payload.ruleViolations.length == 0
+			state.noAreaErrorsFound =
+			payload.ruleViolations.length == 0 ||
+			payload.ruleViolations.filter((ruleViolation: RuleViolation) => ruleViolation.message == 'PDFArea').length == 0
 		}
 	},
 	actions: {},
 	getters: {
+		getContainsErrors(state): boolean {
+			return !state.noErrorsFound
+		},
+		getContainsAreaErrors(state): boolean {
+			return !state.noAreaErrorsFound
+		},
 		getPdfName(state): string {
 			return state.pdfName
 		},
