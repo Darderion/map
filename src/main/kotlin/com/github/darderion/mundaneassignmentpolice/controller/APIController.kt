@@ -48,9 +48,9 @@ class APIController {
 			return null
 		}
 		// val fileName = StringUtils.cleanPath(multipartFile.originalFilename!!)
-		val fileName = (abs(Random.nextInt() % 10000)).toString()
+		val fileName = (abs(Random.nextInt() % 10000)).toString() + (abs(Random.nextInt() % 10000)).toString()
 
-		FileUploadUtil.removeRandomFile(pdfFolder, 10)
+		FileUploadUtil.removeRandomFile(pdfFolder, 1000)
 
 		FileUploadUtil.saveFile(pdfFolder, fileName, multipartFile)
 		logger.info("UploadPDF(pdfName = $fileName)")
@@ -68,7 +68,7 @@ class APIController {
 			   @RequestParam("line") line: Int?
 	): ByteArray {
 		val directory = "${pdfFolder}ruleviolations/"
-		FileUploadUtil.removeRandomFile(directory, 10)
+		FileUploadUtil.removeRandomFile(directory, 1000)
 
 		val pdf = PDFBox().getPDF("$pdfFolder$fileName")
 		val pdf2 = Annotations.underline(pdf,
