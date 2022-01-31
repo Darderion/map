@@ -28,7 +28,9 @@ class PDFStructure(text: List<Text>) {
 				}
 				TABLE_OF_CONTENT -> {
 					if (sectionTitle == null && !TABLE_OF_CONTENT_TITLES.contains(it.content.trim()) && it.content.isNotEmpty()) {
-						sectionTitle = it.text.first().text
+						// sectionTitle = it.text.first().text
+						sectionTitle = it.text.filter { it.text.trim().isNotEmpty() }.dropLast(1).joinToString(" ")
+						println(sectionTitle)
 						area
 					} else {
 						if (sectionTitle != null && it.line == 0 && it.content == sectionTitle) {
@@ -114,8 +116,6 @@ class PDFStructure(text: List<Text>) {
 				.filter {
 					section.clearSymbols() == it.second
 				}
-			section to sectionItem.first().first
-			/*
 			if (sectionItem.isEmpty()) {
 				println("ERR: $section")
 				sectionText
@@ -125,7 +125,7 @@ class PDFStructure(text: List<Text>) {
 						)
 					}
 			}
-			 */
+			section to sectionItem.first().first
 		}
 		// Sections: List<Pair<String, Int>>
 		//	Section.second --> SectionIndex

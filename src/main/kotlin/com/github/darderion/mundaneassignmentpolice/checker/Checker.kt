@@ -3,6 +3,7 @@ package com.github.darderion.mundaneassignmentpolice.checker
 import com.github.darderion.mundaneassignmentpolice.checker.rule.list.ListRuleBuilder
 import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.SymbolRuleBuilder
 import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.and
+import com.github.darderion.mundaneassignmentpolice.checker.rule.tableofcontent.TableOfContentRuleBuilder
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFArea.*
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFRegion.Companion.EVERYWHERE
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFRegion.Companion.NOWHERE
@@ -85,12 +86,24 @@ class Checker {
 				if (it.nodes.count() == 1) it.nodes.first().getText() else listOf()
 			}.getRule()
 
+		val tableOfContentRule = TableOfContentRuleBuilder()
+			.disallow {
+				it.filter {
+					// println("${it.text.count()} -> ${it.content}")
+					val text = it.text.filter { it.text.trim().isNotEmpty() }
+					((text.count() == 3 && (text[1].text == "Введение" || text[1].text == "Заключение")) ||
+							(text.count() == 4 && text[1].text == "Список" && text[2].text == "литературы"))
+				}
+			}.called("Введение, заключение и список литературы не нумеруются")
+			.getRule()
+
 		return listOf(
 			litlinkRule,
 			shortDashRule,
 			mediumDashRule,
 			longDashRule,
-			listRule
+			listRule,
+			tableOfContentRule
 		).map {
 			it.process(document)
 		}.flatten().toSet().toList()
