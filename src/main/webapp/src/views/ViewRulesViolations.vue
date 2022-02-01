@@ -1,16 +1,35 @@
 
 <template>
 	<div>
-		<ul id="rulesViolations">
-			<li v-for="ruleViolation in this.$store.getters.getRuleViolations"
-			:key="'rulesViolations'+ruleViolation.toString()">{{ruleViolation.message}} > Line {{ruleViolation.lines[0].line}}, page {{ruleViolation.lines[0].page}}</li>
-		</ul>
-		<div id="ruleViolation" v-if="curPage != -1">
-			<pdf
-				:src="`api/viewPDFRuleViolations.pdf?pdfName=${this.$store.getters.getPdfName}&page=${curPage}&line=${curLine}`"
-				:page="curPage + 1"
-				style="display: inline-block; width: 100%"
-			></pdf>
+		<div v-show="!this.$store.getters.getContainsErrors" class="messageDiv">
+			Ошибок не найдено!
+		</div>
+		<div v-show="this.$store.getters.getContainsErrors">
+			<div v-show="this.$store.getters.getContainsAreaErrors" class="messageDivText">
+				<div style="color: #A22; font-size: 32px;">Приложение не обработало PDF</div>
+				<br>
+				<br>Возможные причины и способы их проверки:
+				<br><div style="width: 50%; margin: auto;"><ul>
+					<li>Зайдите в раздел <b><i>View as Text</i></b>. Если там текст отображается как "Ñîäåðæàíèå Ïîñòàíîâêà öåëè è çàäà÷", то проблема со шрифтами.<br><br></li>
+					<li>Зайдите в подраздел <b><i>View as Text</i></b> -> <b><i>Highlight sections</i></b>. Если разделы не отображаются разными цветами, то возможна проблема с оглавлением.</li>
+					</ul>
+					</div>
+				<br>
+			</div>
+			<div v-show="!this.$store.getters.getContainsAreaErrors">
+				<div class="messageDiv">Выберите ошибку из списка ошибок для отображения соответствующей страницы.</div>
+				<ul id="rulesViolations">
+					<li v-for="ruleViolation in this.$store.getters.getRuleViolations"
+					:key="'rulesViolations'+ruleViolation.toString()">{{ruleViolation.message}} > Line {{ruleViolation.lines[0].line}}, page {{ruleViolation.lines[0].page}}</li>
+				</ul>
+				<div id="ruleViolation" v-show="curPage != -1">
+					<pdf
+						:src="`api/viewPDFRuleViolations.pdf?pdfName=${this.$store.getters.getPdfName}&page=${curPage}&line=${curLine}`"
+						:page="curPage + 1"
+						style="display: inline-block; width: 100%"
+					></pdf>
+				</div>
+			</div>
 		</div>
 	</div>
 </template>
@@ -21,6 +40,7 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 
 import PDFTextComponent from '../components/PDFTextComponent.vue'
 import pdf from 'vue-pdf'
+import RuleViolation from '@/classes/RuleViolation';
 
 @Component({
 	components: {
@@ -75,6 +95,18 @@ export default class ViewRulesViolations extends Vue {
 		this.curPage = page
 		this.curLine = Number(lineText)
 	}
+
+/*
+	updated() {
+		this.noErrorsFound = this.$store.getters.getRuleViolations().count() == 0
+		this.noAreaErrorsFound =
+			this.$store.getters.getRuleViolations().count() == 0 ||
+			this.$store.getters.getRuleViolations().filter((ruleViolation: RuleViolation) => ruleViolation.message == 'PDFArea').count() == 0
+		console.log(this.$store.getters.getRuleViolations())
+		console.log(this.$store.getters.getRuleViolations().count() == 0)
+		console.log(this.$store.getters.getRuleViolations().filter((ruleViolation: RuleViolation) => ruleViolation.message == 'PDFArea').count() == 0)
+	}
+*/
 }
 </script>
 
@@ -84,7 +116,7 @@ export default class ViewRulesViolations extends Vue {
 	width: 75%;
 }
 
-ul {
+#rulesViolations {
 	float: left;
 	width: 20%;
 }
@@ -93,7 +125,15 @@ ul {
 	background: #e74c3c;
 }
 
-li {
+#rulesViolations li {
 	cursor: pointer;
+}
+
+.messageDiv {
+	font-size: 32px;
+}
+
+.messageDivText {
+	font-size: 24px;
 }
 </style>

@@ -1,6 +1,6 @@
 <template>
 	<ul class="menu cf">
-		<li><router-link to="/">Home</router-link></li>
+		<li><router-link :to="`/?pdfName=${this.$store.getters.getPdfName}`">Home</router-link></li>
 		<li><router-link :to="`/viewPDF?pdfName=${this.$store.getters.getPdfName}&numPages=${this.$store.getters.getNumPages}`">View PDF</router-link></li>
 		<li>
 			<router-link :to="`/viewPDFText?pdfName=${this.$store.getters.getPdfName}`">View as text</router-link>
@@ -11,7 +11,7 @@
 			</ul>
 		</li>
 		<li><router-link :to="`/viewRulesViolations?pdfName=${this.$store.getters.getPdfName}`">Rules' violations</router-link></li>
-		<li><router-link to="/about">About</router-link></li>
+		<li><router-link :to="`/about?pdfName=${this.$store.getters.getPdfName}`">About</router-link></li>
 	</ul>
 </template>
 

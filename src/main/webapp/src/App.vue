@@ -34,6 +34,7 @@ export default class AppComponent extends Vue {
 		this.$store.commit('setPdfName', {
 			name: this.$route.query.pdfName
 		})
+
 		if (this.$store.getters.getNumPages == 0) {
 			fetch(`api/getPDFSize?pdfName=${this.$store.getters.getPdfName}`)
 				.then(response => response.json())
@@ -46,6 +47,9 @@ export default class AppComponent extends Vue {
 				.then(response => response.json())
 				.then(ruleViolations => {
 					this.$store.commit('setRuleViolations', {
+						ruleViolations
+					})
+					this.$store.commit('updateContainsErrors', {
 						ruleViolations
 					})
 				});
