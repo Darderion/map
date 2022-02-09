@@ -10,6 +10,8 @@ import java.io.UncheckedIOException
 import java.nio.file.*
 import java.util.*
 import javax.imageio.ImageIO
+import kotlin.math.abs
+import kotlin.random.Random
 
 
 class FileUploadUtil {
@@ -25,11 +27,17 @@ class FileUploadUtil {
 			}
 		}
 
+		fun getFileName() = (abs(Random.nextInt() % 10000)).toString() + (abs(Random.nextInt() % 10000)).toString()
+
 		fun saveFile(
 			uploadDir: String,
-			fileName: String,
-			multipartFile: MultipartFile
-		) {
+			multipartFile: MultipartFile,
+			fileName: String = getFileName(),
+			folderMaxSize: Int? = null
+		): String {
+			if (folderMaxSize != null) {
+				removeRandomFile(uploadDir, folderMaxSize)
+			}
 			val uploadPath = Paths.get(uploadDir)
 			if (!Files.exists(uploadPath)) {
 				Files.createDirectories(uploadPath)
@@ -42,6 +50,7 @@ class FileUploadUtil {
 			} catch (ioe: IOException) {
 				throw IOException("Could not save pdf file: $fileName", ioe)
 			}
+			return fileName
 		}
 	}
 }

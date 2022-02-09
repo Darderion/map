@@ -1,6 +1,7 @@
 package com.github.darderion.mundaneassignmentpolice.controller
 
 import com.github.darderion.mundaneassignmentpolice.checker.Checker
+import com.github.darderion.mundaneassignmentpolice.checker.DocumentReport
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.Annotations
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Section
 import com.github.darderion.mundaneassignmentpolice.utils.FileUploadUtil
@@ -47,12 +48,8 @@ class APIController {
 		if (multipartFile.originalFilename == null) {
 			return null
 		}
-		// val fileName = StringUtils.cleanPath(multipartFile.originalFilename!!)
-		val fileName = (abs(Random.nextInt() % 10000)).toString() + (abs(Random.nextInt() % 10000)).toString()
 
-		FileUploadUtil.removeRandomFile(pdfFolder, 1000)
-
-		FileUploadUtil.saveFile(pdfFolder, fileName, multipartFile)
+		val fileName = FileUploadUtil.saveFile(pdfFolder, multipartFile, folderMaxSize = 1000)
 		logger.info("UploadPDF(pdfName = $fileName)")
 		return RedirectView("/#/viewPDF?pdfName=$fileName&numPages=${pdfBox.getPDFSize("$pdfFolder$fileName")}", true)
 	}
@@ -84,6 +81,17 @@ class APIController {
 
 	@GetMapping("/api/getPDFSize")
 	fun getPDFSize(@RequestParam pdfName: String) = pdfBox.getPDFSize("$pdfFolder$pdfName")
+
+	@PostMapping("/api/uploadMultipleFiles")
+	fun uploadMultipleFiles(@RequestParam("file") multipartFile: MultipartFile): DocumentReport {
+		if (multipartFile.originalFilename == null) {
+			return DocumentReport("", -1, -1)
+		}
+		val pdfName = FileUploadUtil.saveFile(pdfFolder, multipartFile, folderMaxSize = 1000)
+		val ruleViolations = Checker().getRuleViolations("$pdfFolder$pdfName")
+
+		return DocumentReport(pdfName, ruleViolations.count(), 0)
+	}
 
 	private companion object {
 		private val logger = KotlinLogging.logger {}

@@ -11,6 +11,7 @@
 			</ul>
 		</li>
 		<li><router-link :to="`/viewRulesViolations?pdfName=${this.$store.getters.getPdfName}`">Rules' violations</router-link></li>
+		<li><router-link :to="`/uploadMultipleFiles`">Upload multiple files</router-link></li>
 		<li><router-link :to="`/about?pdfName=${this.$store.getters.getPdfName}`">About</router-link></li>
 	</ul>
 </template>

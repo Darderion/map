@@ -54,6 +54,12 @@ const routes: Array<RouteConfig> = [
 		component: () => import('../views/ViewRulesViolations.vue'),
 		props: (route) => ({ pdfName: route.query.pdfName })
 	},
+	{
+		path: '/uploadMultipleFiles',
+		name: 'UploadMultipleFiles',
+		component: () => import('../views/UploadMultipleFiles.vue'),
+		props: (route) => ({ pdfName: route.query.pdfName })
+	},
 ];
 
 const router = new VueRouter({
