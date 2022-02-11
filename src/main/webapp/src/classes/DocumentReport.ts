@@ -1,12 +1,13 @@
+import RuleViolation from "./RuleViolation";
 
 export default class DocumentReport {
 	name: string;
-	numberOfViolations: number;
+	ruleViolations: RuleViolation[];
 	errorCode: number;
 
-	constructor(name: string, numberOfViolations: number, errorCode: number) {
+	constructor(name: string, ruleViolations: RuleViolation[], errorCode: number) {
 		this.name = name;
-		this.numberOfViolations = numberOfViolations;
+		this.ruleViolations = ruleViolations;
 		this.errorCode = errorCode;
 	}
 }

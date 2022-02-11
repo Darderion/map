@@ -10,7 +10,7 @@
 				<span>{{file.size}}</span> -
 			-->
 			<span v-if="file.error">{{file.error}}</span>
-			<span v-else-if="file.success && file.response.errorCode == 0">{{file.response.numberOfViolations}} errors found <a :href="`#/viewRulesViolations?pdfName=${file.response.name}`">PDF</a></span>
+			<span v-else-if="file.success && file.response.errorCode == 0">{{file.response.ruleViolations.length}} errors found <a :href="`#/viewRulesViolations?pdfName=${file.response.name}`">PDF</a></span>
 			<span v-else-if="file.active">active</span>
 			<span v-else></span>
 		</li>
@@ -26,17 +26,17 @@
 		<h3>Drop files to upload</h3>
 	</div>
 
-	<div class="uploadSection" v-show="files.length">
+	<div class="uploadSection" v-show="files.length > 0">
 		<file-upload
 			class="btn btn-primary"
-			post-action="api/uploadMultipleFiles"
+			post-action="/api/uploadPDF"
 			:multiple="true"
 			:drop="true"
 			:drop-directory="true"
 			v-model="files"
 			ref="upload">
 			<i class="fa fa-plus"></i>
-			Select a file
+			Add another PDF
 		</file-upload>
 		<div>
 		<button type="button" class="btn btn-success" v-if="!$refs.upload || !$refs.upload.active" @click.prevent="$refs.upload.active = true">

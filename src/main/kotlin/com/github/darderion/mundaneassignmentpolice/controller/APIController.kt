@@ -43,13 +43,13 @@ class APIController {
 	fun getPDFImages(@RequestParam pdfName: String) =
 		pdfBox.getImages("$pdfFolder$pdfName").toList().also { logger.info("ViewPDFImages(pdfName = $pdfName)") }
 
-	@PostMapping("/api/uploadPDF")
-	fun uploadPDF(@RequestParam("pdf") multipartFile: MultipartFile): RedirectView? {
-		if (multipartFile.originalFilename == null) {
+	@PostMapping("/api/getPDFReview")
+	fun getPDFReview(@RequestParam("pdf") multipartFile: MultipartFile): RedirectView? {
+		val pdfReport = uploadPDF(multipartFile)
+		if (pdfReport.errorCode != 0) {
 			return null
 		}
-
-		val fileName = FileUploadUtil.saveFile(pdfFolder, multipartFile, folderMaxSize = 1000)
+		val fileName = pdfReport.name
 		logger.info("UploadPDF(pdfName = $fileName)")
 		return RedirectView("/#/viewPDF?pdfName=$fileName&numPages=${pdfBox.getPDFSize("$pdfFolder$fileName")}", true)
 	}
@@ -82,15 +82,15 @@ class APIController {
 	@GetMapping("/api/getPDFSize")
 	fun getPDFSize(@RequestParam pdfName: String) = pdfBox.getPDFSize("$pdfFolder$pdfName")
 
-	@PostMapping("/api/uploadMultipleFiles")
-	fun uploadMultipleFiles(@RequestParam("file") multipartFile: MultipartFile): DocumentReport {
+	@PostMapping("/api/uploadPDF")
+	fun uploadPDF(@RequestParam("file") multipartFile: MultipartFile): DocumentReport {
 		if (multipartFile.originalFilename == null) {
-			return DocumentReport("", -1, -1)
+			return DocumentReport.emptyFileName
 		}
 		val pdfName = FileUploadUtil.saveFile(pdfFolder, multipartFile, folderMaxSize = 1000)
 		val ruleViolations = Checker().getRuleViolations("$pdfFolder$pdfName")
 
-		return DocumentReport(pdfName, ruleViolations.count(), 0)
+		return DocumentReport(pdfName, ruleViolations, 0)
 	}
 
 	private companion object {

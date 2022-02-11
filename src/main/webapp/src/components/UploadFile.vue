@@ -1,6 +1,6 @@
 
 <template>
-	<form action="/api/uploadPDF"
+	<form action="/api/getPDFReview"
 		object="${pdf}" method="post"
 		enctype="multipart/form-data"
 		id="uploadFileForm"
