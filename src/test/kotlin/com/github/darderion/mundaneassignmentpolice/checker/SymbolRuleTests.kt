@@ -18,7 +18,7 @@ class SymbolRuleTests: StringSpec({
 			.ignoringAdjusting(*" ,0123456789".toCharArray())
 			.shouldNotHaveNeighbor(*"[]".toCharArray())
 			.getRule()
-			.process(PDFBox().getPDF(filePath)).count() shouldBeExactly 4
+			.process(PDFBox().getPDF(filePath)).count() shouldBeExactly 3
 	}
 	"Symbol rule should detect incorrect usage of - symbol" {
 		val shortDash = '-'

@@ -78,6 +78,17 @@ class Checker {
 			.inArea(EVERYWHERE.except(BIBLIOGRAPHY, FOOTNOTE))
 			.getRule()
 
+		val bracket = '('
+
+		val bracketRule = SymbolRuleBuilder()
+			.symbol(bracket)
+			.ignoringAdjusting(' ')
+			.shouldHaveNeighbor(*enCapitalLetters.toCharArray())
+			.shouldHaveNeighbor(*rusCapitalLetters.toCharArray())
+			.called("Большая буква после скобки")
+			.inArea(EVERYWHERE)
+			.getRule()
+
 		val listRule = ListRuleBuilder()
 			.inArea(NOWHERE.except(TABLE_OF_CONTENT))
 			//.called("Only 1 subsection in a section")
@@ -103,7 +114,8 @@ class Checker {
 			mediumDashRule,
 			longDashRule,
 			listRule,
-			tableOfContentRule
+			tableOfContentRule,
+			bracketRule
 		).map {
 			it.process(document)
 		}.flatten().toSet().toList()
