@@ -96,6 +96,8 @@ class PDFBox {
 		val stripper = PDFStripper()			// Stripper with additional information
 		val textStripper = PDFTextStripper()	// Text stripper
 
+		val size = document.pages.first().mediaBox
+
 		val strippers = listOf(stripper, textStripper)
 
 		var lineIndex = 0
@@ -170,7 +172,7 @@ class PDFBox {
 
 		document.close()
 
-		return PDFDocument(fileName, pdfText)
+		return PDFDocument(fileName, pdfText, size.width.toDouble(), size.height.toDouble())
 	}
 
 	fun getPDFSize(fileName: String): Int {
