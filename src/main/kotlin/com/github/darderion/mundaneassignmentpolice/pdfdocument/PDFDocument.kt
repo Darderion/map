@@ -4,7 +4,11 @@ import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Line
 import mu.KotlinLogging
 import java.lang.Exception
 
-class PDFDocument(val name: String = "PDF", val text: List<Line>) {
+class PDFDocument(val name: String = "PDF",
+				  val text: List<Line>,
+				  val width: Double = defaultPageWidth,
+				  val height: Double = defaultPageHeight
+				  ) {
 	override fun toString() = "PDF: $name\n" +
 			text.joinToString("\n") { it.toString() }
 
@@ -30,6 +34,9 @@ class PDFDocument(val name: String = "PDF", val text: List<Line>) {
 	}
 
 	private companion object {
+		private const val defaultPageHeight = 842.0
+		private const val defaultPageWidth = 595.22
+
 		private val logger = KotlinLogging.logger {}
 	}
 }

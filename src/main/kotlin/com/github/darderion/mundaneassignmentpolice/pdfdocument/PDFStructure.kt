@@ -88,7 +88,7 @@ class PDFStructure(text: List<Line>) {
 					sectionsTitlesLines.add(curSectionTitle + it)
 					curSectionTitle = ""
 				} else {
-					curSectionTitle += it + " "
+					curSectionTitle += "$it "
 				}
 			}
 
@@ -170,7 +170,7 @@ class PDFStructure(text: List<Line>) {
 	}
 
 	private fun isSectionTitle(line: Line) = sections.any {
-		(if (it.sectionIndex == it.titleIndex + 2)
+		(if (it.contentIndex == it.titleIndex + 2)
 			line.documentIndex == it.titleIndex + 1
 		else
 			false) ||
