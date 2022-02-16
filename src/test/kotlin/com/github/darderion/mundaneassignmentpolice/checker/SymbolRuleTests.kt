@@ -91,8 +91,21 @@ class SymbolRuleTests: StringSpec({
 					.getRule())
 			.process(PDFBox().getPDF(filePath)).count() shouldBeExactly 1
 	}
+	"Symbol rule should detect using closing quote instead opening quote" {
+		val closingQuote = '”'
+		val openingQuote = '“'
+
+		SymbolRuleBuilder()
+			.symbol(closingQuote)
+			.notIgnoringAdjusting(*"$closingQuote$openingQuote".toCharArray())
+			.fromLeft().shouldHaveNeighbor(openingQuote)
+			.inNeighborhood(20)
+			.getRule()
+			.process(PDFBox().getPDF(filePath2)).count() shouldBeExactly 4
+	}
 }) {
 	private companion object {
 		const val filePath = "${resourceFolder}checker/SymbolRuleTests.pdf"
+		const val filePath2 = "${resourceFolder}checker/ClosingQuoteRuleTest.pdf"
 	}
 }
