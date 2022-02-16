@@ -24,7 +24,7 @@ class BasicSymbolRule(
 	override fun isViolated(document: PDFDocument, line: Int, index: Int): Boolean {
 		if (!ignoredIndexes.contains(index)) {
 			val symbolIndex = index + document.getTextFromLines(line - neighborhoodSize, line - 1, area).length +
-					2 * neighborhoodSize.coerceAtMost(line)
+					2 * line.coerceAtMost(1).coerceAtMost(neighborhoodSize)
 			val text = document.getTextFromLines(line - neighborhoodSize, line + neighborhoodSize, area)
 
 			val sideTexts = mutableListOf(

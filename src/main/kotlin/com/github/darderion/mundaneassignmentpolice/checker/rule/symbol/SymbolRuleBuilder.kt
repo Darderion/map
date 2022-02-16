@@ -48,6 +48,8 @@ class SymbolRuleBuilder {
 
 	infix fun inArea(region: PDFRegion) = this.also { this.region = region }
 
+	fun inNeighborhood(size: Int) = this.also { this.neighborhoodSize = size }
+
 	fun getRule() = BasicSymbolRule(
 		symbol,
 		ignoredNeighbors,
