@@ -1,10 +1,10 @@
 package com.github.darderion.mundaneassignmentpolice.pdfdocument
 
-import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Text
+import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Line
 import mu.KotlinLogging
 import java.lang.Exception
 
-class PDFDocument(val name: String = "PDF", val text: List<Text>) {
+class PDFDocument(val name: String = "PDF", val text: List<Line>) {
 	override fun toString() = "PDF: $name\n" +
 			text.joinToString("\n") { it.toString() }
 

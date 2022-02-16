@@ -90,7 +90,7 @@ class PDFBox {
 	 * @return PDFDocument
 	 */
 	fun getPDF(fileName: String): PDFDocument {
-		val pdfText: MutableList<Text> = mutableListOf()
+		val pdfText: MutableList<Line> = mutableListOf()
 
 		val document = getDocument(fileName)
 		val stripper = PDFStripper()			// Stripper with additional information
@@ -164,7 +164,7 @@ class PDFBox {
 				if (font == null && word.isEmpty()) font = Font(0.0f)
 				words.add(Word(word, font!!, coordinates))
 
-				Text(line, pageIndex, lineIndex, words.toList())
+				Line(line, pageIndex, lineIndex, words.toList())
 			})
 		}
 

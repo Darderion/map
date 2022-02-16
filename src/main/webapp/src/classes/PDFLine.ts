@@ -1,13 +1,13 @@
 
-export default class PDFText {
-	line: number;
+export default class PDFLine {
+	index: number;
 	page: number;
 	documentIndex: number;
 	content: string;
 	area: string;
 
-	constructor(line: number, page: number, documentIndex: number, content: string, area: string) {
-		this.line = line
+	constructor(index: number, page: number, documentIndex: number, content: string, area: string) {
+		this.index = index
 		this.page = page
 		this.documentIndex = documentIndex
 		this.content = content

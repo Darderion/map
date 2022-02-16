@@ -20,7 +20,7 @@
 				<div class="messageDiv">Выберите ошибку из списка ошибок для отображения соответствующей страницы.</div>
 				<ul id="rulesViolations">
 					<li v-for="ruleViolation in this.$store.getters.getRuleViolations"
-					:key="'rulesViolations'+ruleViolation.toString()">{{ruleViolation.message}} > Line {{ruleViolation.lines[0].line}}, page {{ruleViolation.lines[0].page}}</li>
+					:key="'rulesViolations'+ruleViolation.toString()">{{ruleViolation.message}} > Line {{ruleViolation.lines[0].index}}, page {{ruleViolation.lines[0].page}}</li>
 				</ul>
 				<div id="ruleViolation" v-show="curPage != -1">
 					<pdf

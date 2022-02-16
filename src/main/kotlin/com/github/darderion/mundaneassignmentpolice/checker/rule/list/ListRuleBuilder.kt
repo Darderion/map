@@ -3,14 +3,14 @@ package com.github.darderion.mundaneassignmentpolice.checker.rule.list
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFArea
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.list.PDFList
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFRegion
-import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Text
+import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Line
 
 class ListRuleBuilder {
 	private var region: PDFRegion = PDFRegion.EVERYWHERE
-	private val predicates: MutableList<(list: PDFList<Text>) -> List<Text>> = mutableListOf()
+	private val predicates: MutableList<(list: PDFList<Line>) -> List<Line>> = mutableListOf()
 	private var name: String = "Rule name"
 
-	fun disallow(predicate: (list: PDFList<Text>) -> List<Text>) = this.also { predicates.add(predicate) }
+	fun disallow(predicate: (list: PDFList<Line>) -> List<Line>) = this.also { predicates.add(predicate) }
 
 	infix fun inArea(area: PDFArea) = this.also { region = PDFRegion.NOWHERE.except(area) }
 

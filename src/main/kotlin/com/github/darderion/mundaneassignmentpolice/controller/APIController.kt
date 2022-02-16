@@ -72,7 +72,7 @@ class APIController {
 			if (page == null || line == null) {
 				Checker().getRuleViolations(fileName).map { it.lines }.flatten()
 			} else
-				listOf(pdf.text.first { it.page == page && it.line == line })
+				listOf(pdf.text.first { it.page == page && it.index == line })
 		)
 		logger.info("File created: $pdf2")
 
