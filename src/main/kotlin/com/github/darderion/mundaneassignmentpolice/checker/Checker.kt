@@ -78,6 +78,17 @@ class Checker {
 			.inArea(EVERYWHERE.except(BIBLIOGRAPHY, FOOTNOTE))
 			.getRule()
 
+		val closingQuote = '”'
+		val openingQuote = '“'
+
+		val closingQuoteRule = SymbolRuleBuilder()
+			.symbol(closingQuote)
+			.notIgnoringAdjusting(*"$closingQuote$openingQuote".toCharArray())
+			.fromLeft().shouldHaveNeighbor(openingQuote)
+			.inNeighborhood(20)
+			.called("Неправильное использование закрывающей кавычки")
+			.getRule()
+
 		val listRule = ListRuleBuilder()
 			.inArea(NOWHERE.except(TABLE_OF_CONTENT))
 			//.called("Only 1 subsection in a section")
@@ -102,6 +113,7 @@ class Checker {
 			shortDashRule,
 			mediumDashRule,
 			longDashRule,
+			closingQuoteRule,
 			listRule,
 			tableOfContentRule
 		).map {

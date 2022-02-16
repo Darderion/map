@@ -4,6 +4,7 @@ import com.github.darderion.mundaneassignmentpolice.checker.Direction
 import com.github.darderion.mundaneassignmentpolice.checker.Direction.*
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFDocument
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFRegion
+import kotlin.reflect.jvm.internal.impl.utils.DFS.Neighbors
 
 /**
  * Rule that looks for closest symbol that is not IGNORED
@@ -13,6 +14,7 @@ import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFRegion
 class BasicSymbolRule(
 	symbol: Char,
 	private val ignoredNeighbors: MutableList<Char>,
+	private val notIgnoredNeighbors: MutableList<Char>,
 	private val ignoredIndexes: MutableList<Int>,
 	private val disallowedNeighbors: MutableList<Char>,
 	private val requiredNeighbors: MutableList<Char>,
@@ -39,11 +41,13 @@ class BasicSymbolRule(
 
 			val neighbors = sideTexts
 				.map { it.filterNot { ignoredNeighbors.contains(it) } }    // Remove ignored symbols
+				.map { if (notIgnoredNeighbors.isNotEmpty())
+					it.filter { notIgnoredNeighbors.contains(it) } else it }    // Keep only non-ignored symbols
 				.filter { it.isNotEmpty() }                                // Remove empty lines
 				.map { it.first() }
 
 			if (neighbors.any { disallowedNeighbors.contains(it) } ||
-				(requiredNeighbors.isNotEmpty() && neighbors.any { !requiredNeighbors.contains(it) })) {
+				(requiredNeighbors.isNotEmpty() && (neighbors.isEmpty() || neighbors.any { !requiredNeighbors.contains(it) }))) {
 				return true
 			}
 		}
