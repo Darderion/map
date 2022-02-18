@@ -2,25 +2,25 @@
 <template>
 	<div>
 		<div v-show="!this.$store.getters.getContainsErrors" class="messageDiv">
-			Ошибок не найдено!
+			{{ $t('page.rulesViolations.noErrors')}}
 		</div>
 		<div v-show="this.$store.getters.getContainsErrors">
 			<div v-show="this.$store.getters.getContainsAreaErrors" class="messageDivText">
-				<div style="color: #A22; font-size: 32px;">Приложение не обработало PDF</div>
+				<div style="color: #A22; font-size: 32px;">{{ $t('page.rulesViolations.errors')}}</div>
 				<br>
-				<br>Возможные причины и способы их проверки:
+				<br>{{ $t('page.rulesViolations.suggestions')}}
 				<br><div style="width: 50%; margin: auto;"><ul>
-					<li>Зайдите в раздел <b><i>View as Text</i></b>. Если там текст отображается как "Ñîäåðæàíèå Ïîñòàíîâêà öåëè è çàäà÷", то проблема со шрифтами.<br><br></li>
-					<li>Зайдите в подраздел <b><i>View as Text</i></b> -> <b><i>Highlight sections</i></b>. Если разделы не отображаются разными цветами, то возможна проблема с оглавлением.</li>
+					<li>{{ $t('page.rulesViolations.suggestion_1_1')}} <b><i>{{ $t('page.viewText.title')}}</i></b>. {{ $t('page.rulesViolations.suggestion_1_2')}}<br><br></li>
+					<li>{{ $t('page.rulesViolations.suggestion_2_1')}} <b><i>{{ $t('page.viewText.title')}}</i></b> -> <b><i>{{ $t('page.viewText.highlightSections')}}</i></b>. {{ $t('page.rulesViolations.suggestion_2_2')}} "Ñîäåðæàíèå Ïîñòàíîâêà öåëè è çàäà÷" {{ $t('page.rulesViolations.suggestion_2_3')}}</li>
 					</ul>
 					</div>
 				<br>
 			</div>
 			<div v-show="!this.$store.getters.getContainsAreaErrors">
-				<div class="messageDiv">Выберите ошибку из списка ошибок для отображения соответствующей страницы.</div>
+				<div class="messageDiv">{{ $t('page.rulesViolations.selectRuleViolation')}}</div>
 				<ul id="rulesViolations">
 					<li v-for="ruleViolation in this.$store.getters.getRuleViolations"
-					:key="'rulesViolations'+ruleViolation.toString()">{{ruleViolation.message}} > Line {{ruleViolation.lines[0].index}}, page {{ruleViolation.lines[0].page}}</li>
+					:key="'rulesViolations'+ruleViolation.toString()">{{ruleViolation.message}} > {{ $t('page.rulesViolations.line')}} {{ruleViolation.lines[0].index}}, {{ $t('page.rulesViolations.page')}} {{ruleViolation.lines[0].page}}</li>
 				</ul>
 				<div id="ruleViolation" v-show="curPage != -1">
 					<pdf
@@ -57,6 +57,10 @@ export default class ViewRulesViolations extends Vue {
 	curLine = 0
 	
 	mounted() {
+		const locale = this.$route.query.locale as string
+		if (locale != undefined && ['en', 'ru'].includes(locale)) {
+			this.$i18n.locale = locale
+		}
 		if (this.listElement == undefined) {
 			this.listElement = document.getElementById('rulesViolations') as HTMLUListElement
 		}

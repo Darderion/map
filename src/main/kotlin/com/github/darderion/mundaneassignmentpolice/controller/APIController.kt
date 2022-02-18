@@ -44,14 +44,17 @@ class APIController {
 		pdfBox.getImages("$pdfFolder$pdfName").toList().also { logger.info("ViewPDFImages(pdfName = $pdfName)") }
 
 	@PostMapping("/api/getPDFReview")
-	fun getPDFReview(@RequestParam("pdf") multipartFile: MultipartFile): RedirectView? {
+	fun getPDFReview(
+		@RequestParam("pdf") multipartFile: MultipartFile,
+		@RequestParam("locale") locale: String
+	): RedirectView? {
 		val pdfReport = uploadPDF(multipartFile)
 		if (pdfReport.errorCode != 0) {
 			return null
 		}
 		val fileName = pdfReport.name
 		logger.info("UploadPDF(pdfName = $fileName)")
-		return RedirectView("/#/viewPDF?pdfName=$fileName&numPages=${pdfBox.getPDFSize("$pdfFolder$fileName")}", true)
+		return RedirectView("/#/viewPDF?pdfName=$fileName&numPages=${pdfBox.getPDFSize("$pdfFolder$fileName")}&locale=${locale}", true)
 	}
 
 	@GetMapping("/api/viewPDF.pdf")

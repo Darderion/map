@@ -1,24 +1,24 @@
 <template>
 	<div class="home">
-		<br>Инструкция по использованию:
+		<br>{{ $t('page.home.instruction')}}
 		<br>
-		<br>Для начала работы выберите PDF файл курсовой/дипломной работы, нажав на кнопку <b><i>"Choose File"</i></b>
+		<br>{{ $t('page.home.instruction_chooseFile')}} <b><i>"{{ $t('button.chooseFile')}}"</i></b>
 		<br>
-		<br>Просмотреть PDF можно в автоматически открывшейся после загрузки PDF вкладке <b><i>"View PDF"</i></b>
+		<br>{{ $t('page.home.instruction_viewPDF')}} <b><i>"{{ $t('page.viewPDF.title')}}"</i></b>
 		<br>
-		<br>Просмотреть список ошибок, найденных в работе, можно во вкладке <b><i>"Rules' violations"</i></b>
+		<br>{{ $t('page.home.instruction_rulesViolations')}} <b><i>"{{ $t('page.rulesViolations.title')}}"</i></b>
 		<br>
 		<br>
 		<br>
-		<br>Список проверяемых ошибок оформления:
+		<br>{{ $t('page.home.rulesViolations.title')}}
 		<br>
 		<br><div style="width: 50%; margin: auto;"><ul>
-			<li>Один подраздел в разделе</li>
-			<li>Неправильное использование дефиса</li>
-			<li>Неправильное использование короткого тире</li>
-			<li>Неправильное использование длинного тире</li>
-			<li>Некорректные ссылки на литературу [?]</li>
-			<li>Введение, заключение и список литературы не нумеруются</li>
+			<li>{{ $t('page.home.rulesViolations.rules[0]')}}</li>
+			<li>{{ $t('page.home.rulesViolations.rules[1]')}}</li>
+			<li>{{ $t('page.home.rulesViolations.rules[2]')}}</li>
+			<li>{{ $t('page.home.rulesViolations.rules[3]')}}</li>
+			<li>{{ $t('page.home.rulesViolations.rules[4]')}}</li>
+			<li>{{ $t('page.home.rulesViolations.rules[5]')}}</li>
 			</ul>
 			</div>
 	</div>

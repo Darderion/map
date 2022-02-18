@@ -1,9 +1,9 @@
 
 <template>
 	<div class="about">
-		Text:
+		{{ $t('page.viewText.text')}}
 		<div v-for="text in this.pdfLines" :key="text.toString() + (new Date()).getTime()" :id="`pdfLine${text.index}-${text.page}`" v-html="text.content"></div>
-		Images:
+		{{ $t('page.viewText.images')}}
 		<img v-for="pdfImage in this.pdfImages" :key="pdfImage"
 		:src="'data:image/png;base64, '+pdfImage"/>
 	</div>

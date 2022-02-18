@@ -2,9 +2,9 @@
 <template>
 	<div class="about">
 		<img alt="Vue logo" src="../assets/logo.png">
-		<br><a href="https://github.com/darderion/map"><b>Github</b> проекта</a>
+		<br><a href="https://github.com/darderion/map"><b>Github</b> {{ $t('page.about.github')}}</a>
 		<br>
-		<br>Любые замечания, баги, рекомендации, вопросы и предложения можно сообщать с помощью:
+		<br>{{ $t('page.about.suggestions')}}
 		<br>
 		<br><b>Discord</b>: Darderion#8682
 		<br>

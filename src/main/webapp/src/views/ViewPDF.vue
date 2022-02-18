@@ -19,5 +19,11 @@ import PDFComponent from '../components/PDFComponent.vue'
 })
 
 export default class ViewPDF extends Vue {
+	mounted() {
+		const locale = this.$route.query.locale as string
+		if (locale != undefined && ['en', 'ru'].includes(locale)) {
+			this.$i18n.locale = locale
+		}
+	}
 }
 </script>
