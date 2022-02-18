@@ -18,7 +18,7 @@ class SymbolRuleTests: StringSpec({
 			.ignoringAdjusting(*" ,0123456789".toCharArray())
 			.shouldNotHaveNeighbor(*"[]".toCharArray())
 			.getRule()
-			.process(PDFBox().getPDF(filePath)).count() shouldBeExactly 3
+			.process(PDFBox().getPDF(filePath)).count() shouldBeExactly 4
 	}
 	"Symbol rule should detect incorrect usage of - symbol" {
 		val shortDash = '-'
@@ -64,6 +64,23 @@ class SymbolRuleTests: StringSpec({
 					if (area == SECTION) 3 else 0
 		}
 	}
+	"Symbol rule should detect incorrect using multiple links" {
+		SymbolRuleBuilder()
+			.symbol(']')
+			.ignoringAdjusting(*" ,".toCharArray())
+			.fromRight().shouldNotHaveNeighbor(*"[".toCharArray())
+			.getRule()
+			.process(PDFBox().getPDF(filePath2)).count() shouldBeExactly 3
+	}
+	"Symbol rule should detect incorrect using multiple links" {
+		SymbolRuleBuilder()
+			.symbol('(')
+			.ignoringAdjusting(*" ".toCharArray())
+			.fromRight().shouldNotHaveNeighbor(*"АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ".toCharArray())
+			.getRule()
+			.process(PDFBox().getPDF(filePath3)).count() shouldBeExactly 3
+	}
+
 	"Combined symbol rule should search for rule violations in its region" {
 		val longDash = '—'
 
@@ -94,5 +111,7 @@ class SymbolRuleTests: StringSpec({
 }) {
 	private companion object {
 		const val filePath = "${resourceFolder}checker/SymbolRuleTests.pdf"
+		const val filePath2 = "${resourceFolder}checker/MultipleLinksRuleTest.pdf"
+		const val filePath3 = "${resourceFolder}checker/LargeRussianLetterTests.pdf"
 	}
 }

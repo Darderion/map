@@ -78,15 +78,23 @@ class Checker {
 			.inArea(EVERYWHERE.except(BIBLIOGRAPHY, FOOTNOTE))
 			.getRule()
 
+		val sqareSecondBracket=']'
+		val sqareFirstBracket='['
+
+		val multiLinksRule = SymbolRuleBuilder()
+			.ignoringAdjusting(' ')
+			.symbol(sqareSecondBracket)
+			.fromRight().shouldNotHaveNeighbor(sqareFirstBracket)
+			.called("*Неправильное оформление нескольких ссылок")
+			.getRule()
+
 		val bracket = '('
 
 		val bracketRule = SymbolRuleBuilder()
 			.symbol(bracket)
-			.ignoringAdjusting(' ')
-			.shouldHaveNeighbor(*enCapitalLetters.toCharArray())
-			.shouldHaveNeighbor(*rusCapitalLetters.toCharArray())
-			.called("Большая буква после скобки")
-			.inArea(EVERYWHERE)
+			.ignoringAdjusting(' ' )
+			.fromRight().shouldNotHaveNeighbor(*rusCapitalLetters.toCharArray())
+			.called("Большая русская буква после скобки")
 			.getRule()
 
 		val listRule = ListRuleBuilder()
@@ -95,6 +103,7 @@ class Checker {
 			.called("Одна подсекция в секции")
 			.disallow {
 				if (it.nodes.count() == 1) it.nodes.first().getText() else listOf()
+
 			}.getRule()
 
 		val tableOfContentRule = TableOfContentRuleBuilder()
@@ -115,7 +124,8 @@ class Checker {
 			longDashRule,
 			listRule,
 			tableOfContentRule,
-			bracketRule
+			bracketRule,
+			multiLinksRule
 		).map {
 			it.process(document)
 		}.flatten().toSet().toList()

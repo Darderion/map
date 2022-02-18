@@ -5,6 +5,7 @@ import com.github.darderion.mundaneassignmentpolice.checker.Direction.*
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFDocument
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFRegion
 
+
 /**
  * Rule that looks for closest symbol that is not IGNORED
  * 		If that symbol is DISALLOWED then a rule violation is detected
@@ -38,8 +39,8 @@ class BasicSymbolRule(
 			}
 
 			val neighbors = sideTexts
-				.map { it.filterNot { ignoredNeighbors.contains(it) } }    // Remove ignored symbols
-				.filter { it.isNotEmpty() }                                // Remove empty lines
+				.map { it.filterNot { ignoredNeighbors.contains(it) } }		// Remove ignored symbols
+				.filter { it.isNotEmpty() }                                 // Remove empty lines
 				.map { it.first() }
 
 			if (neighbors.any { disallowedNeighbors.contains(it) } ||
