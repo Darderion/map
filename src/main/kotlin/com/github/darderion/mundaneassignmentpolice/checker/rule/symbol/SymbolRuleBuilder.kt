@@ -31,9 +31,13 @@ class SymbolRuleBuilder {
 
 	fun called(name: String) = this.also { this.name = name }
 
-	fun ignoringAdjusting(vararg symbols: Char) = this.also { if (notIgnoredNeighbors.isEmpty()) ignoredNeighbors.addAll(symbols.toList()) }
+	fun ignoringAdjusting(vararg symbols: Char) = this.also { if (notIgnoredNeighbors.isEmpty()) ignoredNeighbors.addAll(symbols.toList())
+															  else throw Exception("Up to one of the following methods can be used:" +
+																				   " ignoringAdjusting() or ignoringEveryCharacterExcept().")}
 
-	fun notIgnoringAdjusting(vararg symbols: Char) = this.also { if (ignoredNeighbors.isEmpty()) notIgnoredNeighbors.addAll(symbols.toList()) }
+	fun ignoringEveryCharacterExcept(vararg symbols: Char) = this.also { if (ignoredNeighbors.isEmpty()) notIgnoredNeighbors.addAll(symbols.toList())
+																		 else throw Exception("Up to one of the following methods can be used:" +
+																							  " ignoringAdjusting() or ignoringEveryCharacterExcept().")}
 
 	fun ignoringIfIndex(index: Int) = this.also { ignoredIndexes.add(index) }
 

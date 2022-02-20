@@ -83,10 +83,18 @@ class Checker {
 
 		val closingQuoteRule = SymbolRuleBuilder()
 			.symbol(closingQuote)
-			.notIgnoringAdjusting(*"$closingQuote$openingQuote".toCharArray())
+			.ignoringEveryCharacterExcept(*"$closingQuote$openingQuote".toCharArray())
 			.fromLeft().shouldHaveNeighbor(openingQuote)
 			.inNeighborhood(20)
 			.called("Неправильное использование закрывающей кавычки")
+			.getRule()
+
+		val openingQuoteRule = SymbolRuleBuilder()
+			.symbol(openingQuote)
+			.ignoringEveryCharacterExcept(*"$closingQuote$openingQuote".toCharArray())
+			.fromRight().shouldHaveNeighbor(closingQuote)
+			.inNeighborhood(20)
+			.called("Неправильное использование открывающей кавычки")
 			.getRule()
 
 		val listRule = ListRuleBuilder()
@@ -114,6 +122,7 @@ class Checker {
 			mediumDashRule,
 			longDashRule,
 			closingQuoteRule,
+			openingQuoteRule,
 			listRule,
 			tableOfContentRule
 		).map {

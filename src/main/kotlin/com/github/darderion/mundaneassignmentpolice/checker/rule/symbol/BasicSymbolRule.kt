@@ -8,8 +8,9 @@ import kotlin.reflect.jvm.internal.impl.utils.DFS.Neighbors
 
 /**
  * Rule that looks for closest symbol that is not IGNORED
+ * 		If notIgnoredNeighbors is not empty then every symbol is ignored unless it is explicitly stated to not be ignored by being included in notIgnoredNeighbors
  * 		If that symbol is DISALLOWED then a rule violation is detected
- * 		If REQUIRED_SYMBOLS is not empty and that symbol is not REQUIRED then a rule violation is detected
+ * 		If REQUIRED_SYMBOLS is not empty and either no symbol is found or that symbol is not REQUIRED then a rule violation is detected
  */
 class BasicSymbolRule(
 	symbol: Char,
@@ -39,10 +40,10 @@ class BasicSymbolRule(
 				RIGHT -> sideTexts.removeAt(0)
 			}
 
-			val neighbors = sideTexts
-				.map { it.filterNot { ignoredNeighbors.contains(it) } }    // Remove ignored symbols
-				.map { if (notIgnoredNeighbors.isNotEmpty())
-					it.filter { notIgnoredNeighbors.contains(it) } else it }    // Keep only non-ignored symbols
+			val neighbors = (if (notIgnoredNeighbors.isNotEmpty()) sideTexts
+				.map { it.filter { notIgnoredNeighbors.contains(it) } }    // Keep only non-ignored symbols
+				else sideTexts
+				.map { it.filterNot { ignoredNeighbors.contains(it) } })    // Remove ignored symbols
 				.filter { it.isNotEmpty() }                                // Remove empty lines
 				.map { it.first() }
 
