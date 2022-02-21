@@ -18,7 +18,7 @@ class SymbolRuleTests: StringSpec({
 			.ignoringAdjusting(*" ,0123456789".toCharArray())
 			.shouldNotHaveNeighbor(*"[]".toCharArray())
 			.getRule()
-			.process(PDFBox().getPDF(filePath)).count() shouldBeExactly 4
+			.process(PDFBox().getPDF(filePathQuestionMarkAndDashes)).count() shouldBeExactly 4
 	}
 	"Symbol rule should detect incorrect usage of - symbol" {
 		val shortDash = '-'
@@ -27,7 +27,7 @@ class SymbolRuleTests: StringSpec({
 			.symbol(shortDash)
 			.shouldHaveNeighbor(*"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".toCharArray())
 			.shouldHaveNeighbor(*"абвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ".toCharArray())
-			.getRule().process(PDFBox().getPDF(filePath)).count() shouldBeExactly 2
+			.getRule().process(PDFBox().getPDF(filePathQuestionMarkAndDashes)).count() shouldBeExactly 2
 	}
 	"Symbol rule should detect incorrect usage of -- symbol" {
 		val mediumDash = '–'
@@ -35,7 +35,7 @@ class SymbolRuleTests: StringSpec({
 		SymbolRuleBuilder()
 			.symbol(mediumDash)
 			.shouldHaveNeighbor(*"0123456789".toCharArray())
-			.getRule().process(PDFBox().getPDF(filePath)).count() shouldBeExactly 3
+			.getRule().process(PDFBox().getPDF(filePathQuestionMarkAndDashes)).count() shouldBeExactly 3
 	}
 	"Symbol rule should detect incorrect usage of --- symbol" {
 		val longDash = '—'
@@ -43,13 +43,13 @@ class SymbolRuleTests: StringSpec({
 		SymbolRuleBuilder()
 			.symbol(longDash)
 			.shouldHaveNeighbor(' ')
-			.getRule().process(PDFBox().getPDF(filePath)).count() shouldBeExactly 1
+			.getRule().process(PDFBox().getPDF(filePathQuestionMarkAndDashes)).count() shouldBeExactly 1
 
 		SymbolRuleBuilder()
 			.symbol(longDash)
 			.ignoringAdjusting(' ')
 			.shouldNotHaveNeighbor(*"0123456789".toCharArray())
-			.getRule().process(PDFBox().getPDF(filePath)).count() shouldBeExactly 2
+			.getRule().process(PDFBox().getPDF(filePathQuestionMarkAndDashes)).count() shouldBeExactly 2
 	}
 	"Symbol rule should only search for rule violations in its region" {
 		val mediumDash = '–'
@@ -60,7 +60,7 @@ class SymbolRuleTests: StringSpec({
 
 		for(area in PDFArea.values()) {
 			symbolBuilder.inArea(PDFRegion.NOWHERE.except(area))
-				.getRule().process(PDFBox().getPDF(filePath)).count() shouldBeExactly
+				.getRule().process(PDFBox().getPDF(filePathQuestionMarkAndDashes)).count() shouldBeExactly
 					if (area == SECTION) 3 else 0
 		}
 	}
@@ -77,7 +77,7 @@ class SymbolRuleTests: StringSpec({
 					.ignoringAdjusting(' ')
 					.shouldNotHaveNeighbor(*"0123456789".toCharArray())
 					.getRule())
-			.process(PDFBox().getPDF(filePath)).count() shouldBeExactly 2
+			.process(PDFBox().getPDF(filePathQuestionMarkAndDashes)).count() shouldBeExactly 2
 
 		(SymbolRuleBuilder()
 			.symbol(longDash)
@@ -89,10 +89,35 @@ class SymbolRuleTests: StringSpec({
 					.ignoringAdjusting(' ')
 					.shouldNotHaveNeighbor(*"0123456789".toCharArray())
 					.getRule())
-			.process(PDFBox().getPDF(filePath)).count() shouldBeExactly 1
+			.process(PDFBox().getPDF(filePathQuestionMarkAndDashes)).count() shouldBeExactly 1
+	}
+	"Symbol rule should detect using closing quote instead opening quote" {
+		val closingQuote = '”'
+		val openingQuote = '“'
+
+		SymbolRuleBuilder()
+			.symbol(closingQuote)
+			.ignoringEveryCharacterExcept(*"$closingQuote$openingQuote".toCharArray())
+			.fromLeft().shouldHaveNeighbor(openingQuote)
+			.inNeighborhood(20)
+			.getRule()
+			.process(PDFBox().getPDF(filePathQuotes)).count() shouldBeExactly 4
+	}
+	"Symbol rule should detect using opening quote instead closing quote" {
+		val closingQuote = '”'
+		val openingQuote = '“'
+
+		SymbolRuleBuilder()
+			.symbol(openingQuote)
+			.ignoringEveryCharacterExcept(*"$closingQuote$openingQuote".toCharArray())
+			.fromRight().shouldHaveNeighbor(closingQuote)
+			.inNeighborhood(20)
+			.getRule()
+			.process(PDFBox().getPDF(filePathQuotes)).count() shouldBeExactly 2
 	}
 }) {
 	private companion object {
-		const val filePath = "${resourceFolder}checker/SymbolRuleTests.pdf"
+		const val filePathQuestionMarkAndDashes = "${resourceFolder}checker/SymbolRuleTestsQuestionMarkAndDashes.pdf"
+		const val filePathQuotes = "${resourceFolder}checker/SymbolRuleTestsQuotes.pdf"
 	}
 }

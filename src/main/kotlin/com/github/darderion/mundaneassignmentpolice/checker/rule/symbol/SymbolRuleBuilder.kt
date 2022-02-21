@@ -18,6 +18,7 @@ fun CharSequence.indicesOf(input: String): List<Int> =
 class SymbolRuleBuilder {
 	private var symbol: Char = ' '
 	private var ignoredNeighbors: MutableList<Char> = mutableListOf()
+	private var notIgnoredNeighbors: MutableList<Char> = mutableListOf()
 	private var ignoredIndexes: MutableList<Int> = mutableListOf()
 	private var disallowedNeighbors: MutableList<Char> = mutableListOf()
 	private var requiredNeighbors: MutableList<Char> = mutableListOf()
@@ -30,7 +31,13 @@ class SymbolRuleBuilder {
 
 	fun called(name: String) = this.also { this.name = name }
 
-	fun ignoringAdjusting(vararg symbols: Char) = this.also { ignoredNeighbors.addAll(symbols.toList()) }
+	fun ignoringAdjusting(vararg symbols: Char) = this.also { if (notIgnoredNeighbors.isEmpty()) ignoredNeighbors.addAll(symbols.toList())
+															  else throw Exception("Up to one of the following methods can be used:" +
+																				   " ignoringAdjusting() or ignoringEveryCharacterExcept().")}
+
+	fun ignoringEveryCharacterExcept(vararg symbols: Char) = this.also { if (ignoredNeighbors.isEmpty()) notIgnoredNeighbors.addAll(symbols.toList())
+																		 else throw Exception("Up to one of the following methods can be used:" +
+																							  " ignoringAdjusting() or ignoringEveryCharacterExcept().")}
 
 	fun ignoringIfIndex(index: Int) = this.also { ignoredIndexes.add(index) }
 
@@ -53,6 +60,7 @@ class SymbolRuleBuilder {
 	fun getRule() = BasicSymbolRule(
 		symbol,
 		ignoredNeighbors,
+		notIgnoredNeighbors,
 		ignoredIndexes,
 		disallowedNeighbors,
 		requiredNeighbors,
