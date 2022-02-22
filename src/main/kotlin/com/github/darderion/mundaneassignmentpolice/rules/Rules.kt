@@ -137,7 +137,7 @@ val smallNumbersRuleBuilder = SymbolRuleBuilder()
     .called("Неправильное написание целых чисел от 1 до 9")
     .inArea(PDFRegion.EVERYWHERE.except(PDFArea.FOOTNOTE, PDFArea.PAGE_INDEX, PDFArea.TABLE_OF_CONTENT))
 
-val RULES_SMALL_NUMBERS = MutableList<SymbolRule>(9) { number ->
-    smallNumbersRuleBuilder.symbol((number + 1).digitToChar()).fromLeft().shouldNotHaveNeighbor(*" \n".toCharArray()).getRule() or
+val RULES_SMALL_NUMBERS = MutableList<SymbolRule>(9) { index ->
+    smallNumbersRuleBuilder.symbol((index + 1).digitToChar()).fromLeft().shouldNotHaveNeighbor(*" \n".toCharArray()).getRule() or
             smallNumbersRuleBuilder.fromRight().shouldNotHaveNeighbor(*" \n,;:?$".toCharArray()).getRule()
 }
