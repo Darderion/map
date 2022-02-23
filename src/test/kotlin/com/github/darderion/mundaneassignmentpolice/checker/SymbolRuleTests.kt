@@ -64,21 +64,21 @@ class SymbolRuleTests: StringSpec({
 					if (area == SECTION) 3 else 0
 		}
 	}
-	"Symbol rule should detect incorrect using multiple links" {
+	"Symbol rule should detect incorrect use of multiple links" {
 		SymbolRuleBuilder()
 			.symbol(']')
-			.ignoringAdjusting(*" ,".toCharArray())
-			.fromRight().shouldNotHaveNeighbor(*"[".toCharArray())
+			.ignoringAdjusting(',',' ')
+			.fromRight().shouldNotHaveNeighbor('[')
 			.getRule()
-			.process(PDFBox().getPDF(filePath2)).count() shouldBeExactly 3
+			.process(PDFBox().getPDF(filePathMultipleLinks)).count() shouldBeExactly 3
 	}
-	"Symbol rule should detect incorrect using multiple links" {
+	"Symbol rule should detect incorrect using capital letters" {
 		SymbolRuleBuilder()
 			.symbol('(')
 			.ignoringAdjusting(*" ".toCharArray())
 			.fromRight().shouldNotHaveNeighbor(*"АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ".toCharArray())
 			.getRule()
-			.process(PDFBox().getPDF(filePath3)).count() shouldBeExactly 3
+			.process(PDFBox().getPDF(filePathLargerussianLetter)).count() shouldBeExactly 3
 	}
 
 	"Combined symbol rule should search for rule violations in its region" {
@@ -111,7 +111,7 @@ class SymbolRuleTests: StringSpec({
 }) {
 	private companion object {
 		const val filePath = "${resourceFolder}checker/SymbolRuleTests.pdf"
-		const val filePath2 = "${resourceFolder}checker/MultipleLinksRuleTest.pdf"
-		const val filePath3 = "${resourceFolder}checker/LargeRussianLetterTests.pdf"
+		const val filePathMultipleLinks = "${resourceFolder}checker/SymbolRuleTestsMultipleLinks.pdf"
+		const val filePathLargerussianLetter = "${resourceFolder}checker/SymbolRuleTestsLargeRussianLetter.pdf"
 	}
 }
