@@ -10,8 +10,8 @@
 				<br>
 				<br>{{ $t('page.rulesViolations.suggestions')}}
 				<br><div style="width: 50%; margin: auto;"><ul>
-					<li>{{ $t('page.rulesViolations.suggestion_1_1')}} <b><i>{{ $t('page.viewText.title')}}</i></b>. {{ $t('page.rulesViolations.suggestion_1_2')}}<br><br></li>
-					<li>{{ $t('page.rulesViolations.suggestion_2_1')}} <b><i>{{ $t('page.viewText.title')}}</i></b> -> <b><i>{{ $t('page.viewText.highlightSections')}}</i></b>. {{ $t('page.rulesViolations.suggestion_2_2')}} "Ñîäåðæàíèå Ïîñòàíîâêà öåëè è çàäà÷" {{ $t('page.rulesViolations.suggestion_2_3')}}</li>
+					<li>{{ $t('page.rulesViolations.suggestion_1_1')}} <b><i>{{ $t('page.viewText.title')}}</i></b>. {{ $t('page.rulesViolations.suggestion_1_2')}} "Ñîäåðæàíèå Ïîñòàíîâêà öåëè è çàäà÷" {{ $t('page.rulesViolations.suggestion_1_3')}}<br><br></li>
+					<li>{{ $t('page.rulesViolations.suggestion_2_1')}} <b><i>{{ $t('page.viewText.title')}}</i></b> -> <b><i>{{ $t('page.viewText.highlightSections')}}</i></b>. {{ $t('page.rulesViolations.suggestion_2_2')}}</li>
 					</ul>
 					</div>
 				<br>
@@ -94,7 +94,7 @@ export default class ViewRulesViolations extends Vue {
 
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore: Object is possibly 'null'.
-		const lineText = li.textContent.split('Line ')[1].split(', page')[0]
+		const lineText = li.textContent.split(this.$t('page.rulesViolations.line')+' ')[1].split(', '+this.$t('page.rulesViolations.page'))[0]
 
 		this.curPage = page
 		this.curLine = Number(lineText)

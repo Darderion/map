@@ -1,26 +1,28 @@
 
 <template>
 <div class="upload">
-	<ul v-if="files.length">
-		<li v-for="file in files" :key="file.id">
-			<span><button class="btn btn-dark" @click="removePDF(file)">X</button></span> -
-			<span>{{file.name}}</span>
-			<span> - </span>
-			<!--
-				<span>{{file.size}}</span> -
-			-->
-			<span v-if="file.error">{{file.error}}</span>
-			<span v-else-if="file.success && file.response.errorCode == 0">{{file.response.ruleViolations.length}} {{ $t('page.uploadMultipleFiles.errorsFound')}} <a :href="`#/viewRulesViolations?pdfName=${file.response.name}&locale=${getLocale()}`">PDF</a></span>
-			<span v-else-if="file.active">active</span>
-			<span v-else></span>
-		</li>
-	</ul>
-	<ul v-else>
+	<div v-if="files.length" class="uploadDiv">
+		<b-row v-for="file in files" :key="file.id" class="mb-1">
+			<b-col v-if="file.active" md="1"><b-spinner label=""></b-spinner></b-col>
+			<b-col v-else md="1"><button class="btn btn-dark" @click="removePDF(file)">X</button></b-col>
+			<b-col md="4">{{file.name}}</b-col>
+			<b-col md="7" v-if="file.error">{{$t('page.uploadMultipleFiles.error')}}</b-col>
+			<b-col md="7" v-else-if="file.success && file.response.errorCode == 0">
+				<b-col md="12" v-if="file.response.ruleViolations.filter(ruleViolation => ruleViolation.type == 'System').length > 0"> Couldn't process PDF</b-col>
+				<b-row v-if="file.response.ruleViolations.filter(ruleViolation => ruleViolation.type == 'System').length == 0">
+					<b-col md="5">{{file.response.ruleViolations.filter(ruleViolation => ruleViolation.type == 'Error').length}} {{ $t('page.uploadMultipleFiles.errorsFound')}}</b-col>
+					<b-col md="5">{{file.response.ruleViolations.filter(ruleViolation => ruleViolation.type == 'Warning').length}} {{ $t('page.uploadMultipleFiles.warningsFound')}}</b-col>
+					<b-col md="2"><a :href="`#/viewRulesViolations?pdfName=${file.response.name}&locale=${getLocale()}`">PDF</a></b-col>
+				</b-row>
+			</b-col>
+		</b-row>
+	</div>
+	<div class="uploadFilesDiv" v-else>
 		<div class="p-5">
 			<h4>{{ $t('page.uploadMultipleFiles.uploadFiles1')}}<br/>{{ $t('page.uploadMultipleFiles.options')}}</h4>
 			<label for="file" class="btn btn-lg btn-primary">{{ $t('page.uploadMultipleFiles.selectFiles')}}</label>
 		</div>
-	</ul>
+	</div>
 
 	<div v-show="$refs.upload && $refs.upload.dropActive" class="drop-active">
 		<h3>{{ $t('page.uploadMultipleFiles.uploadFiles2')}}</h3>
@@ -39,7 +41,7 @@
 			{{ $t('page.uploadMultipleFiles.addPDF')}}
 		</file-upload>
 		<div>
-		<button type="button" class="btn btn-success" v-if="!$refs.upload || !$refs.upload.active" @click.prevent="$refs.upload.active = true">
+		<button type="button" class="btn btn-success mb1" v-if="!$refs.upload || !$refs.upload.active" @click.prevent="$refs.upload.active = true">
 			<i class="fa fa-arrow-up" aria-hidden="true"></i>
 			{{ $t('page.uploadMultipleFiles.startUploading')}}
 		</button>
@@ -67,6 +69,7 @@ export default class MultipleFileUpload extends Vue {
 	files: any[] = [];
 
 	removePDF(file: any) {
+		console.log(this.files);
 		this.files = this.files.filter(it => it != file)
 	}
 
@@ -85,12 +88,17 @@ export default class MultipleFileUpload extends Vue {
 	align-items: center;
 }
 
-.upload ul {
+.upload .uploadDiv {
 	grid-column: 2;
 	grid-row: 2;
 }
 
 .uploadSection {
+	grid-column: 2;
+	grid-row: 1;
+}
+
+.uploadFilesDiv {
 	grid-column: 2;
 	grid-row: 1;
 }

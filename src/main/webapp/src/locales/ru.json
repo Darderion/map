@@ -50,6 +50,7 @@
 			"options": "или",
 			"selectFiles": "Выберите файлы",
 			"errorsFound": "ошибок найдено",
+			"warningsFound": "предупреждений",
 			"uploadFiles2": "Перетащите файлы для загрузки",
 			"addPDF": "Добавить PDF",
 			"startUploading": "Начать загрузку файлов",

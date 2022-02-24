@@ -50,6 +50,7 @@
 			"options": "or",
 			"selectFiles": "Select Files",
 			"errorsFound": "errors found",
+			"warningsFound": "warnings",
 			"uploadFiles2": "Drop files to upload",
 			"addPDF": "Add another PDF",
 			"startUploading": "Start Upload",
