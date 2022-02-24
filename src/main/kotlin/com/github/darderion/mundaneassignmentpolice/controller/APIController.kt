@@ -4,6 +4,8 @@ import com.github.darderion.mundaneassignmentpolice.checker.Checker
 import com.github.darderion.mundaneassignmentpolice.checker.DocumentReport
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.Annotations
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Section
+import com.github.darderion.mundaneassignmentpolice.rules.RuleSet
+import com.github.darderion.mundaneassignmentpolice.rules.*
 import com.github.darderion.mundaneassignmentpolice.utils.FileUploadUtil
 import com.github.darderion.mundaneassignmentpolice.wrapper.PDFBox
 import mu.KotlinLogging
@@ -20,6 +22,7 @@ const val pdfFolder = "build/"
 @RestController
 class APIController {
 	val pdfBox = PDFBox()
+	val ruleSet = RULE_SET_RU
 
 	@GetMapping("/api/viewPDFText")
 	fun getPDFText(@RequestParam pdfName: String) =
@@ -37,7 +40,7 @@ class APIController {
 
 	@GetMapping("/api/viewRuleViolations")
 	fun getRulesViolations(@RequestParam pdfName: String) =
-		Checker().getRuleViolations("$pdfFolder$pdfName").also { logger.info("ViewRuleViolations(pdfName = $pdfName)") }
+		Checker().getRuleViolations("$pdfFolder$pdfName", ruleSet).also { logger.info("ViewRuleViolations(pdfName = $pdfName)") }
 
 	@GetMapping("/api/viewPDFImages")
 	fun getPDFImages(@RequestParam pdfName: String) =
@@ -73,7 +76,7 @@ class APIController {
 		val pdf = PDFBox().getPDF("$pdfFolder$fileName")
 		val pdf2 = Annotations.underline(pdf,
 			if (page == null || line == null) {
-				Checker().getRuleViolations(fileName).map { it.lines }.flatten()
+				Checker().getRuleViolations(fileName, ruleSet).map { it.lines }.flatten()
 			} else
 				listOf(pdf.text.first { it.page == page && it.index == line })
 		)
@@ -91,7 +94,7 @@ class APIController {
 			return DocumentReport.emptyFileName
 		}
 		val pdfName = FileUploadUtil.saveFile(pdfFolder, multipartFile, folderMaxSize = 1000)
-		val ruleViolations = Checker().getRuleViolations("$pdfFolder$pdfName")
+		val ruleViolations = Checker().getRuleViolations("$pdfFolder$pdfName", ruleSet)
 
 		return DocumentReport(pdfName, ruleViolations, 0)
 	}

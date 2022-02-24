@@ -1,6 +1,7 @@
 package com.github.darderion.mundaneassignmentpolice.checker.rule.list
 
 import com.github.darderion.mundaneassignmentpolice.checker.RuleViolation
+import com.github.darderion.mundaneassignmentpolice.checker.RuleViolationType
 import com.github.darderion.mundaneassignmentpolice.checker.rule.Rule
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFArea.SECTION
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFArea.TABLE_OF_CONTENT
@@ -11,9 +12,10 @@ import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Line
 
 class ListRule(
 	val predicates: List<(list: PDFList<Line>) -> List<Line>>,
+	type: RuleViolationType,
 	area: PDFRegion,
 	name: String
-	): Rule(area, name) {
+	): Rule(area, name, type) {
 	override fun process(document: PDFDocument): List<RuleViolation> {
 		val rulesViolations: MutableSet<RuleViolation> = mutableSetOf()
 
@@ -37,7 +39,7 @@ class ListRule(
 				pdfLists.map {
 					predicate(it)
 				}.filter { it.isNotEmpty() }.map {
-					RuleViolation(it, name)
+					RuleViolation(it, name, type)
 				}
 			)
 		}

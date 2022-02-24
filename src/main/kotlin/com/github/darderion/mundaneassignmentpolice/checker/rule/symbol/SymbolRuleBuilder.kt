@@ -1,6 +1,7 @@
 package com.github.darderion.mundaneassignmentpolice.checker.rule.symbol
 
 import com.github.darderion.mundaneassignmentpolice.checker.Direction
+import com.github.darderion.mundaneassignmentpolice.checker.RuleViolationType
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFArea
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFRegion
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFRegion.Companion.EVERYWHERE
@@ -24,12 +25,13 @@ class SymbolRuleBuilder {
 	private var requiredNeighbors: MutableList<Char> = mutableListOf()
 	private var direction: Direction = Direction.BIDIRECTIONAL
 	private var neighborhoodSize: Int = 1
+	private var type: RuleViolationType = RuleViolationType.Error
 	private var name: String = "Rule name"
 	private var region: PDFRegion = EVERYWHERE
 
-	fun symbol(symbol: Char) = this.also { this.symbol = symbol }
+	infix fun symbol(symbol: Char) = this.also { this.symbol = symbol }
 
-	fun called(name: String) = this.also { this.name = name }
+	infix fun called(name: String) = this.also { this.name = name }
 
 	fun ignoringAdjusting(vararg symbols: Char) = this.also { if (notIgnoredNeighbors.isEmpty()) ignoredNeighbors.addAll(symbols.toList())
 															  else throw Exception("Up to one of the following methods can be used:" +
@@ -51,9 +53,13 @@ class SymbolRuleBuilder {
 
 	fun fromBothSides() = this.also { direction = Direction.BIDIRECTIONAL }
 
+	infix fun from(direction: Direction) = this.also { this.direction = direction }
+
 	infix fun inArea(area: PDFArea) = this.also { region = NOWHERE.except(area) }
 
 	infix fun inArea(region: PDFRegion) = this.also { this.region = region }
+
+	infix fun type(type: RuleViolationType) = this.also { this.type = type }
 
 	fun inNeighborhood(size: Int) = this.also { this.neighborhoodSize = size }
 
@@ -66,6 +72,7 @@ class SymbolRuleBuilder {
 		requiredNeighbors,
 		direction,
 		neighborhoodSize,
+		type,
 		region,
 		name
 	) as SymbolRule

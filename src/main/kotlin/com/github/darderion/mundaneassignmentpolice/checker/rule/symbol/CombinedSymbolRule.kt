@@ -17,7 +17,12 @@ infix fun SymbolRule.or(otherSymbolRule: SymbolRule) = CombinedSymbolRule(
 class CombinedSymbolRule(
 	private val rules: List<SymbolRule>,
 	private val predicateType: PredicateType
-): SymbolRule(rules.first().symbol, rules.first().area, rules.first().name) {
+): SymbolRule(
+	rules.first().symbol,
+	rules.first().type,
+	rules.first().area,
+	rules.first().name
+) {
 	override fun isViolated(document: PDFDocument, line: Int, index: Int) = rules.map { it.isViolated(document, line, index) }.reduce {
 			acc, ruleViolation ->
 		when(predicateType) {

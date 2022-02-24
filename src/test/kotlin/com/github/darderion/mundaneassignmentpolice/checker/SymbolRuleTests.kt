@@ -12,45 +12,6 @@ import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.and
 import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.or
 
 class SymbolRuleTests: StringSpec({
-	"Symbol rule should detect incorrect symbols ? in links" {
-		SymbolRuleBuilder()
-			.symbol('?')
-			.ignoringAdjusting(*" ,0123456789".toCharArray())
-			.shouldNotHaveNeighbor(*"[]".toCharArray())
-			.getRule()
-			.process(PDFBox().getPDF(filePathQuestionMarkAndDashes)).count() shouldBeExactly 4
-	}
-	"Symbol rule should detect incorrect usage of - symbol" {
-		val shortDash = '-'
-
-		SymbolRuleBuilder()
-			.symbol(shortDash)
-			.shouldHaveNeighbor(*"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".toCharArray())
-			.shouldHaveNeighbor(*"абвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ".toCharArray())
-			.getRule().process(PDFBox().getPDF(filePathQuestionMarkAndDashes)).count() shouldBeExactly 2
-	}
-	"Symbol rule should detect incorrect usage of -- symbol" {
-		val mediumDash = '–'
-
-		SymbolRuleBuilder()
-			.symbol(mediumDash)
-			.shouldHaveNeighbor(*"0123456789".toCharArray())
-			.getRule().process(PDFBox().getPDF(filePathQuestionMarkAndDashes)).count() shouldBeExactly 3
-	}
-	"Symbol rule should detect incorrect usage of --- symbol" {
-		val longDash = '—'
-
-		SymbolRuleBuilder()
-			.symbol(longDash)
-			.shouldHaveNeighbor(' ')
-			.getRule().process(PDFBox().getPDF(filePathQuestionMarkAndDashes)).count() shouldBeExactly 1
-
-		SymbolRuleBuilder()
-			.symbol(longDash)
-			.ignoringAdjusting(' ')
-			.shouldNotHaveNeighbor(*"0123456789".toCharArray())
-			.getRule().process(PDFBox().getPDF(filePathQuestionMarkAndDashes)).count() shouldBeExactly 2
-	}
 	"Symbol rule should only search for rule violations in its region" {
 		val mediumDash = '–'
 
@@ -64,23 +25,6 @@ class SymbolRuleTests: StringSpec({
 					if (area == SECTION) 3 else 0
 		}
 	}
-	"Symbol rule should detect incorrect use of multiple links" {
-		SymbolRuleBuilder()
-			.symbol(']')
-			.ignoringAdjusting(',',' ')
-			.fromRight().shouldNotHaveNeighbor('[')
-			.getRule()
-			.process(PDFBox().getPDF(filePathMultipleLinks)).count() shouldBeExactly 3
-	}
-	"Symbol rule should detect incorrect using capital letters" {
-		SymbolRuleBuilder()
-			.symbol('(')
-			.ignoringAdjusting(*" ".toCharArray())
-			.fromRight().shouldNotHaveNeighbor(*"АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ".toCharArray())
-			.getRule()
-			.process(PDFBox().getPDF(filePathLargerussianLetter)).count() shouldBeExactly 3
-	}
-
 	"Combined symbol rule should search for rule violations in its region" {
 		val longDash = '—'
 
@@ -108,35 +52,8 @@ class SymbolRuleTests: StringSpec({
 					.getRule())
 			.process(PDFBox().getPDF(filePathQuestionMarkAndDashes)).count() shouldBeExactly 1
 	}
-	"Symbol rule should detect using closing quote instead opening quote" {
-		val closingQuote = '”'
-		val openingQuote = '“'
-
-		SymbolRuleBuilder()
-			.symbol(closingQuote)
-			.ignoringEveryCharacterExcept(*"$closingQuote$openingQuote".toCharArray())
-			.fromLeft().shouldHaveNeighbor(openingQuote)
-			.inNeighborhood(20)
-			.getRule()
-			.process(PDFBox().getPDF(filePathQuotes)).count() shouldBeExactly 4
-	}
-	"Symbol rule should detect using opening quote instead closing quote" {
-		val closingQuote = '”'
-		val openingQuote = '“'
-
-		SymbolRuleBuilder()
-			.symbol(openingQuote)
-			.ignoringEveryCharacterExcept(*"$closingQuote$openingQuote".toCharArray())
-			.fromRight().shouldHaveNeighbor(closingQuote)
-			.inNeighborhood(20)
-			.getRule()
-			.process(PDFBox().getPDF(filePathQuotes)).count() shouldBeExactly 2
-	}
 }) {
 	private companion object {
-		const val filePathMultipleLinks = "${resourceFolder}checker/SymbolRuleTestsMultipleLinks.pdf"
-		const val filePathLargerussianLetter = "${resourceFolder}checker/SymbolRuleTestsLargeRussianLetter.pdf"
 		const val filePathQuestionMarkAndDashes = "${resourceFolder}checker/SymbolRuleTestsQuestionMarkAndDashes.pdf"
-		const val filePathQuotes = "${resourceFolder}checker/SymbolRuleTestsQuotes.pdf"
 	}
 }
