@@ -1,12 +1,19 @@
+import RuleViolation from "./RuleViolation";
 
+/**
+ * Document report contains PDF's name, list of rule violations and error code
+ * Error codes:
+ * 		0	--	No Errors
+ * 		-1	--	Empty File Name
+ */
 export default class DocumentReport {
 	name: string;
-	numberOfViolations: number;
+	ruleViolations: RuleViolation[];
 	errorCode: number;
 
-	constructor(name: string, numberOfViolations: number, errorCode: number) {
+	constructor(name: string, ruleViolations: RuleViolation[], errorCode: number) {
 		this.name = name;
-		this.numberOfViolations = numberOfViolations;
+		this.ruleViolations = ruleViolations;
 		this.errorCode = errorCode;
 	}
 }

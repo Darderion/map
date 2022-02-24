@@ -2,7 +2,7 @@ package com.github.darderion.mundaneassignmentpolice.pdfdocument.list
 
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Coordinate
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Font
-import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Text
+import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Line
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Word
 import java.util.*
 
@@ -52,14 +52,14 @@ data class PDFList<T>(val value: MutableList<T> = mutableListOf(), val nodes: Mu
 		 * @param lines Text lines
 		 * @return List of <ENUMERATE> and <ITEMIZE> lists
 		 */
-		fun getLists(lines: List<Text>): List<PDFList<Text>> {
+		fun getLists(lines: List<Line>): List<PDFList<Line>> {
 			// Adding a line to process a text that has no lines after a list
-			val lines = lines + Text(-1, -1, -1, listOf(Word("NOT A LIST ITEM", Font(0.0f), Coordinate(1000, -1))))
+			val lines = lines + Line(-1, -1, -1, listOf(Word("NOT A LIST ITEM", Font(0.0f), Coordinate(1000, -1))))
 
-			val lists: MutableList<PDFList<Text>> = mutableListOf()
-			val stack: Stack<PDFList<Text>> = Stack()
+			val lists: MutableList<PDFList<Line>> = mutableListOf()
+			val stack: Stack<PDFList<Line>> = Stack()
 			var previousPosition: Coordinate
-			var previousList: PDFList<Text>? = null
+			var previousList: PDFList<Line>? = null
 
 			lines.forEach { line ->
 				if (stack.isEmpty()) {
@@ -109,12 +109,12 @@ data class PDFList<T>(val value: MutableList<T> = mutableListOf(), val nodes: Mu
 			return lists
 		}
 
-		private fun isListItem(text: Text) =
-			"•–*·".contains(text.first!!) || (
-					(text.first!!.contains(".") ||
-							(text.first!!.contains("(") && text.first!!.contains(")") && text.first!!.length == 3)) &&
-							text.first!!.replace(".", "").isNotEmpty() &&
-							text.first!!.length <= 3)
+		private fun isListItem(line: Line) =
+			"•–*·".contains(line.first!!) || (
+					(line.first!!.contains(".") ||
+							(line.first!!.contains("(") && line.first!!.contains(")") && line.first!!.length == 3)) &&
+							line.first!!.replace(".", "").isNotEmpty() &&
+							line.first!!.length <= 3)
 
 		private const val LIST_ENUMERATE_FIRST_ITEM = "1."
 		private const val LIST_ITEMIZE_FIRST_ITEM = "•"

@@ -1,0 +1,67 @@
+{
+	"page": {
+		"home": {
+			"title": "Home",
+			"instruction": "How to use:",
+			"instruction_chooseFile": "Select a PDF file containing qualification work by pressing",
+			"instruction_viewPDF": "Uploaded PDF is available in section",
+			"instruction_rulesViolations": "List of rules' violations is available in section",
+			"rulesViolations": {
+				"title": "Rules' violations that can be checked:",
+				"rules": [
+					"One subsection in a section",
+					"Incorrect usage of '-'",
+					"Incorrect usage of '--'",
+					"Incorrect usage of '---'",
+					"Incorrect citing [?]",
+					"Introduction, conclusion or bibliography is numbered"
+				]
+			}
+		},
+		"viewPDF": {
+			"title": "View as PDF"
+		},
+		"viewText": {
+			"title": "View as text",
+			"plain": "Plain",
+			"highlightSections": "Highlight sections",
+			"highlightErrors": "Highlight errors",
+
+			"text": "Text:",
+			"images": "Images:"
+		},
+		"rulesViolations": {
+			"title": "Rules' violations",
+			"noErrors": "No errors found!",
+			"errors": "Application couldn't process PDF",
+			"suggestions": "Ways to check PDF:",
+			"suggestion_1_1": "Check section",
+			"suggestion_1_2": "If it is filled with characters: ",
+			"suggestion_1_3": " then PDF doesn't have embedded fonts.",
+			"suggestion_2_1": "Check section",
+			"suggestion_2_2": "If sections are not highlighted then it could be because of incorrect table of contents.",
+			"selectRuleViolation": "Select a rule violation to view PDF page with that rule violation.",
+			"line": "Line",
+			"page": "page"
+		},
+		"uploadMultipleFiles": {
+			"title": "Upload multiple files",
+			"uploadFiles1": "Drop files anywhere to upload",
+			"options": "or",
+			"selectFiles": "Select Files",
+			"errorsFound": "errors found",
+			"uploadFiles2": "Drop files to upload",
+			"addPDF": "Add another PDF",
+			"startUploading": "Start Upload",
+			"stopUploading": "Stop Upload"
+		},
+		"about": {
+			"title": "About",
+			"github": "repository",
+			"suggestions": "For any suggestions, bug reports and questions:"
+		}
+	},
+	"button": {
+		"chooseFile": "Choose File"
+	}
+}

@@ -78,12 +78,13 @@ class Checker {
 			.inArea(EVERYWHERE.except(BIBLIOGRAPHY, FOOTNOTE))
 			.getRule()
 
+
 		val squareClosingBracket=']'
 		val squareOpeningBracket='['
 
 		val multiLinksRule = SymbolRuleBuilder()
-			.ignoringAdjusting(' ',',')
 			.symbol(squareClosingBracket)
+			.ignoringAdjusting(' ', ',')
 			.fromRight().shouldNotHaveNeighbor(squareOpeningBracket)
 			.called("Неправильное оформление нескольких ссылок")
 			.getRule()
@@ -95,6 +96,24 @@ class Checker {
 			.ignoringAdjusting(' ')
 			.fromRight().shouldNotHaveNeighbor(*rusCapitalLetters.toCharArray())
 			.called("Большая русская буква после скобки")
+
+		val closingQuote = '”'
+		val openingQuote = '“'
+
+		val closingQuoteRule = SymbolRuleBuilder()
+			.symbol(closingQuote)
+			.ignoringEveryCharacterExcept(*"$closingQuote$openingQuote".toCharArray())
+			.fromLeft().shouldHaveNeighbor(openingQuote)
+			.inNeighborhood(20)
+			.called("Неправильное использование закрывающей кавычки")
+			.getRule()
+
+		val openingQuoteRule = SymbolRuleBuilder()
+			.symbol(openingQuote)
+			.ignoringEveryCharacterExcept(*"$closingQuote$openingQuote".toCharArray())
+			.fromRight().shouldHaveNeighbor(closingQuote)
+			.inNeighborhood(20)
+			.called("Неправильное использование открывающей кавычки")
 			.getRule()
 
 		val listRule = ListRuleBuilder()
@@ -121,6 +140,8 @@ class Checker {
 			shortDashRule,
 			mediumDashRule,
 			longDashRule,
+			closingQuoteRule,
+			openingQuoteRule,
 			listRule,
 			tableOfContentRule,
 			bracketRule,

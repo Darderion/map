@@ -1,12 +1,12 @@
 
 <template>
-	<form action="/api/uploadPDF"
+	<form :action="`/api/getPDFReview?locale=${getLocale()}`"
 		object="${pdf}" method="post"
 		enctype="multipart/form-data"
 		id="uploadFileForm"
 		>
 		<div>
-			<label for="actual-btn">Choose File</label>
+			<label for="actual-btn">{{ $t('button.chooseFile') }}</label>
 			<span id="file-chosen"></span>
 			<input type="file" name="pdf" accept="application/pdf" id="actual-btn" hidden/>
 		</div>
@@ -55,6 +55,10 @@ export default class UploadFileComponent extends Vue {
 			const uploadFileButton = document.getElementById("uploadFileComponent") as HTMLFormElement
 			uploadFileButton.submit()
 		};
+	}
+
+	getLocale() {
+		return this.$i18n.locale
 	}
 }
 </script>

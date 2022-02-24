@@ -10,42 +10,42 @@
 				<span>{{file.size}}</span> -
 			-->
 			<span v-if="file.error">{{file.error}}</span>
-			<span v-else-if="file.success && file.response.errorCode == 0">{{file.response.numberOfViolations}} errors found <a :href="`#/viewRulesViolations?pdfName=${file.response.name}`">PDF</a></span>
+			<span v-else-if="file.success && file.response.errorCode == 0">{{file.response.ruleViolations.length}} {{ $t('page.uploadMultipleFiles.errorsFound')}} <a :href="`#/viewRulesViolations?pdfName=${file.response.name}&locale=${getLocale()}`">PDF</a></span>
 			<span v-else-if="file.active">active</span>
 			<span v-else></span>
 		</li>
 	</ul>
 	<ul v-else>
 		<div class="p-5">
-			<h4>Drop files anywhere to upload<br/>or</h4>
-			<label for="file" class="btn btn-lg btn-primary">Select Files</label>
+			<h4>{{ $t('page.uploadMultipleFiles.uploadFiles1')}}<br/>{{ $t('page.uploadMultipleFiles.options')}}</h4>
+			<label for="file" class="btn btn-lg btn-primary">{{ $t('page.uploadMultipleFiles.selectFiles')}}</label>
 		</div>
 	</ul>
 
 	<div v-show="$refs.upload && $refs.upload.dropActive" class="drop-active">
-		<h3>Drop files to upload</h3>
+		<h3>{{ $t('page.uploadMultipleFiles.uploadFiles2')}}</h3>
 	</div>
 
-	<div class="uploadSection" v-show="files.length">
+	<div class="uploadSection" v-show="files.length > 0">
 		<file-upload
 			class="btn btn-primary"
-			post-action="api/uploadMultipleFiles"
+			post-action="/api/uploadPDF"
 			:multiple="true"
 			:drop="true"
 			:drop-directory="true"
 			v-model="files"
 			ref="upload">
 			<i class="fa fa-plus"></i>
-			Select a file
+			{{ $t('page.uploadMultipleFiles.addPDF')}}
 		</file-upload>
 		<div>
 		<button type="button" class="btn btn-success" v-if="!$refs.upload || !$refs.upload.active" @click.prevent="$refs.upload.active = true">
 			<i class="fa fa-arrow-up" aria-hidden="true"></i>
-			Start Upload
+			{{ $t('page.uploadMultipleFiles.startUploading')}}
 		</button>
 		<button type="button" class="btn btn-danger"  v-else @click.prevent="$refs.upload.active = false">
 			<i class="fa fa-stop" aria-hidden="true"></i>
-			Stop Upload
+			{{ $t('page.uploadMultipleFiles.stopUploading')}}
 		</button>
 		</div>
 	</div>
@@ -68,6 +68,10 @@ export default class MultipleFileUpload extends Vue {
 
 	removePDF(file: any) {
 		this.files = this.files.filter(it => it != file)
+	}
+
+	getLocale() {
+		return this.$i18n.locale;
 	}
 }
 </script>

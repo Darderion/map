@@ -1,18 +1,18 @@
 <template>
 	<ul class="menu cf">
-		<li><router-link :to="`/?pdfName=${this.$store.getters.getPdfName}`">Home</router-link></li>
-		<li><router-link :to="`/viewPDF?pdfName=${this.$store.getters.getPdfName}&numPages=${this.$store.getters.getNumPages}`">View PDF</router-link></li>
+		<li><router-link :to="`/?pdfName=${this.$store.getters.getPdfName}`">{{ $t("page.home.title") }}</router-link></li>
+		<li><router-link :to="`/viewPDF?pdfName=${this.$store.getters.getPdfName}&numPages=${this.$store.getters.getNumPages}`">{{ $t("page.viewPDF.title") }}</router-link></li>
 		<li>
-			<router-link :to="`/viewPDFText?pdfName=${this.$store.getters.getPdfName}`">View as text</router-link>
+			<router-link :to="`/viewPDFText?pdfName=${this.$store.getters.getPdfName}`">{{ $t("page.viewText.title") }}</router-link>
 			<ul class="submenu">
-				<li><router-link :to="`/viewPDFText?pdfName=${this.$store.getters.getPdfName}`">Plain</router-link></li>
-				<li><router-link :to="`/viewPDFTextSections?pdfName=${this.$store.getters.getPdfName}`" @click.native="InlineButtonClickHandler">Highlight sections</router-link></li>
-				<li><router-link :to="`/viewPDFTextErrors?pdfName=${this.$store.getters.getPdfName}`">Highlight errors</router-link></li>
+				<li><router-link :to="`/viewPDFText?pdfName=${this.$store.getters.getPdfName}`">{{ $t("page.viewText.plain") }}</router-link></li>
+				<li><router-link :to="`/viewPDFTextSections?pdfName=${this.$store.getters.getPdfName}`" @click.native="InlineButtonClickHandler">{{ $t("page.viewText.highlightSections") }}</router-link></li>
+				<li><router-link :to="`/viewPDFTextErrors?pdfName=${this.$store.getters.getPdfName}`">{{ $t("page.viewText.highlightErrors") }}</router-link></li>
 			</ul>
 		</li>
-		<li><router-link :to="`/viewRulesViolations?pdfName=${this.$store.getters.getPdfName}`">Rules' violations</router-link></li>
-		<li><router-link :to="`/uploadMultipleFiles`">Upload multiple files</router-link></li>
-		<li><router-link :to="`/about?pdfName=${this.$store.getters.getPdfName}`">About</router-link></li>
+		<li><router-link :to="`/viewRulesViolations?pdfName=${this.$store.getters.getPdfName}`">{{ $t("page.rulesViolations.title") }}</router-link></li>
+		<li><router-link :to="`/uploadMultipleFiles`">{{ $t("page.uploadMultipleFiles.title") }}</router-link></li>
+		<li><router-link :to="`/about?pdfName=${this.$store.getters.getPdfName}`">{{ $t("page.about.title") }}</router-link></li>
 	</ul>
 </template>
 

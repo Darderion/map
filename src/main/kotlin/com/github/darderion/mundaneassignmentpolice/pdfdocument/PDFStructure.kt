@@ -1,14 +1,14 @@
 package com.github.darderion.mundaneassignmentpolice.pdfdocument
 
-import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Text
+import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Line
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFArea.*
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.list.PDFList
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Section
 import com.github.darderion.mundaneassignmentpolice.utils.floatEquals
 import java.util.*
 
-class PDFStructure(text: List<Text>) {
-	val lists: List<PDFList<Text>>
+class PDFStructure(text: List<Line>) {
+	val lists: List<PDFList<Line>>
 	val sections: List<Section>
 	val tableOfContents: PDFList<String>
 
@@ -33,7 +33,7 @@ class PDFStructure(text: List<Text>) {
 						println(sectionTitle)
 						area
 					} else {
-						if (sectionTitle != null && it.line == 0 && it.content == sectionTitle) {
+						if (sectionTitle != null && it.index == 0 && it.content == sectionTitle) {
 							SECTION
 						} else area
 					}
@@ -48,7 +48,7 @@ class PDFStructure(text: List<Text>) {
 					}
 				}
 				FOOTNOTE -> {
-					if (it.line == 0) {
+					if (it.index == 0) {
 						if (it.content == BIBLIOGRAPHY_TITLE) {
 							BIBLIOGRAPHY
 						} else {
@@ -88,7 +88,7 @@ class PDFStructure(text: List<Text>) {
 					sectionsTitlesLines.add(curSectionTitle + it)
 					curSectionTitle = ""
 				} else {
-					curSectionTitle += it + " "
+					curSectionTitle += "$it "
 				}
 			}
 
@@ -169,8 +169,8 @@ class PDFStructure(text: List<Text>) {
 		if (text.none { it.area == BIBLIOGRAPHY		}) throw Error("No BIBLIOGRAPHY in PDF")
 	}
 
-	private fun isSectionTitle(line: Text) = sections.any {
-		(if (it.sectionIndex == it.titleIndex + 2)
+	private fun isSectionTitle(line: Line) = sections.any {
+		(if (it.contentIndex == it.titleIndex + 2)
 			line.documentIndex == it.titleIndex + 1
 		else
 			false) ||
@@ -183,15 +183,15 @@ class PDFStructure(text: List<Text>) {
 
 		private const val FOOTNOTE_FONT_SIZE = 6.9738
 
-		private fun isFootnote(line: Text) = line.content.isNotEmpty() &&
+		private fun isFootnote(line: Line) = line.content.isNotEmpty() &&
 				line.text.first().text.isNotEmpty() &&
 				floatEquals(line.text.first().font.size, FOOTNOTE_FONT_SIZE) &&
 				line.text.first().text.first().isDigit() &&
 				line.text.first().text.filterNot { it.isDigit() }.isEmpty()
 
-		private fun isPageIndex(text: List<Text>, line: Text, area: PDFArea) = area != TITLE_PAGE &&
-				line.line == (text.filter { textLine ->
+		private fun isPageIndex(text: List<Line>, line: Line, area: PDFArea) = area != TITLE_PAGE &&
+				line.index == (text.filter { textLine ->
 			textLine.page == line.page && textLine.content.isNotEmpty()
-		}.maxOfOrNull { it.line } ?: -1)
+		}.maxOfOrNull { it.index } ?: -1)
 	}
 }

@@ -90,11 +90,13 @@ class PDFBox {
 	 * @return PDFDocument
 	 */
 	fun getPDF(fileName: String): PDFDocument {
-		val pdfText: MutableList<Text> = mutableListOf()
+		val pdfText: MutableList<Line> = mutableListOf()
 
 		val document = getDocument(fileName)
 		val stripper = PDFStripper()			// Stripper with additional information
 		val textStripper = PDFTextStripper()	// Text stripper
+
+		val size = document.pages.first().mediaBox
 
 		val strippers = listOf(stripper, textStripper)
 
@@ -164,13 +166,13 @@ class PDFBox {
 				if (font == null && word.isEmpty()) font = Font(0.0f)
 				words.add(Word(word, font!!, coordinates))
 
-				Text(line, pageIndex, lineIndex, words.toList())
+				Line(line, pageIndex, lineIndex, words.toList())
 			})
 		}
 
 		document.close()
 
-		return PDFDocument(fileName, pdfText)
+		return PDFDocument(fileName, pdfText, size.width.toDouble(), size.height.toDouble())
 	}
 
 	fun getPDFSize(fileName: String): Int {
