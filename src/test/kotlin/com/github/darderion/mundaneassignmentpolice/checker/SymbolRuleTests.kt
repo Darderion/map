@@ -64,6 +64,23 @@ class SymbolRuleTests: StringSpec({
 					if (area == SECTION) 3 else 0
 		}
 	}
+	"Symbol rule should detect incorrect use of multiple links" {
+		SymbolRuleBuilder()
+			.symbol(']')
+			.ignoringAdjusting(',',' ')
+			.fromRight().shouldNotHaveNeighbor('[')
+			.getRule()
+			.process(PDFBox().getPDF(filePathMultipleLinks)).count() shouldBeExactly 3
+	}
+	"Symbol rule should detect incorrect using capital letters" {
+		SymbolRuleBuilder()
+			.symbol('(')
+			.ignoringAdjusting(*" ".toCharArray())
+			.fromRight().shouldNotHaveNeighbor(*"АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ".toCharArray())
+			.getRule()
+			.process(PDFBox().getPDF(filePathLargerussianLetter)).count() shouldBeExactly 3
+	}
+
 	"Combined symbol rule should search for rule violations in its region" {
 		val longDash = '—'
 
@@ -117,6 +134,8 @@ class SymbolRuleTests: StringSpec({
 	}
 }) {
 	private companion object {
+		const val filePathMultipleLinks = "${resourceFolder}checker/SymbolRuleTestsMultipleLinks.pdf"
+		const val filePathLargerussianLetter = "${resourceFolder}checker/SymbolRuleTestsLargeRussianLetter.pdf"
 		const val filePathQuestionMarkAndDashes = "${resourceFolder}checker/SymbolRuleTestsQuestionMarkAndDashes.pdf"
 		const val filePathQuotes = "${resourceFolder}checker/SymbolRuleTestsQuotes.pdf"
 	}

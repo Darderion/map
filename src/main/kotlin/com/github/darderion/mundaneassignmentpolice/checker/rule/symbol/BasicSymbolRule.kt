@@ -6,6 +6,7 @@ import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFDocument
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFRegion
 import kotlin.reflect.jvm.internal.impl.utils.DFS.Neighbors
 
+
 /**
  * Rule that looks for closest symbol that is not IGNORED
  * 		If notIgnoredNeighbors is not empty then every symbol is ignored unless it is explicitly stated to not be ignored by being included in notIgnoredNeighbors

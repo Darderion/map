@@ -78,6 +78,25 @@ class Checker {
 			.inArea(EVERYWHERE.except(BIBLIOGRAPHY, FOOTNOTE))
 			.getRule()
 
+
+		val squareClosingBracket=']'
+		val squareOpeningBracket='['
+
+		val multiLinksRule = SymbolRuleBuilder()
+			.symbol(squareClosingBracket)
+			.ignoringAdjusting(' ', ',')
+			.fromRight().shouldNotHaveNeighbor(squareOpeningBracket)
+			.called("Неправильное оформление нескольких ссылок")
+			.getRule()
+
+		val bracket = '('
+
+		val bracketRule = SymbolRuleBuilder()
+			.symbol(bracket)
+			.ignoringAdjusting(' ')
+			.fromRight().shouldNotHaveNeighbor(*rusCapitalLetters.toCharArray())
+			.called("Большая русская буква после скобки")
+
 		val closingQuote = '”'
 		val openingQuote = '“'
 
@@ -124,7 +143,9 @@ class Checker {
 			closingQuoteRule,
 			openingQuoteRule,
 			listRule,
-			tableOfContentRule
+			tableOfContentRule,
+			bracketRule,
+			multiLinksRule
 		).map {
 			it.process(document)
 		}.flatten().toSet().toList()
