@@ -113,6 +113,25 @@ val RULE_BRACKETS_LETTERS = SymbolRuleBuilder()
 	.type(RuleViolationType.Warning)
 	.getRule()
 
+private const val openingBrackets = "({[<"
+private const val closingBrackets = ")}]>"
+private const val punctuationSymbols = ".,;:!?"
+
+private val spaceAroundBracketsRule = SymbolRuleBuilder()
+	.shouldHaveNeighbor(' ')
+	.called("Отсутсвует пробел с внешней стороны скобок")
+
+private val spaceBeforeBracketRules = openingBrackets.toCharArray().map {
+	spaceAroundBracketsRule.symbol(it).fromLeft()
+}
+
+private val spaceAfterBracketRules = closingBrackets.toCharArray().map {
+	spaceAroundBracketsRule.symbol(it)
+		.fromRight().shouldHaveNeighbor(*punctuationSymbols.toCharArray())
+}
+
+val RULES_SPACE_AROUND_BRACKETS = (spaceBeforeBracketRules + spaceAfterBracketRules).map { it.getRule() }
+
 val RULE_SINGLE_SUBSECTION = ListRuleBuilder()
 	.inArea(PDFRegion.NOWHERE.except(PDFArea.TABLE_OF_CONTENT))
 	//.called("Only 1 subsection in a section")
