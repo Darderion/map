@@ -32,11 +32,15 @@ class RulesTests: StringSpec({
 	"Symbol rule should detect incorrect usage of capital letters" {
 		RULE_BRACKETS_LETTERS.process(PDFBox().getPDF(filePathLargeRussianLetter)).count() shouldBeExactly 2
 	}
+	"Symbol rule should detect incorrect citation" {
+		RULE_CITATION.process(PDFBox().getPDF(filePathCitation)).count() shouldBeExactly 2
+	}
 }) {
 	companion object {
 		const val filePathQuestionMarkAndDashes = "${TestsConfiguration.resourceFolder}checker/SymbolRuleTestsQuestionMarkAndDashes.pdf"
 		const val filePathQuotes = "${TestsConfiguration.resourceFolder}checker/SymbolRuleTestsQuotes.pdf"
 		const val filePathMultipleLinks = "${TestsConfiguration.resourceFolder}checker/SymbolRuleTestsMultipleLinks.pdf"
 		const val filePathLargeRussianLetter = "${TestsConfiguration.resourceFolder}checker/SymbolRuleTestsLargeRussianLetter.pdf"
+		const val filePathCitation = "${TestsConfiguration.resourceFolder}checker/SymbolRuleTestsCitation.pdf"
 	}
 }
