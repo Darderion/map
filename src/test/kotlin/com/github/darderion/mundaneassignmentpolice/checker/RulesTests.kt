@@ -34,7 +34,7 @@ class RulesTests: StringSpec({
 		RULE_BRACKETS_LETTERS.process(PDFBox().getPDF(filePathLargeRussianLetter)).count() shouldBeExactly 2
 	}
 	"Symbol rule should detect writing integers from one to nine as digits instead of words" {
-		RULES_SMALL_NUMBERS.sumOf { it.process(PDFBox().getPDF(filePathSmallNumbers)).count() } shouldBeExactly 1
+		RULES_SMALL_NUMBERS.sumOf { it.process(PDFBox().getPDF(filePathSmallNumbers)).count() } shouldBeExactly 6
 	}
 }) {
 	companion object {
