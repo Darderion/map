@@ -113,24 +113,24 @@ val RULE_BRACKETS_LETTERS = SymbolRuleBuilder()
 	.type(RuleViolationType.Warning)
 	.getRule()
 
-private const val openingBrackets = "({[<"
-private const val closingBrackets = ")}]>"
+private const val openingBrackets = "([{<"
+private const val closingBrackets = ")]}>"
 private const val punctuationSymbols = ".,;:!?"
 
-private val spaceAroundBracketsRule = SymbolRuleBuilder()
-	.shouldHaveNeighbor(' ')
-	.called("Отсутсвует пробел с внешней стороны скобок")
+private val spaceAroundBracketsRuleBuilders = List(2) { SymbolRuleBuilder() }
+	.map { it.shouldHaveNeighbor(' ', '\n') }
+	.map { it.called("Отсутсвует пробел с внешней стороны скобок") }
+	.apply {
+		// setting up a rule that should look for a space before opening brackets
+		first().fromLeft()
+		// and this rule should look for after closing brackets
+		last().fromRight().shouldHaveNeighbor(*punctuationSymbols.toCharArray())
+	}
 
-private val spaceBeforeBracketRules = openingBrackets.toCharArray().map {
-	spaceAroundBracketsRule.symbol(it).fromLeft()
-}
-
-private val spaceAfterBracketRules = closingBrackets.toCharArray().map {
-	spaceAroundBracketsRule.symbol(it)
-		.fromRight().shouldHaveNeighbor(*punctuationSymbols.toCharArray())
-}
-
-val RULES_SPACE_AROUND_BRACKETS = (spaceBeforeBracketRules + spaceAfterBracketRules).map { it.getRule() }
+val RULES_SPACE_AROUND_BRACKETS = spaceAroundBracketsRuleBuilders
+	.zip(listOf(openingBrackets, closingBrackets).map { it.toCharArray() })
+	.map { pair -> pair.second.map { pair.first.symbol(it).getRule() } }
+	.flatten()
 
 val RULE_SINGLE_SUBSECTION = ListRuleBuilder()
 	.inArea(PDFRegion.NOWHERE.except(PDFArea.TABLE_OF_CONTENT))
