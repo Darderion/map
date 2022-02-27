@@ -135,9 +135,11 @@ val RULE_TABLE_OF_CONTENT_NUMBERS = TableOfContentRuleBuilder()
 
 val smallNumbersRuleBuilder = SymbolRuleBuilder()
     .called("Неправильное написание целых чисел от 1 до 9")
-    .inArea(PDFRegion.EVERYWHERE.except(PDFArea.FOOTNOTE, PDFArea.PAGE_INDEX, PDFArea.TABLE_OF_CONTENT))
+    .inArea(PDFRegion.EVERYWHERE.except(PDFArea.PAGE_INDEX, PDFArea.TABLE_OF_CONTENT, PDFArea.BIBLIOGRAPHY))
+    .shouldNotHaveNeighbor(*" \n\t".toCharArray())
+    .ignoringAdjusting(*",.;:?[]()$closingQuote$openingQuote".toCharArray())
+    .ignoringIfIndex(0)
 
-val RULES_SMALL_NUMBERS = MutableList<SymbolRule>(9) { index ->
-    smallNumbersRuleBuilder.symbol((index + 1).digitToChar()).fromLeft().shouldNotHaveNeighbor(*" \n".toCharArray()).getRule() or
-            smallNumbersRuleBuilder.fromRight().shouldNotHaveNeighbor(*" \n,;:?$".toCharArray()).getRule()
-}
+val RULES_SMALL_NUMBERS = List<SymbolRule>(9) { index ->
+    smallNumbersRuleBuilder.symbol((index + 1).digitToChar()).fromLeft().getRule() or
+            smallNumbersRuleBuilder.fromRight().getRule() }
