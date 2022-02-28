@@ -115,7 +115,8 @@ val RULE_BRACKETS_LETTERS = SymbolRuleBuilder()
 
 private const val openingBrackets = "([{<"
 private const val closingBrackets = ")]}>"
-private const val punctuationSymbols = ".,;:!?"
+private const val closingQuotes = "”»"
+private const val punctuationSymbols = ".,;:!?$closingQuotes$closingBrackets"
 
 private val spaceAroundBracketsRuleBuilders = List(2) { SymbolRuleBuilder() }
 	.map { it.shouldHaveNeighbor(' ', '\n') }
