@@ -119,12 +119,12 @@ private const val punctuationSymbols = ".,;:!?"
 
 private val spaceAroundBracketsRuleBuilders = List(2) { SymbolRuleBuilder() }
 	.map { it.shouldHaveNeighbor(' ', '\n') }
-	.map { it.called("Отсутсвует пробел с внешней стороны скобок") }
+	.map { it.called("Отсутствует пробел с внешней стороны скобок") }
 	.apply {
 		// setting up a rule that should look for a space before opening brackets
 		first().fromLeft()
 		// and this rule should look for after closing brackets
-		last().fromRight().shouldHaveNeighbor(*punctuationSymbols.toCharArray())
+		last().fromRight().ignoringAdjusting(*punctuationSymbols.toCharArray())
 	}
 
 val RULES_SPACE_AROUND_BRACKETS = spaceAroundBracketsRuleBuilders
