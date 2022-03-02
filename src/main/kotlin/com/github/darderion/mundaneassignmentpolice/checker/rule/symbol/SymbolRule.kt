@@ -19,7 +19,7 @@ abstract class SymbolRule(
 		val rulesViolations: MutableList<RuleViolation> = mutableListOf()
 
 		document.text.filter { it.area!! inside area }.forEachIndexed { lineIndex, pdfText ->
-			val pdfText = document.text.filter { it.area!! inside area }[lineIndex]
+			//val pdfText = document.text.filter { it.area!! inside area }[lineIndex]
 			pdfText.content.indicesOf(symbol.toString()).forEach {
 				if (isViolated(document, lineIndex, it)) {
 					rulesViolations.add(RuleViolation(listOf(pdfText), name, type))
