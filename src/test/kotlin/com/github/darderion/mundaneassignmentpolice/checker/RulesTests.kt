@@ -35,6 +35,9 @@ class RulesTests: StringSpec({
 		RULES_SPACE_AROUND_BRACKETS.map { it.process(PDFBox().getPDF(filePathSpaceAroundBrackets)) }
 			.flatten()
 			.count() shouldBeExactly 16
+  }
+	"Symbol rule should detect incorrect citation" {
+		RULE_CITATION.process(PDFBox().getPDF(filePathCitation)).count() shouldBeExactly 2
 	}
 }) {
 	companion object {
@@ -43,5 +46,6 @@ class RulesTests: StringSpec({
 		const val filePathMultipleLinks = "${TestsConfiguration.resourceFolder}checker/SymbolRuleTestsMultipleLinks.pdf"
 		const val filePathLargeRussianLetter = "${TestsConfiguration.resourceFolder}checker/SymbolRuleTestsLargeRussianLetter.pdf"
 		const val filePathSpaceAroundBrackets = "${TestsConfiguration.resourceFolder}checker/SymbolRuleTestsSpaceAroundBrackets.pdf"
+		const val filePathCitation = "${TestsConfiguration.resourceFolder}checker/SymbolRuleTestsCitation.pdf"
 	}
 }

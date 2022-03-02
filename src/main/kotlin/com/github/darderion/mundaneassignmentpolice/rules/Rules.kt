@@ -144,6 +144,14 @@ val RULES_SPACE_AROUND_BRACKETS = spaceAroundBracketsRuleBuilders
 		else it
 	}
 
+val RULE_CITATION = SymbolRuleBuilder()
+	.symbol('[')
+	.ignoringAdjusting(' ', '\n')
+	.fromLeft().shouldNotHaveNeighbor('.')
+	.called("Некорректное цитирование")
+	.inArea(PDFArea.SECTION)
+	.getRule()
+
 val RULE_SINGLE_SUBSECTION = ListRuleBuilder()
 	.inArea(PDFRegion.NOWHERE.except(PDFArea.TABLE_OF_CONTENT))
 	//.called("Only 1 subsection in a section")
