@@ -124,7 +124,7 @@ class PDFBox {
 
 			var stripperIndex = 0
 
-			pdfText.addAll(text.split('\n').mapIndexed { line, content ->
+			pdfText.addAll(text.lines().mapIndexed { line, content ->
 				// For each line
 				lineIndex++
 				words.clear()
