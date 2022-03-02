@@ -113,6 +113,37 @@ val RULE_BRACKETS_LETTERS = SymbolRuleBuilder()
 	.type(RuleViolationType.Warning)
 	.getRule()
 
+private const val openingBrackets = "([{<"
+private const val closingBrackets = ")]}>"
+private const val closingQuotes = "”»"
+private const val punctuationSymbols = ".,;:!?"
+
+private val spaceAroundBracketsRuleBuilders = List(2) { SymbolRuleBuilder() }
+	.map { it.shouldHaveNeighbor(' ', '\n') }
+	.map { it.called("Отсутствует пробел с внешней стороны скобок") }
+	.apply {
+		// setting up a rule that should look for a space before opening brackets
+		first().fromLeft().ignoringAdjusting(*openingBrackets.toCharArray())
+		// and this rule should look for after closing brackets
+		last().fromRight()
+			.ignoringAdjusting(*"$punctuationSymbols$closingQuotes$closingBrackets".toCharArray())
+	}
+
+// For case when round brackets are empty: "function()"
+private val openingRoundBracketExceptionalRule = SymbolRuleBuilder()
+	.symbol('(')
+	.fromRight().shouldHaveNeighbor(')')
+	.getRule()
+
+val RULES_SPACE_AROUND_BRACKETS = spaceAroundBracketsRuleBuilders
+	.zip(listOf(openingBrackets, closingBrackets).map { it.toCharArray() })
+	.map { pair -> pair.second.map { pair.first.symbol(it).getRule() } }
+	.flatten()
+	.map {
+		if (it.symbol == '(') it or openingRoundBracketExceptionalRule
+		else it
+	}
+
 val RULE_CITATION = SymbolRuleBuilder()
 	.symbol('[')
 	.ignoringAdjusting(' ', '\n')
