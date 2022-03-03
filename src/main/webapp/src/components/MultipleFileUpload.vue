@@ -5,7 +5,7 @@
 		<b-row v-for="file in files" :key="file.id" class="mb-1">
 			<b-col v-if="file.active" md="1"><b-spinner label=""></b-spinner></b-col>
 			<b-col v-else md="1"><button class="btn btn-dark" @click="removePDF(file)">X</button></b-col>
-			<b-col md="4">{{file.name}}</b-col>
+			<b-col md="4">{{getFileName(file.name)}}</b-col>
 			<b-col md="7" v-if="file.error">{{$t('page.uploadMultipleFiles.error')}}</b-col>
 			<b-col md="7" v-else-if="file.success && file.response.errorCode == 0">
 				<b-col md="12" v-if="file.response.ruleViolations.filter(ruleViolation => ruleViolation.type == 'System').length > 0"> Couldn't process PDF</b-col>
@@ -67,6 +67,14 @@ import { Component, Vue } from 'vue-property-decorator';
 
 export default class MultipleFileUpload extends Vue {
 	files: any[] = [];
+
+	getFileName(fileName: string) {
+		if (fileName.length < 25) {
+			return fileName;
+		} else {
+			return fileName.substr(0, 25) + '...'
+		}
+	}
 
 	removePDF(file: any) {
 		console.log(this.files);

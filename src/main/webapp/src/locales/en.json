@@ -14,7 +14,13 @@
 					"Incorrect usage of '--'",
 					"Incorrect usage of '---'",
 					"Incorrect citing [?]",
-					"Introduction, conclusion or bibliography is numbered"
+					"Introduction, conclusion or bibliography is numbered",
+					"Incorrect usage of quotes",
+					"Multiple litlinks [3][5]",
+					"Incorrect case inside parenthesis",
+					"Small number written as a number instead of a word",
+					"Spaces around brackets",
+					"Incorrect citation"
 				]
 			}
 		},
@@ -54,7 +60,8 @@
 			"uploadFiles2": "Drop files to upload",
 			"addPDF": "Add another PDF",
 			"startUploading": "Start Upload",
-			"stopUploading": "Stop Upload"
+			"stopUploading": "Stop Upload",
+			"error": "File upload failed"
 		},
 		"about": {
 			"title": "About",
