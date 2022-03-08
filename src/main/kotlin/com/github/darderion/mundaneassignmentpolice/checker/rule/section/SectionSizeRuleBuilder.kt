@@ -19,5 +19,5 @@ class SectionSizeRuleBuilder {
 
     infix fun percentageLimit(limit: Int) = this.also { this.percentageLimit = limit }
 
-    fun getRule() = SectionSizeRule(name, type, sectionName, pageLimit, percentageLimit)
+    fun getRule() = SectionSizeRule(name, type, sectionName, pageLimit, percentageLimit) as SectionRule
 }
