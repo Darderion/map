@@ -9,8 +9,8 @@ class SectionSizeRule(
     name: String,
     type: RuleViolationType,
     sectionName: String,
-    private val pageLimit: Int,
-    private val percentageLimit: Int
+    val pageLimit: Int,
+    val percentageLimit: Int
 ): SectionRule(name, type, sectionName) {
     override fun isViolated(section: Section, document: PDFDocument): Boolean {
         val text = document.text

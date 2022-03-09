@@ -1,8 +1,6 @@
 package com.github.darderion.mundaneassignmentpolice.checker
 
 import com.github.darderion.mundaneassignmentpolice.TestsConfiguration
-import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.SymbolRule
-import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.SymbolRuleBuilder
 import com.github.darderion.mundaneassignmentpolice.rules.*
 import com.github.darderion.mundaneassignmentpolice.wrapper.PDFBox
 import io.kotest.core.spec.style.StringSpec
@@ -35,14 +33,17 @@ class RulesTests: StringSpec({
 	}
 	"Symbol rule should detect writing integers from one to nine as digits instead of words" {
 		RULES_SMALL_NUMBERS.sumOf { it.process(PDFBox().getPDF(filePathSmallNumbers)).count() } shouldBeExactly 6
-  }
+    }
 	"Symbol rule should detect the lack of space around brackets" {
 		RULES_SPACE_AROUND_BRACKETS.map { it.process(PDFBox().getPDF(filePathSpaceAroundBrackets)) }
 			.flatten()
 			.count() shouldBeExactly 16
-  }
+    }
 	"Symbol rule should detect incorrect citation" {
 		RULE_CITATION.process(PDFBox().getPDF(filePathCitation)).count() shouldBeExactly 2
+	}
+	"Section rule should detect sections whose size exceeds specified limit" {
+
 	}
 }) {
 	companion object {
@@ -53,5 +54,10 @@ class RulesTests: StringSpec({
 		const val filePathSmallNumbers = "${TestsConfiguration.resourceFolder}checker/SymbolRuleTestsSmallNumbers.pdf"
 		const val filePathSpaceAroundBrackets = "${TestsConfiguration.resourceFolder}checker/SymbolRuleTestsSpaceAroundBrackets.pdf"
 		const val filePathCitation = "${TestsConfiguration.resourceFolder}checker/SymbolRuleTestsCitation.pdf"
+
+		const val filePathIntroductionSize = "${TestsConfiguration.resourceFolder}checker/SectionRuleTestsIntroductionSize.pdf"
+		const val filePathProblemStatementSize = "${TestsConfiguration.resourceFolder}checker/SectionRuleTestsProblemStatementSize.pdf"
+		const val filePathOverviewSize = "${TestsConfiguration.resourceFolder}checker/SectionRuleTestsOverviewSize.pdf"
+		const val filePathConclusionSize = "${TestsConfiguration.resourceFolder}checker/SectionRuleTestsConclusionSize.pdf"
 	}
 }
