@@ -1,7 +1,12 @@
 
 <template>
 	<div class="about">
-		<PDFComponent :pdfURL="`api/viewPDF.pdf?pdfName=${this.$store.getters.getPdfName}`"></PDFComponent>
+		<div v-if="this.$store.getters.pdfName">
+			<PDFComponent :pdfURL="`api/viewPDF.pdf?pdfName=${this.$store.getters.getPdfName}`"></PDFComponent>
+		</div>
+		<div v-else>
+			<NoPDFComponent/>
+		</div>
 	</div>
 </template>
 
@@ -10,11 +15,13 @@
 import { Component, Prop, Vue } from 'vue-property-decorator';
 
 import PDFComponent from '../components/PDFComponent.vue'
+import NoPDFComponent from '../components/NoPDFComponent.vue'
 
 @Component({
 	components: {
 		Keypress: () => import('vue-keypress'),
-		PDFComponent
+		PDFComponent,
+		NoPDFComponent
 	},
 })
 

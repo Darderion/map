@@ -5,27 +5,27 @@
 		<b-row v-for="file in files" :key="file.id" class="mb-1">
 			<b-col v-if="file.active" md="1"><b-spinner label=""></b-spinner></b-col>
 			<b-col v-else md="1"><button class="btn btn-dark" @click="removePDF(file)">X</button></b-col>
-			<b-col md="4">{{getFileName(file.name)}}</b-col>
-			<b-col md="7" v-if="file.error">{{$t('page.uploadMultipleFiles.error')}}</b-col>
+			<b-col md="4">{{ getFileName(file.name) }}</b-col>
+			<b-col md="7" v-if="file.error">{{ $t('page.uploadMultipleFiles.error') }}</b-col>
 			<b-col md="7" v-else-if="file.success && file.response.errorCode == 0">
-				<b-col md="12" v-if="file.response.ruleViolations.filter(ruleViolation => ruleViolation.type == 'System').length > 0"> Couldn't process PDF</b-col>
+				<b-col md="12" v-if="file.response.ruleViolations.filter(ruleViolation => ruleViolation.type == 'System').length > 0">{{ $t('noPDFProcessed') }}</b-col>
 				<b-row v-if="file.response.ruleViolations.filter(ruleViolation => ruleViolation.type == 'System').length == 0">
-					<b-col md="5">{{file.response.ruleViolations.filter(ruleViolation => ruleViolation.type == 'Error').length}} {{ $t('page.uploadMultipleFiles.errorsFound')}}</b-col>
-					<b-col md="5">{{file.response.ruleViolations.filter(ruleViolation => ruleViolation.type == 'Warning').length}} {{ $t('page.uploadMultipleFiles.warningsFound')}}</b-col>
-					<b-col md="2"><a :href="`#/viewRulesViolations?pdfName=${file.response.name}&locale=${getLocale()}`">PDF</a></b-col>
+					<b-col md="5">{{file.response.ruleViolations.filter(ruleViolation => ruleViolation.type == 'Error').length}} {{ $t('page.uploadMultipleFiles.errorsFound') }}</b-col>
+					<b-col md="5">{{file.response.ruleViolations.filter(ruleViolation => ruleViolation.type == 'Warning').length}} {{ $t('page.uploadMultipleFiles.warningsFound') }}</b-col>
+					<b-col md="2"><a :href="`#/viewPDFText?pdfName=${file.response.name}&locale=${getLocale()}`">PDF</a></b-col>
 				</b-row>
 			</b-col>
 		</b-row>
 	</div>
 	<div class="uploadFilesDiv" v-else>
 		<div class="p-5">
-			<h4>{{ $t('page.uploadMultipleFiles.uploadFiles1')}}<br/>{{ $t('page.uploadMultipleFiles.options')}}</h4>
-			<label for="file" class="btn btn-lg btn-primary">{{ $t('page.uploadMultipleFiles.selectFiles')}}</label>
+			<h4>{{ $t('page.uploadMultipleFiles.uploadFiles1') }}<br/>{{ $t('page.uploadMultipleFiles.options') }}</h4>
+			<label for="file" class="btn btn-lg btn-primary">{{ $t('page.uploadMultipleFiles.selectFiles') }}</label>
 		</div>
 	</div>
 
 	<div v-show="$refs.upload && $refs.upload.dropActive" class="drop-active">
-		<h3>{{ $t('page.uploadMultipleFiles.uploadFiles2')}}</h3>
+		<h3>{{ $t('page.uploadMultipleFiles.uploadFiles2') }}</h3>
 	</div>
 
 	<div class="uploadSection" v-show="files.length > 0">
@@ -47,7 +47,7 @@
 		</button>
 		<button type="button" class="btn btn-danger"  v-else @click.prevent="$refs.upload.active = false">
 			<i class="fa fa-stop" aria-hidden="true"></i>
-			{{ $t('page.uploadMultipleFiles.stopUploading')}}
+			{{ $t('page.uploadMultipleFiles.stopUploading') }}
 		</button>
 		</div>
 	</div>
@@ -61,6 +61,7 @@ import { Component, Vue } from 'vue-property-decorator';
 
 @Component({
 	components: {
+		Keypress: () => import('vue-keypress'),
 		FileUpload: VueUploadComponent
 	},
 })
