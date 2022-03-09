@@ -54,7 +54,7 @@ class UrlUtil {
     }
 }
 
-class InvalidOperationException: UnsupportedOperationException {
+class InvalidOperationException: Exception {
     constructor(message: String): super(message)
     constructor(cause: Throwable): super(cause)
 }
