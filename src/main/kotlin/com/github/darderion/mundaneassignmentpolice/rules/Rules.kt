@@ -180,7 +180,7 @@ val RULE_SYMBOLS_IN_SECTION_NAMES = TableOfContentRuleBuilder()
                 .joinToString("")
             text.contains("[:.,]".toRegex())
         }
-    }.called("Символы \":\", \".\", \",\" в названии секции")
+    }.called("""Символы ":", ".", "," в названии секции""")
     .getRule()
 
 val smallNumbersRuleBuilder = SymbolRuleBuilder()
