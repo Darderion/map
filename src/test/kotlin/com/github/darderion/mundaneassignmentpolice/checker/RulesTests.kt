@@ -1,6 +1,7 @@
 package com.github.darderion.mundaneassignmentpolice.checker
 
 import com.github.darderion.mundaneassignmentpolice.TestsConfiguration
+import com.github.darderion.mundaneassignmentpolice.checker.rule.section.SectionSizeRule
 import com.github.darderion.mundaneassignmentpolice.rules.*
 import com.github.darderion.mundaneassignmentpolice.wrapper.PDFBox
 import io.kotest.core.spec.style.StringSpec
@@ -42,8 +43,18 @@ class RulesTests: StringSpec({
 	"Symbol rule should detect incorrect citation" {
 		RULE_CITATION.process(PDFBox().getPDF(filePathCitation)).count() shouldBeExactly 2
 	}
-	"Section rule should detect sections whose size exceeds specified limit" {
+	"Section rules should detect sections whose size exceeds specified limit" {
+		(introductionSizeRule as SectionSizeRule).percentageLimit shouldBeExactly 20
+		introductionSizeRule.process(PDFBox().getPDF(filePathIntroductionSize)).count() shouldBeExactly 1
 
+		(problemStatementSizeRule as SectionSizeRule).pageLimit shouldBeExactly 1
+		problemStatementSizeRule.process(PDFBox().getPDF(filePathProblemStatementSize)).count() shouldBeExactly 1
+
+		(overviewSizeRule as SectionSizeRule).percentageLimit shouldBeExactly 50
+		overviewSizeRule.process(PDFBox().getPDF(filePathOverviewSize)).count() shouldBeExactly 1
+
+		(conclusionSizeRule as SectionSizeRule).pageLimit shouldBeExactly 2
+		conclusionSizeRule.process(PDFBox().getPDF(filePathConclusionSize)).count() shouldBeExactly 1
 	}
 }) {
 	companion object {
