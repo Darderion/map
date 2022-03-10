@@ -24,16 +24,15 @@ class URLUtilTests: StringSpec({
         val url = "https://google.com"
         URLUtil.isShortened(url).shouldBeFalse()
 
-        val shortenedUrl = "https://cutt.ly/VAOZr94"
+        val shortenedUrl = "https://t.ly/FX8U"
         URLUtil.isShortened(shortenedUrl).shouldBeTrue()
     }
 
     "URLUtil should expand various shortener URLs" {
         val urls = listOf(
-            "https://cutt.ly/VAOZr94",
             "https://is.gd/gZgSmH",
             "https://bit.ly/3KvfLJR",
-            "https://shorturl.at/kHQT5"
+            "https://t.ly/FX8U"
         )
         urls.forEach { URLUtil.expand(it) shouldBe "https://www.google.com/" }
     }

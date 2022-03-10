@@ -46,10 +46,11 @@ class URLRule(
                 var currentWord = word
                 var nextLine = linesInsideArea[lineIndex + 1]
                 var nextWord = nextLine.text.first().text
-                while (":/._".contains(currentWord.last()) && nextWord.isNotEmpty()) {
+
+                while (currentWord.last() in ":/._-" && nextWord.isNotEmpty()) {
                     currentWord = nextWord
                     multilineUrl += currentWord
-                    if (nextLine.text.size != 1) break
+                    if (nextLine.text.size > 1) break
                     lineIndex++
                     nextLine = linesInsideArea[lineIndex + 1]
                     nextWord = nextLine.text.first().text

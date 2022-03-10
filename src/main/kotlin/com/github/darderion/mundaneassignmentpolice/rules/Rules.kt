@@ -189,7 +189,10 @@ val RULE_SHORTENED_URLS = URLRuleBuilder()
     .called("Сокращенная ссылка")
     .disallow { urls ->
         urls.filter { pair ->
-            try { URLUtil.isShortened(pair.first) }
-            catch (_: Exception) { false }
+            try {
+                var url = pair.first
+                if (!url.startsWith("http")) url = "https://$url"
+                URLUtil.isShortened(url)
+            } catch (_: Exception) { false }
         }.map { it.second }
     }.getRule()
