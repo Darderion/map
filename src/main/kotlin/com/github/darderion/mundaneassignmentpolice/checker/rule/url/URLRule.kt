@@ -28,7 +28,7 @@ class URLRule(
 
     private fun getAllUrls(document: PDFDocument, area: PDFRegion): List<Pair<String, Line>> {
         val urls: MutableList<Pair<String, Line>> = mutableListOf()
-        val urlRegex = Regex("""^((https?://)|(www\.))[^\s]+""")
+        val urlRegex = Regex("""^((https?:)|(www\.))[^\s]*""")
 
         val linesInsideArea = document.text.filter { it.area!! inside area }
         var lineIndex = 0
@@ -45,12 +45,14 @@ class URLRule(
                 var multilineUrl = word
                 var currentWord = word
                 var nextLine = linesInsideArea[lineIndex + 1]
-                while (":/._".contains(currentWord.last()) && nextLine.text.isNotEmpty()) {
-                    currentWord = nextLine.text.first().text
+                var nextWord = nextLine.text.first().text
+                while (":/._".contains(currentWord.last()) && nextWord.isNotEmpty()) {
+                    currentWord = nextWord
                     multilineUrl += currentWord
                     if (nextLine.text.size != 1) break
                     lineIndex++
                     nextLine = linesInsideArea[lineIndex + 1]
+                    nextWord = nextLine.text.first().text
                 }
                 urls.add(multilineUrl to line)
             }
