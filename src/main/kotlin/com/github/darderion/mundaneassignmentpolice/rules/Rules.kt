@@ -7,8 +7,10 @@ import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.SymbolRu
 import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.and
 import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.or
 import com.github.darderion.mundaneassignmentpolice.checker.rule.tableofcontent.TableOfContentRuleBuilder
+import com.github.darderion.mundaneassignmentpolice.checker.rule.url.URLRuleBuilder
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFArea
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFRegion
+import com.github.darderion.mundaneassignmentpolice.utils.URLUtil
 import java.util.*
 
 private val enLetters = "abcdefghijklmnopqrstuvwxyz"
@@ -193,3 +195,15 @@ val smallNumbersRuleBuilder = SymbolRuleBuilder()
 val RULES_SMALL_NUMBERS = List<SymbolRule>(9) { index ->
     smallNumbersRuleBuilder.symbol((index + 1).digitToChar()).fromLeft().getRule() or
             smallNumbersRuleBuilder.fromRight().getRule() }
+
+val RULE_SHORTENED_URLS = URLRuleBuilder()
+    .called("Сокращённая ссылка")
+    .disallow { urls ->
+        urls.filter { pair ->
+            try {
+                var url = pair.first
+                if (!url.startsWith("http")) url = "https://$url"
+                URLUtil.isShortened(url)
+            } catch (_: Exception) { false }
+        }.map { it.second }
+    }.getRule()
