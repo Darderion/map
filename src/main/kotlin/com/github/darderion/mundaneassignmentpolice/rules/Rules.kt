@@ -174,6 +174,17 @@ val RULE_TABLE_OF_CONTENT_NUMBERS = TableOfContentRuleBuilder()
     }.called("Введение, заключение и список литературы не нумеруются")
     .getRule()
 
+val RULE_SYMBOLS_IN_SECTION_NAMES = TableOfContentRuleBuilder()
+    .disallow { listOfLines ->
+        listOfLines.filter { line ->
+            val text = line.text.filterNot { it.text == "." }           // remove leaders
+                .filterNot { it.text.contains("[0-9]+\\.".toRegex()) }  // remove numbering
+                .joinToString("")
+            text.contains("[:.,]".toRegex())
+        }
+    }.called("""Символы ":", ".", "," в названии секции""")
+    .getRule()
+
 val smallNumbersRuleBuilder = SymbolRuleBuilder()
     .called("Неправильное написание целых чисел от 1 до 9")
     .inArea(PDFRegion.EVERYWHERE.except(PDFArea.PAGE_INDEX, PDFArea.TABLE_OF_CONTENT, PDFArea.BIBLIOGRAPHY))
@@ -186,7 +197,7 @@ val RULES_SMALL_NUMBERS = List<SymbolRule>(9) { index ->
             smallNumbersRuleBuilder.fromRight().getRule() }
 
 val RULE_SHORTENED_URLS = URLRuleBuilder()
-    .called("Сокращенная ссылка")
+    .called("Сокращённая ссылка")
     .disallow { urls ->
         urls.filter { pair ->
             try {

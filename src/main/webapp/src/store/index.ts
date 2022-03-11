@@ -12,7 +12,8 @@ export default new Vuex.Store({
 		pages: 0,
 		ruleViolations: [],
 		noErrorsFound: false,
-		noAreaErrorsFound: false
+		noAreaErrorsFound: false,
+		languages: ['ru', 'en']
 	},
 	mutations: {
 		setPdfName(state, payload) {
@@ -33,6 +34,12 @@ export default new Vuex.Store({
 	},
 	actions: {},
 	getters: {
+		getLanguages(state): string[] {
+			return state.languages;
+		},
+		pdfName(state): boolean {
+			return state.pdfName != undefined && state.pdfName.trim() != "" && state.pdfName != "undefined"
+		},
 		getContainsErrors(state): boolean {
 			return !state.noErrorsFound
 		},

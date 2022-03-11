@@ -1,7 +1,12 @@
 
 <template>
 	<div class="about">
-		<PDFTextComponent :viewModeName="`Errors`"/>
+		<div v-if="this.$store.getters.pdfName">
+			<PDFTextComponent :viewModeName="`Errors`"/>
+		</div>
+		<div v-else>
+			<NoPDFComponent/>
+		</div>
 	</div>
 </template>
 
@@ -10,10 +15,13 @@
 import { Component, Prop, Vue } from 'vue-property-decorator';
 
 import PDFTextComponent from '../components/PDFTextComponent.vue'
+import NoPDFComponent from '../components/NoPDFComponent.vue'
 
 @Component({
 	components: {
-		PDFTextComponent
+		Keypress: () => import('vue-keypress'),
+		PDFTextComponent,
+		NoPDFComponent
 	},
 })
 

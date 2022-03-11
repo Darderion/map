@@ -71,5 +71,7 @@
 	},
 	"button": {
 		"chooseFile": "Выбор файла"
-	}
+	},
+	"noPDFUploaded": "PDF не загружена",
+	"noPDFProcessed": "PDF не обработалась"
 }

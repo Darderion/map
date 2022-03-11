@@ -1,15 +1,12 @@
 package com.github.darderion.mundaneassignmentpolice.utils
 
-import com.github.darderion.mundaneassignmentpolice.controller.pdfFolder
 import org.springframework.web.multipart.MultipartFile
-import java.awt.image.RenderedImage
-import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.IOException
-import java.io.UncheckedIOException
+import java.math.BigInteger
 import java.nio.file.*
+import java.security.MessageDigest
 import java.util.*
-import javax.imageio.ImageIO
 import kotlin.math.abs
 import kotlin.random.Random
 
@@ -27,12 +24,22 @@ class FileUploadUtil {
 			}
 		}
 
-		fun getFileName() = (abs(Random.nextInt() % 10000)).toString() + (abs(Random.nextInt() % 10000)).toString()
+		fun getFileNameNextInt() = (abs(Random.nextInt() % 10000)).toString() + (abs(Random.nextInt() % 10000)).toString()
+
+		fun getFileName(file: MultipartFile): String {
+			val uploadBytes: ByteArray = file.bytes
+			val md5: MessageDigest = MessageDigest.getInstance("MD5")
+			val digest: ByteArray = md5.digest(uploadBytes)
+			val hashString = BigInteger(1, digest).toString(16)
+			println("File hash: $hashString")
+
+			return hashString
+		}
 
 		fun saveFile(
 			uploadDir: String,
 			multipartFile: MultipartFile,
-			fileName: String = getFileName(),
+			fileName: String = getFileName(multipartFile),
 			folderMaxSize: Int? = null
 		): String {
 			if (folderMaxSize != null) {

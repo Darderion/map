@@ -20,6 +20,7 @@ import pdf from 'vue-pdf'
 
 @Component({
 	components: {
+		Keypress: () => import('vue-keypress'),
 		pdf,
 		NavbarComponent
 	},
