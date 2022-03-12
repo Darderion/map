@@ -8,16 +8,23 @@ import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFDocument
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFRegion
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Section
 
+enum class SectionTitle(val text: String) {
+    Introduction("Введение"),
+    ProblemStatement("Постановка задачи"),
+    Overview("Обзор"),
+    Conclusion("Заключение")
+}
+
 abstract class SectionRule(
-    name: String,
+    ruleName: String,
     type: RuleViolationType,
-    val sectionName: String
-): Rule(PDFRegion.NOWHERE.except(PDFArea.SECTION), name, type) {
+    val title: SectionTitle
+): Rule(PDFRegion.NOWHERE.except(PDFArea.SECTION), ruleName, type) {
     abstract fun isViolated(section: Section, document: PDFDocument): Boolean
 
     override fun process(document: PDFDocument): List<RuleViolation> {
         val section = document.areas!!.sections.firstOrNull {
-            it.title.contains(sectionName, true)
+            it.title.contains(title.text, true)
         } ?: return emptyList()
 
         if (!isViolated(section, document)) return emptyList()

@@ -6,12 +6,12 @@ import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFDocument
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Section
 
 class SectionSizeRule(
-    name: String,
+    ruleName: String,
     type: RuleViolationType,
-    sectionName: String,
+    title: SectionTitle,
     val pageLimit: Int,
     val percentageLimit: Number
-): SectionRule(name, type, sectionName) {
+): SectionRule(ruleName, type, title) {
     override fun isViolated(section: Section, document: PDFDocument): Boolean {
         val text = document.text
         val sections = document.areas!!.sections

@@ -3,6 +3,7 @@ package com.github.darderion.mundaneassignmentpolice.rules
 import com.github.darderion.mundaneassignmentpolice.checker.RuleViolationType
 import com.github.darderion.mundaneassignmentpolice.checker.rule.list.ListRuleBuilder
 import com.github.darderion.mundaneassignmentpolice.checker.rule.section.SectionSizeRuleBuilder
+import com.github.darderion.mundaneassignmentpolice.checker.rule.section.SectionTitle
 import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.SymbolRule
 import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.SymbolRuleBuilder
 import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.and
@@ -76,7 +77,6 @@ val RULE_LONG_DASH = SymbolRuleBuilder()
     .getRule() and SymbolRuleBuilder()
     .symbol(longDash)
     .shouldHaveNeighbor(' ')
-    .inArea(PDFRegion.EVERYWHERE.except(PDFArea.BIBLIOGRAPHY, PDFArea.FOOTNOTE))
     .getRule()
 
 val closingQuote = '”'
@@ -199,22 +199,26 @@ val RULES_SMALL_NUMBERS = List<SymbolRule>(9) { index ->
             smallNumbersRuleBuilder.fromRight().getRule() }
 
 val introductionSizeRule = SectionSizeRuleBuilder()
-    .section("Введение")
+    .called("Слишком длинная секция")
+    .section(SectionTitle.Introduction)
     .percentageLimit(20)
     .getRule()
 
 val problemStatementSizeRule = SectionSizeRuleBuilder()
-    .section("Постановка задачи")
+    .called("Слишком длинная секция")
+    .section(SectionTitle.ProblemStatement)
     .pageLimit(1)
     .getRule()
 
 val overviewSizeRule = SectionSizeRuleBuilder()
-    .section("Обзор")
+    .called("Слишком длинная секция")
+    .section(SectionTitle.Overview)
     .percentageLimit(50)
     .getRule()
 
 val conclusionSizeRule = SectionSizeRuleBuilder()
-    .section("Заключение")
+    .called("Слишком длинная секция")
+    .section(SectionTitle.Conclusion)
     .pageLimit(2)
     .getRule()
 

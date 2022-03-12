@@ -3,17 +3,17 @@ package com.github.darderion.mundaneassignmentpolice.checker.rule.section
 import com.github.darderion.mundaneassignmentpolice.checker.RuleViolationType
 
 class SectionSizeRuleBuilder {
-    private var name: String = "Rule name"
+    private var ruleName: String = "Rule name"
     private var type: RuleViolationType = RuleViolationType.Warning
-    private var sectionName: String = "Section name"
+    private var title: SectionTitle = SectionTitle.values().first()
     private var pageLimit: Int = Int.MAX_VALUE
     private var percentageLimit: Number = 100
 
-    infix fun called(name: String) = this.also { this.name = name }
+    infix fun called(name: String) = this.also { this.ruleName = name }
 
     infix fun type(type: RuleViolationType) = this.also { this.type = type }
 
-    infix fun section(name: String) = this.also { this.sectionName = name }
+    infix fun section(title: SectionTitle) = this.also { this.title = title }
 
     infix fun pageLimit(limit: Int) = this.also {
         if (limit < 0) throw IllegalArgumentException("Page limit must not be negative")
@@ -26,5 +26,5 @@ class SectionSizeRuleBuilder {
         this.percentageLimit = limit
     }
 
-    fun getRule() = SectionSizeRule(name, type, sectionName, pageLimit, percentageLimit) as SectionRule
+    fun getRule() = SectionSizeRule(ruleName, type, title, pageLimit, percentageLimit) as SectionRule
 }
