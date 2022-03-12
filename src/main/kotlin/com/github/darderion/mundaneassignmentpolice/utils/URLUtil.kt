@@ -40,7 +40,7 @@ class URLUtil {
                 requestMethod = "HEAD"
                 connect()
                 return when (responseCode) {
-                    301 -> {  // HttpURLConnection doesn't automatically follow redirects from a protocol to another
+                    301 -> {  // HttpURLConnection doesn't automatically follow redirects from one protocol to another
                         val redirect = headerFields.filter {
                             it.key.equals("location", true)
                         }.map { it.value.first() }.first()
