@@ -71,5 +71,7 @@
 	},
 	"button": {
 		"chooseFile": "Choose File"
-	}
+	},
+	"noPDFUploaded": "No PDF uploaded",
+	"noPDFProcessed": "Couldn't process PDF"
 }

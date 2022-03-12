@@ -8,8 +8,10 @@ import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.SymbolRu
 import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.and
 import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.or
 import com.github.darderion.mundaneassignmentpolice.checker.rule.tableofcontent.TableOfContentRuleBuilder
+import com.github.darderion.mundaneassignmentpolice.checker.rule.url.URLRuleBuilder
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFArea
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFRegion
+import com.github.darderion.mundaneassignmentpolice.utils.URLUtil
 import java.util.*
 
 private val enLetters = "abcdefghijklmnopqrstuvwxyz"
@@ -174,6 +176,17 @@ val RULE_TABLE_OF_CONTENT_NUMBERS = TableOfContentRuleBuilder()
     }.called("Введение, заключение и список литературы не нумеруются")
     .getRule()
 
+val RULE_SYMBOLS_IN_SECTION_NAMES = TableOfContentRuleBuilder()
+    .disallow { listOfLines ->
+        listOfLines.filter { line ->
+            val text = line.text.filterNot { it.text == "." }           // remove leaders
+                .filterNot { it.text.contains("[0-9]+\\.".toRegex()) }  // remove numbering
+                .joinToString("")
+            text.contains("[:.,]".toRegex())
+        }
+    }.called("""Символы ":", ".", "," в названии секции""")
+    .getRule()
+
 val smallNumbersRuleBuilder = SymbolRuleBuilder()
     .called("Неправильное написание целых чисел от 1 до 9")
     .inArea(PDFRegion.EVERYWHERE.except(PDFArea.PAGE_INDEX, PDFArea.TABLE_OF_CONTENT, PDFArea.BIBLIOGRAPHY))
@@ -211,3 +224,15 @@ val RULES_SECTION_SIZE = listOf(
     overviewSizeRule,
     conclusionSizeRule
 )
+
+val RULE_SHORTENED_URLS = URLRuleBuilder()
+    .called("Сокращённая ссылка")
+    .disallow { urls ->
+        urls.filter { pair ->
+            try {
+                var url = pair.first
+                if (!url.startsWith("http")) url = "https://$url"
+                URLUtil.isShortened(url)
+            } catch (_: Exception) { false }
+        }.map { it.second }
+    }.getRule()

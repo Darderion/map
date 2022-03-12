@@ -43,6 +43,12 @@ class RulesTests: StringSpec({
 	"Symbol rule should detect incorrect citation" {
 		RULE_CITATION.process(PDFBox().getPDF(filePathCitation)).count() shouldBeExactly 2
 	}
+	"URLRule should detect shortened URLs" {
+		RULE_SHORTENED_URLS.process(PDFBox().getPDF(filePathShortenedUrls)).count() shouldBeExactly 3
+	}
+	"Rule should detect incorrect symbols in section names" {
+		RULE_SYMBOLS_IN_SECTION_NAMES.process(PDFBox().getPDF(filePathSymbolsInSectionNames)).count() shouldBeExactly 4
+	}
 	"Section rules should detect sections whose size exceeds specified limit" {
 		(introductionSizeRule as SectionSizeRule).percentageLimit shouldBeExactly 20
 		introductionSizeRule.process(PDFBox().getPDF(filePathIntroductionSize)).count() shouldBeExactly 1
@@ -65,6 +71,8 @@ class RulesTests: StringSpec({
 		const val filePathSmallNumbers = "${TestsConfiguration.resourceFolder}checker/SymbolRuleTestsSmallNumbers.pdf"
 		const val filePathSpaceAroundBrackets = "${TestsConfiguration.resourceFolder}checker/SymbolRuleTestsSpaceAroundBrackets.pdf"
 		const val filePathCitation = "${TestsConfiguration.resourceFolder}checker/SymbolRuleTestsCitation.pdf"
+		const val filePathShortenedUrls = "${TestsConfiguration.resourceFolder}checker/URLRuleShortenedUrls.pdf"
+		const val filePathSymbolsInSectionNames = "${TestsConfiguration.resourceFolder}checker/RulesTestsSymbolsInSectionNames.pdf"
 
 		const val filePathIntroductionSize = "${TestsConfiguration.resourceFolder}checker/SectionRuleTestsIntroductionSize.pdf"
 		const val filePathProblemStatementSize = "${TestsConfiguration.resourceFolder}checker/SectionRuleTestsProblemStatementSize.pdf"
