@@ -24,6 +24,7 @@ class SectionSizeRule(
             }
         } else emptyList()
 
+        val firstPageOfSections = text[sections.first().titleIndex].page
         val lastPageOfSections = text[text.indexOfFirst { it.area == PDFArea.BIBLIOGRAPHY } - 1].page
 
         val firstSectionPage = text[section.titleIndex].page
@@ -36,8 +37,8 @@ class SectionSizeRule(
             }
         }
 
-        val totalPages = text.last().page + 1
+        val totalPagesOfSections = lastPageOfSections - firstPageOfSections + 1
         val sectionSize = lastSectionPage - firstSectionPage + 1
-        return sectionSize > pageLimit || sectionSize.toDouble() / totalPages * 100 > percentageLimit.toDouble()
+        return sectionSize > pageLimit || sectionSize.toDouble() / totalPagesOfSections * 100 > percentageLimit.toDouble()
     }
 }
