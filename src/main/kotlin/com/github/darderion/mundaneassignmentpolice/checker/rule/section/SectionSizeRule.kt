@@ -10,7 +10,7 @@ class SectionSizeRule(
     type: RuleViolationType,
     sectionName: String,
     val pageLimit: Int,
-    val percentageLimit: Int
+    val percentageLimit: Number
 ): SectionRule(name, type, sectionName) {
     override fun isViolated(section: Section, document: PDFDocument): Boolean {
         val text = document.text
@@ -38,6 +38,6 @@ class SectionSizeRule(
 
         val totalPages = text.last().page + 1
         val sectionSize = lastSectionPage - firstSectionPage + 1
-        return sectionSize > pageLimit || sectionSize.toDouble() / totalPages * 100 > percentageLimit
+        return sectionSize > pageLimit || sectionSize.toDouble() / totalPages * 100 > percentageLimit.toDouble()
     }
 }
