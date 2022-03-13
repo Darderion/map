@@ -30,7 +30,6 @@ class PDFStructure(text: List<Line>) {
 					if (sectionTitle == null && !TABLE_OF_CONTENT_TITLES.contains(it.content.trim()) && it.content.isNotEmpty()) {
 						// sectionTitle = it.text.first().text
 						sectionTitle = it.text.filter { it.text.trim().isNotEmpty() }.dropLast(1).joinToString(" ")
-						println(sectionTitle)
 						area
 					} else {
 						if (sectionTitle != null && it.index == 0 && it.content == sectionTitle) {
@@ -98,7 +97,7 @@ class PDFStructure(text: List<Line>) {
 		}															//	LESS THAN 100 PAGES
 
 		val sectionsTitlesWithIndexes = sectionsTitles.map { if (it.contains('.')) it else ". $it" }
-		
+
 		val sectionTextLines = text
 			.filter { it.area == SECTION }
 			.map { it.documentIndex to it.content.clearSymbols()
