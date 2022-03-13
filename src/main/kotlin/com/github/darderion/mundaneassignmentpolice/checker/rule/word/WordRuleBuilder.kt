@@ -5,17 +5,33 @@ import com.github.darderion.mundaneassignmentpolice.checker.RuleViolationType
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFArea
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFRegion
 
+fun splitToWordsAndPunctuations(str: String): List<String> {
+	val wordsAndPunctuations: MutableList<String> = mutableListOf("")
+	var index = 0
+	for (symbol in str) {
+		if (symbol.isLetterOrDigit()) {
+			wordsAndPunctuations[index] += symbol.toString()
+			continue
+		}
+		wordsAndPunctuations.addAll(listOf(symbol.toString(), ""))
+		index += 2
+	}
+
+	return wordsAndPunctuations.filter { it != "" }
+}
+
 class WordRuleBuilder {
 	private var word: String = " "
-	private var ignoredNeighbors: MutableList<String> = mutableListOf()
-	private var notIgnoredNeighbors: MutableList<String> = mutableListOf()
+	private var ignoredNeighbors: MutableList<Regex> = mutableListOf()
+	private var notIgnoredNeighbors: MutableList<Regex> = mutableListOf()
 	private var ignoredIndexes: MutableList<Int> = mutableListOf()
 	private var isPunctuationIgnored: Boolean = false
 	private var areWordsIgnored: Boolean = false
-	private var disallowedNeighbors: MutableList<String> = mutableListOf()
-	private var requiredNeighbors: MutableList<String> = mutableListOf()
+	private var disallowedNeighbors: MutableList<Regex> = mutableListOf()
+	private var requiredNeighbors: MutableList<Regex> = mutableListOf()
 	private var direction: Direction = Direction.BIDIRECTIONAL
 	private var neighborhoodSize: Int = 1
+	private var numberOfNeighbors: Int = 1
 	private var type: RuleViolationType = RuleViolationType.Error
 	private var name: String = "Rule name"
 	private var region: PDFRegion = PDFRegion.EVERYWHERE
@@ -24,7 +40,7 @@ class WordRuleBuilder {
 
 	infix fun called(name: String) = this.also { this.name = name }
 
-	fun ignoringAdjusting(vararg words: String) = this.also {
+	fun ignoringAdjusting(vararg words: Regex) = this.also {
 		if (notIgnoredNeighbors.isEmpty()) ignoredNeighbors.addAll(words.toList())
 		else throw Exception(
 			"Up to one of the following methods can be used:" +
@@ -32,7 +48,7 @@ class WordRuleBuilder {
 		)
 	}
 
-	fun ignoringEveryWordExcept(vararg words: String) = this.also {
+	fun ignoringEveryWordExcept(vararg words: Regex) = this.also {
 		if (ignoredNeighbors.isEmpty()) notIgnoredNeighbors.addAll(words.toList())
 		else throw Exception(
 			"Up to one of the following methods can be used:" +
@@ -58,17 +74,17 @@ class WordRuleBuilder {
 		)
 	}
 
-	fun shouldNotHaveNeighbor(vararg words: String) = this.also { disallowedNeighbors.addAll(words.toList()) }
+	fun shouldNotHaveNeighbor(vararg words: Regex) =
+		this.also { disallowedNeighbors.addAll(words.toList()) }
 
-	fun shouldHaveNeighbor(vararg words: String) = this.also { requiredNeighbors.addAll(words.toList()) }
+	fun shouldHaveNeighbor(vararg words: Regex) =
+		this.also { requiredNeighbors.addAll(words.toList()) }
 
 	fun fromLeft() = this.also { direction = Direction.LEFT }
 
 	fun fromRight() = this.also { direction = Direction.RIGHT }
 
 	fun fromBothSides() = this.also { direction = Direction.BIDIRECTIONAL }
-
-	infix fun from(direction: Direction) = this.also { this.direction = direction }
 
 	infix fun inArea(area: PDFArea) = this.also { region = PDFRegion.NOWHERE.except(area) }
 
@@ -78,7 +94,9 @@ class WordRuleBuilder {
 
 	fun inNeighborhood(size: Int) = this.also { this.neighborhoodSize = size }
 
-	fun getRule() = WordRule(
+	fun shouldHaveNumberOfNeighbors(number: Int) = this.also { this.numberOfNeighbors = number }
+
+	fun getRule() = BasicWordRule(
 		word,
 		ignoredNeighbors,
 		notIgnoredNeighbors,
@@ -89,8 +107,9 @@ class WordRuleBuilder {
 		requiredNeighbors,
 		direction,
 		neighborhoodSize,
+		numberOfNeighbors,
 		type,
 		region,
 		name
-	)
+	) as WordRule
 }
