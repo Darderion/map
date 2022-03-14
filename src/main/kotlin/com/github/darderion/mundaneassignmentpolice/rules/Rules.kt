@@ -77,6 +77,7 @@ val RULE_LONG_DASH = SymbolRuleBuilder()
     .getRule() and SymbolRuleBuilder()
     .symbol(longDash)
     .shouldHaveNeighbor(' ')
+    .inArea(PDFRegion.EVERYWHERE.except(PDFArea.BIBLIOGRAPHY, PDFArea.FOOTNOTE))
     .getRule()
 
 val closingQuote = '”'
