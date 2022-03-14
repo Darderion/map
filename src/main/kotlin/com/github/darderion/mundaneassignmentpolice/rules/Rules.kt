@@ -3,6 +3,7 @@ package com.github.darderion.mundaneassignmentpolice.rules
 import com.github.darderion.mundaneassignmentpolice.checker.RuleViolationType
 import com.github.darderion.mundaneassignmentpolice.checker.rule.list.ListRuleBuilder
 import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.SymbolRule
+import com.github.darderion.mundaneassignmentpolice.checker.rule.regex.RegexRuleBuilder
 import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.SymbolRuleBuilder
 import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.and
 import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.or
@@ -175,15 +176,15 @@ val RULE_TABLE_OF_CONTENT_NUMBERS = TableOfContentRuleBuilder()
     .getRule()
 
 val RULE_SYMBOLS_IN_SECTION_NAMES = TableOfContentRuleBuilder()
-    .disallow { listOfLines ->
-        listOfLines.filter { line ->
-            val text = line.text.filterNot { it.text == "." }           // remove leaders
-                .filterNot { it.text.contains("[0-9]+\\.".toRegex()) }  // remove numbering
-                .joinToString("")
-            text.contains("[:.,]".toRegex())
-        }
-    }.called("""Символы ":", ".", "," в названии секции""")
-    .getRule()
+	.disallow { listOfLines ->
+		listOfLines.filter { line ->
+			val text = line.text.filterNot { it.text == "." }           // remove leaders
+				.filterNot { it.text.contains("[0-9]+\\.".toRegex()) }  // remove numbering
+				.joinToString("")
+			text.contains("[:.,]".toRegex())
+		}
+	}.called("""Символы ":", ".", "," в названии секции""")
+	.getRule()
 
 val smallNumbersRuleBuilder = SymbolRuleBuilder()
     .called("Неправильное написание целых чисел от 1 до 9")
@@ -197,13 +198,30 @@ val RULES_SMALL_NUMBERS = List<SymbolRule>(9) { index ->
             smallNumbersRuleBuilder.fromRight().getRule() }
 
 val RULE_SHORTENED_URLS = URLRuleBuilder()
-    .called("Сокращённая ссылка")
-    .disallow { urls ->
-        urls.filter { pair ->
-            try {
-                var url = pair.first
-                if (!url.startsWith("http")) url = "https://$url"
-                URLUtil.isShortened(url)
-            } catch (_: Exception) { false }
-        }.map { it.second }
-    }.getRule()
+	.called("Сокращённая ссылка")
+	.disallow { urls ->
+		urls.filter { pair ->
+			try {
+				var url = pair.first
+				if (!url.startsWith("http")) url = "https://$url"
+				URLUtil.isShortened(url)
+			} catch (_: Exception) {
+				false
+			}
+		}.map { it.second }
+	}.getRule()
+
+val RULE_ORDER_OF_REFERENCES = RegexRuleBuilder()
+	.called("Неверный порядок ссылок на литературу")
+	.regex(Regex("""\[[0-9,\s]+\]"""))
+	.searchIn(1)
+	.disallow { matches ->
+		matches.filter { pair ->
+			val references = pair.first
+			val referencesInIntList = references
+				.slice(IntRange(1, references.length - 2))
+				.split(Regex(""","""))
+				.map { it.trim().toInt() }
+			referencesInIntList != referencesInIntList.sorted()
+		}.map { it.second }
+	}.getRule()
