@@ -16,7 +16,15 @@ class SectionSizeRuleBuilder {
 
     infix fun section(title: SectionTitle) = this.also { this.title = title }
 
-    infix fun sizeShouldBe(comparisonType: ComparisonType) = this.also { this.comparisonType = comparisonType }
+    fun shouldBeLessThan() = this.also { this.comparisonType = ComparisonType.LESS_THAN }
+
+    fun shouldBeLessThanOrEqualTo() = this.also { this.comparisonType = ComparisonType.LESS_THAN_OR_EQUAL_TO }
+
+    fun shouldBeEqualTo() = this.also { this.comparisonType = ComparisonType.EQUAL_TO }
+
+    fun shouldBeGreaterThanOrEqualTo() = this.also { this.comparisonType = ComparisonType.GREATER_THAN_OR_EQUAL_TO }
+
+    fun shouldBeGreaterThan() = this.also { this.comparisonType = ComparisonType.GREATER_THAN }
 
     infix fun pageLimit(limit: Int) = this.also {
         if (limit < 0) throw IllegalArgumentException("Page limit must not be negative")

@@ -16,10 +16,10 @@ enum class SectionTitle(val text: String) {
 }
 
 abstract class SectionRule(
-    ruleName: String,
+    name: String,
     type: RuleViolationType,
     val title: SectionTitle
-): Rule(PDFRegion.NOWHERE.except(PDFArea.SECTION), ruleName, type) {
+): Rule(PDFRegion.NOWHERE.except(PDFArea.SECTION), name, type) {
     abstract fun isViolated(section: Section, document: PDFDocument): Boolean
 
     override fun process(document: PDFDocument): List<RuleViolation> {

@@ -2,6 +2,7 @@ package com.github.darderion.mundaneassignmentpolice.checker
 
 import com.github.darderion.mundaneassignmentpolice.TestsConfiguration
 import com.github.darderion.mundaneassignmentpolice.checker.rule.section.SectionSizeRule
+import com.github.darderion.mundaneassignmentpolice.checker.rule.section.SectionTitle
 import com.github.darderion.mundaneassignmentpolice.rules.*
 import com.github.darderion.mundaneassignmentpolice.wrapper.PDFBox
 import io.kotest.core.spec.style.StringSpec
@@ -50,15 +51,19 @@ class RulesTests: StringSpec({
 		RULE_SYMBOLS_IN_SECTION_NAMES.process(PDFBox().getPDF(filePathSymbolsInSectionNames)).count() shouldBeExactly 4
 	}
 	"Section rules should detect sections whose size exceeds specified limit" {
+		val introductionSizeRule = RULES_SECTION_SIZE.first { it.title == SectionTitle.Introduction }
 		(introductionSizeRule as SectionSizeRule).percentageLimit!!.toInt() shouldBeExactly 20
 		introductionSizeRule.process(PDFBox().getPDF(filePathIntroductionSize)).count() shouldBeExactly 1
 
+		val problemStatementSizeRule = RULES_SECTION_SIZE.first { it.title == SectionTitle.ProblemStatement }
 		(problemStatementSizeRule as SectionSizeRule).pageLimit!! shouldBeExactly 1
 		problemStatementSizeRule.process(PDFBox().getPDF(filePathProblemStatementSize)).count() shouldBeExactly 1
 
+		val overviewSizeRule = RULES_SECTION_SIZE.first { it.title == SectionTitle.Overview }
 		(overviewSizeRule as SectionSizeRule).percentageLimit!!.toInt() shouldBeExactly 50
 		overviewSizeRule.process(PDFBox().getPDF(filePathOverviewSize)).count() shouldBeExactly 1
 
+		val conclusionSizeRule = RULES_SECTION_SIZE.first { it.title == SectionTitle.Conclusion }
 		(conclusionSizeRule as SectionSizeRule).pageLimit!! shouldBeExactly 2
 		conclusionSizeRule.process(PDFBox().getPDF(filePathConclusionSize)).count() shouldBeExactly 1
 	}

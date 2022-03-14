@@ -3,7 +3,7 @@ package com.github.darderion.mundaneassignmentpolice.rules
 import com.github.darderion.mundaneassignmentpolice.checker.RuleViolationType
 import com.github.darderion.mundaneassignmentpolice.checker.rule.list.ListRuleBuilder
 import com.github.darderion.mundaneassignmentpolice.checker.rule.section.SectionSizeRuleBuilder
-import com.github.darderion.mundaneassignmentpolice.checker.rule.section.SectionTitle
+import com.github.darderion.mundaneassignmentpolice.checker.rule.section.SectionTitle.*
 import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.SymbolRule
 import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.SymbolRuleBuilder
 import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.and
@@ -198,36 +198,23 @@ val RULES_SMALL_NUMBERS = List<SymbolRule>(9) { index ->
     smallNumbersRuleBuilder.symbol((index + 1).digitToChar()).fromLeft().getRule() or
             smallNumbersRuleBuilder.fromRight().getRule() }
 
-val introductionSizeRule = SectionSizeRuleBuilder()
-    .called("Слишком длинная секция")
-    .section(SectionTitle.Introduction)
-    .percentageLimit(20)
-    .getRule()
-
-val problemStatementSizeRule = SectionSizeRuleBuilder()
-    .called("Слишком длинная секция")
-    .section(SectionTitle.ProblemStatement)
-    .pageLimit(1)
-    .getRule()
-
-val overviewSizeRule = SectionSizeRuleBuilder()
-    .called("Слишком длинная секция")
-    .section(SectionTitle.Overview)
-    .percentageLimit(50)
-    .getRule()
-
-val conclusionSizeRule = SectionSizeRuleBuilder()
-    .called("Слишком длинная секция")
-    .section(SectionTitle.Conclusion)
-    .pageLimit(2)
-    .getRule()
-
-val RULES_SECTION_SIZE = listOf(
-    introductionSizeRule,
-    problemStatementSizeRule,
-    overviewSizeRule,
-    conclusionSizeRule
+private val sectionsWithLimits = mapOf(
+    Introduction to (null to 20),
+    ProblemStatement to (1 to null),
+    Overview to (null to 50),
+    Conclusion to (2 to null)
 )
+
+val RULES_SECTION_SIZE = sectionsWithLimits
+    .mapKeys {
+        SectionSizeRuleBuilder().called("Слишком длинная секция")
+            .section(it.key)
+            .shouldBeLessThanOrEqualTo()
+    }.mapKeys { entry ->
+        entry.value.first?.let { entry.key.pageLimit(it) } ?: entry.key
+    }.mapKeys { entry ->
+        entry.value.second?.let { entry.key.percentageLimit(it) } ?: entry.key
+    }.map { it.key.getRule() }
 
 val RULE_SHORTENED_URLS = URLRuleBuilder()
     .called("Сокращённая ссылка")

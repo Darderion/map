@@ -12,13 +12,13 @@ enum class ComparisonType {
 }
 
 class SectionSizeRule(
-    ruleName: String,
+    name: String,
     type: RuleViolationType,
     title: SectionTitle,
     val comparisonType: ComparisonType,
     val pageLimit: Int?,
     val percentageLimit: Number?
-): SectionRule(ruleName, type, title) {
+): SectionRule(name, type, title) {
     init {
         if (pageLimit == null && percentageLimit == null) throw Exception("Size limit was not specified")
     }
