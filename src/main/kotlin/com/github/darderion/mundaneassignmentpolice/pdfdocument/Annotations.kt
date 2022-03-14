@@ -19,7 +19,7 @@ class Annotations {
 			Files.createDirectories(Paths.get("build/ruleviolations/"))
 			val fileName = "build/ruleviolations/${
 				pdf.name.split('/')[pdf.name.split('/').count() - 1].replace(".pdf", "")
-			}${lines[0].index}-${lines[0].page}.pdf"
+			}${lines.first().index}-${lines.last().index}(${lines[0].page}).pdf"
 			document.save(fileName)
 			return fileName
 		}
