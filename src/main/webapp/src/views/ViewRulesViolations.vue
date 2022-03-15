@@ -21,11 +21,16 @@
 					<div class="messageDiv">{{ $t('page.rulesViolations.selectRuleViolation')}}</div>
 					<ul id="rulesViolations">
 						<li v-for="ruleViolation in this.$store.getters.getRuleViolations"
-						:key="'rulesViolations'+ruleViolation.toString()">{{ruleViolation.message}} > {{ $t('page.rulesViolations.line')}} {{ruleViolation.lines[0].index}}, {{ $t('page.rulesViolations.page')}} {{ruleViolation.lines[0].page}}</li>
+						:key="'rulesViolations'+ruleViolation.toString()">{{ruleViolation.message}} >
+              {{(ruleViolation.lines.length > 1) ? $t('page.rulesViolations.lines') : $t('page.rulesViolations.line')}}
+              {{(ruleViolation.lines.length > 1) ?
+                ruleViolation.lines.map((line) => line.index)[0] + "-" + ruleViolation.lines.map((line) => line.index)[ruleViolation.lines.length - 1] :
+                ruleViolation.lines[0].index}},
+              {{ $t('page.rulesViolations.page')}} {{ruleViolation.lines[0].page}}</li>
 					</ul>
 					<div id="ruleViolation" v-show="curPage != -1">
 						<pdf
-							:src="`api/viewPDFRuleViolations.pdf?pdfName=${this.$store.getters.getPdfName}&page=${curPage}&line=${curLine}`"
+							:src="`api/viewPDFRuleViolations.pdf?pdfName=${this.$store.getters.getPdfName}&page=${curPage}&lines=${curLines}`"
 							:page="curPage + 1"
 							style="display: inline-block; width: 100%"
 						></pdf>
@@ -45,7 +50,6 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 
 import NoPDFComponent from '../components/NoPDFComponent.vue'
 import pdf from 'vue-pdf'
-import RuleViolation from '@/classes/RuleViolation';
 
 @Component({
 	components: {
@@ -60,8 +64,8 @@ export default class ViewRulesViolations extends Vue {
 		document.getElementById('rulesViolations') as HTMLUListElement: undefined
 
 	curPage = -1
-	curLine = 0
-	
+	curLines = [Number(0)]
+
 	mounted() {
 		const locale = this.$route.query.locale as string
 		if (locale != undefined && ['en', 'ru'].includes(locale)) {
@@ -79,7 +83,7 @@ export default class ViewRulesViolations extends Vue {
 			// @ts-ignore: Object is possibly 'null'.
 			const element = (event.target as HTMLElement)
 			if (element.tagName != "LI") return;
-			
+
 			this.singleSelect(element);
 		}
 
@@ -104,10 +108,14 @@ export default class ViewRulesViolations extends Vue {
 
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore: Object is possibly 'null'.
-		const lineText = li.textContent.split(this.$t('page.rulesViolations.line')+' ')[1].split(', '+this.$t('page.rulesViolations.page'))[0]
+		const lines = ((li.textContent.match(RegExp("[0-9]+-[0-9]+")) != null) ?
+      li.textContent!.match(RegExp("[0-9]+-[0-9]+"))![0].split("-") :
+      [li.textContent!.split(this.$t('page.rulesViolations.line')+' ')[1]
+        .split(', '+this.$t('page.rulesViolations.page'))[0]])
+      .map((line) => Number(line.trim())).sort((a, b) => a - b)
 
 		this.curPage = page
-		this.curLine = Number(lineText)
+		this.curLines = lines
 	}
 
 /*

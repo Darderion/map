@@ -23,5 +23,4 @@ val RULE_SET_RU = RuleSet(
 			+ RULES_SMALL_NUMBERS
 )
 
-class RuleSet(val rules: List<Rule>) {
-}
+class RuleSet(val rules: List<Rule>) {}
