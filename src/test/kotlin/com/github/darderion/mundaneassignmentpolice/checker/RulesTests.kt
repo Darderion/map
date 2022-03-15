@@ -6,7 +6,7 @@ import com.github.darderion.mundaneassignmentpolice.wrapper.PDFBox
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.ints.shouldBeExactly
 
-class RulesTests: StringSpec({
+class RulesTests : StringSpec({
 	"Symbol rule should detect incorrect symbols ? in links" {
 		RULE_LITLINK.process(PDFBox().getPDF(filePathQuestionMarkAndDashes)).count() shouldBeExactly 4
 	}
@@ -44,20 +44,29 @@ class RulesTests: StringSpec({
 	}
 	"URLRule should detect shortened URLs" {
 		RULE_SHORTENED_URLS.process(PDFBox().getPDF(filePathShortenedUrls)).count() shouldBeExactly 3
-  }
+	}
 	"Rule should detect incorrect symbols in section names" {
 		RULE_SYMBOLS_IN_SECTION_NAMES.process(PDFBox().getPDF(filePathSymbolsInSectionNames)).count() shouldBeExactly 4
 	}
+	"Regex rule should detect incorrect order of literature references"{
+		RULE_ORDER_OF_REFERENCES.process(PDFBox().getPDF(filePathOrderOfReferences)).count() shouldBeExactly 3
+	}
 }) {
 	companion object {
-		const val filePathQuestionMarkAndDashes = "${TestsConfiguration.resourceFolder}checker/SymbolRuleTestsQuestionMarkAndDashes.pdf"
+		const val filePathQuestionMarkAndDashes =
+			"${TestsConfiguration.resourceFolder}checker/SymbolRuleTestsQuestionMarkAndDashes.pdf"
 		const val filePathQuotes = "${TestsConfiguration.resourceFolder}checker/SymbolRuleTestsQuotes.pdf"
 		const val filePathMultipleLinks = "${TestsConfiguration.resourceFolder}checker/SymbolRuleTestsMultipleLinks.pdf"
-		const val filePathLargeRussianLetter = "${TestsConfiguration.resourceFolder}checker/SymbolRuleTestsLargeRussianLetter.pdf"
+		const val filePathLargeRussianLetter =
+			"${TestsConfiguration.resourceFolder}checker/SymbolRuleTestsLargeRussianLetter.pdf"
 		const val filePathSmallNumbers = "${TestsConfiguration.resourceFolder}checker/SymbolRuleTestsSmallNumbers.pdf"
-		const val filePathSpaceAroundBrackets = "${TestsConfiguration.resourceFolder}checker/SymbolRuleTestsSpaceAroundBrackets.pdf"
+		const val filePathSpaceAroundBrackets =
+			"${TestsConfiguration.resourceFolder}checker/SymbolRuleTestsSpaceAroundBrackets.pdf"
 		const val filePathCitation = "${TestsConfiguration.resourceFolder}checker/SymbolRuleTestsCitation.pdf"
 		const val filePathShortenedUrls = "${TestsConfiguration.resourceFolder}checker/URLRuleShortenedUrls.pdf"
-		const val filePathSymbolsInSectionNames = "${TestsConfiguration.resourceFolder}checker/RulesTestsSymbolsInSectionNames.pdf"
+		const val filePathSymbolsInSectionNames =
+			"${TestsConfiguration.resourceFolder}checker/RulesTestsSymbolsInSectionNames.pdf"
+		const val filePathOrderOfReferences =
+			"${TestsConfiguration.resourceFolder}checker/RegexRuleTestsOrderOfReferences.pdf"
 	}
 }

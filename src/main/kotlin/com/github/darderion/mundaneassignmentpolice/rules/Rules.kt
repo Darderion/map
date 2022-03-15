@@ -2,6 +2,8 @@ package com.github.darderion.mundaneassignmentpolice.rules
 
 import com.github.darderion.mundaneassignmentpolice.checker.RuleViolationType
 import com.github.darderion.mundaneassignmentpolice.checker.rule.list.ListRuleBuilder
+import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.SymbolRule
+import com.github.darderion.mundaneassignmentpolice.checker.rule.regex.RegexRuleBuilder
 import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.SymbolRuleBuilder
 import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.and
 import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.or
@@ -246,5 +248,20 @@ val RULE_SHORTENED_URLS = URLRuleBuilder()
 			} catch (_: Exception) {
 				false
 			}
+		}.map { it.second }
+	}.getRule()
+
+val RULE_ORDER_OF_REFERENCES = RegexRuleBuilder()
+	.called("Неверный порядок ссылок на литературу")
+	.regex(Regex("""\[[0-9,\s]+\]"""))
+	.searchIn(1)
+	.disallow { matches ->
+		matches.filter { pair ->
+			val references = pair.first
+			val referencesInIntList = references
+				.slice(IntRange(1, references.length - 2))
+				.split(Regex(""","""))
+				.map { it.trim().toInt() }
+			referencesInIntList != referencesInIntList.sorted()
 		}.map { it.second }
 	}.getRule()
