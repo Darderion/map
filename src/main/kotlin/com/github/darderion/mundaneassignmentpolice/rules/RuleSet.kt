@@ -5,6 +5,8 @@ import com.github.darderion.mundaneassignmentpolice.checker.rule.Rule
 val RULE_SET_RU = RuleSet(
 	mutableListOf(
 		RULE_LITLINK,
+		TwoIdenticalWordsRule,
+		LinkUniformityRule,
 		RULE_SHORT_DASH,
 		RULE_MEDIUM_DASH,
 		RULE_LONG_DASH,

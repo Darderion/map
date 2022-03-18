@@ -7,11 +7,10 @@ import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.and
 import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.or
 import com.github.darderion.mundaneassignmentpolice.checker.rule.tableofcontent.TableOfContentRuleBuilder
 import com.github.darderion.mundaneassignmentpolice.checker.rule.url.URLRuleBuilder
-import com.github.darderion.mundaneassignmentpolice.checker.rule.word.WordRule
-import com.github.darderion.mundaneassignmentpolice.checker.rule.word.WordRuleBuilder
-import com.github.darderion.mundaneassignmentpolice.checker.rule.word.or
+import com.github.darderion.mundaneassignmentpolice.checker.rule.word.*
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFArea
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFRegion
+import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Line
 import com.github.darderion.mundaneassignmentpolice.utils.URLUtil
 import java.util.*
 
@@ -64,6 +63,12 @@ val RULE_MEDIUM_DASH = SymbolRuleBuilder()
 	.inArea(PDFRegion.EVERYWHERE.except(PDFArea.BIBLIOGRAPHY, PDFArea.FOOTNOTE))
 	.ignoringIfIndex(0)
 	.getRule()
+
+val TwoIdenticalWordsRule = TwoIdenticalWordsRuleBuilder()
+	.inArea(PDFRegion.EVERYWHERE.except(PDFArea.TABLE_OF_CONTENT))
+	.called("Два одинаковых слова подряд")
+	.getRule()
+
 
 val longDash = '—'
 
@@ -248,3 +253,33 @@ val RULE_SHORTENED_URLS = URLRuleBuilder()
 			}
 		}.map { it.second }
 	}.getRule()
+val mutableListNames: MutableList<String> = mutableListOf<String>()
+val LinkUniformityRule=URLRuleBuilder()
+	.called("Ссылки разных видов")
+	.disallow { urls ->
+		val urls2 : List<Pair<String,Line>> = urls.filter { pair ->
+		try {
+				val url = pair.first
+				!url.startsWith("htt")
+			} catch (_: Exception) {
+				false
+			}
+		}
+		if (urls.size==urls2.size)
+		{
+			urls2.filter {	pair ->
+				try {
+					val url = pair.first
+
+					!url.startsWith("www")
+				} catch (_: Exception) {
+					false
+				}
+			}
+		}
+		urls2.map { it.second }
+			}.getRule()
+
+
+
+
