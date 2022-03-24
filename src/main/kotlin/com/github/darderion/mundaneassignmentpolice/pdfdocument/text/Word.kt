@@ -5,6 +5,6 @@ data class Word(val text: String, val font: Font, val position: Coordinate) {
 
 	companion object {
 		val spaceCharacter: Word
-		get() = Word(" ", Font(0.0f), Coordinate(0, 0))
+		get() = Word(" ", Font(), Coordinate(0, 0))
 	}
 }

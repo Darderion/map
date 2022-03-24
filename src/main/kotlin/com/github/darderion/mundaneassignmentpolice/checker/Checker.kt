@@ -1,18 +1,8 @@
 package com.github.darderion.mundaneassignmentpolice.checker
 
 import com.github.darderion.mundaneassignmentpolice.checker.rule.Rule
-import com.github.darderion.mundaneassignmentpolice.checker.rule.list.ListRuleBuilder
-import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.SymbolRule
-import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.SymbolRuleBuilder
-import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.and
-import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.or
-import com.github.darderion.mundaneassignmentpolice.checker.rule.tableofcontent.TableOfContentRuleBuilder
-import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFArea.*
-import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFRegion.Companion.EVERYWHERE
-import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFRegion.Companion.NOWHERE
 import com.github.darderion.mundaneassignmentpolice.rules.RuleSet
 import com.github.darderion.mundaneassignmentpolice.wrapper.PDFBox
-import java.util.*
 
 class Checker {
 	fun getRuleViolations(pdfName: String, ruleSet: RuleSet) = getRuleViolations(pdfName, ruleSet.rules)

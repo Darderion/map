@@ -1,9 +1,6 @@
 package com.github.darderion.mundaneassignmentpolice.pdfdocument.list
 
-import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Coordinate
-import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Font
-import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Line
-import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Word
+import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.*
 import java.util.*
 
 data class PDFList<T>(val value: MutableList<T> = mutableListOf(), val nodes: MutableList<PDFList<T>> = mutableListOf()) {
@@ -54,7 +51,7 @@ data class PDFList<T>(val value: MutableList<T> = mutableListOf(), val nodes: Mu
 		 */
 		fun getLists(lines: List<Line>): List<PDFList<Line>> {
 			// Adding a line to process a text that has no lines after a list
-			val lines = lines + Line(-1, -1, -1, listOf(Word("NOT A LIST ITEM", Font(0.0f), Coordinate(1000, -1))))
+			val lines = lines + Line(-1, -1, -1, listOf(Word("NOT A LIST ITEM", Font(), Coordinate(1000, -1))))
 
 			val lists: MutableList<PDFList<Line>> = mutableListOf()
 			val stack: Stack<PDFList<Line>> = Stack()

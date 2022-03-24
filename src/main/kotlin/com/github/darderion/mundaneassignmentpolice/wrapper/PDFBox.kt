@@ -100,8 +100,8 @@ class PDFBox {
 
 		val strippers = listOf(stripper, textStripper)
 
-		var lineIndex = 0
-		for(pageIndex in (0..document.pages.count)) {
+		var lineIndex = -1
+		for (pageIndex in (0 until document.pages.count)) {
 			// For each page
 			strippers.forEach {
 				it.startPage = pageIndex + 1
@@ -142,7 +142,7 @@ class PDFBox {
 					contentIndex += contentItem.length
 
 					if (contentItem == " ") {
-						words.add(Word(word, font?: Font(0.0f), coordinates))
+						words.add(Word(word, font?: Font(), coordinates))
 						words.add(Word.spaceCharacter)
 						font = null
 						word = ""
@@ -163,7 +163,7 @@ class PDFBox {
 						stripperIndex++
 					}
 				}
-				if (font == null && word.isEmpty()) font = Font(0.0f)
+				if (font == null && word.isEmpty()) font = Font()
 				words.add(Word(word, font!!, coordinates))
 
 				Line(line, pageIndex, lineIndex, words.toList())

@@ -1,9 +1,10 @@
 package com.github.darderion.mundaneassignmentpolice.wrapper
 
-import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Coordinate
-import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Font
-import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Symbol
-import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Word
+import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.*
+import org.apache.pdfbox.pdmodel.font.PDType0Font
+import org.apache.pdfbox.pdmodel.font.PDType1CFont
+import org.apache.pdfbox.pdmodel.font.PDType1Font
+import org.apache.pdfbox.pdmodel.font.PDType3Font
 import org.apache.pdfbox.text.PDFTextStripper
 import org.apache.pdfbox.text.TextPosition
 
@@ -16,10 +17,19 @@ class PDFStripper: PDFTextStripper() {
 	override fun writeString(string: String?, textPositions: List<TextPosition>) {
 		for (text: TextPosition in textPositions) {
 			val symbol = text.unicode
+
+			val fontType = when(text.font) {
+				is PDType0Font -> PostScriptFontType.TYPE0
+				is PDType1Font -> PostScriptFontType.TYPE1
+				is PDType1CFont -> PostScriptFontType.TYPE2
+				is PDType3Font -> PostScriptFontType.TYPE3
+				else -> PostScriptFontType.NONE
+			}
+
 			if (symbol != null && symbol != " ") {
 				symbol.forEach {
 					symbols.add(
-						Symbol(it, Font(text.fontSize), Coordinate(text.xDirAdj to text.yDirAdj))
+						Symbol(it, Font(fontType, text.fontSize), Coordinate(text.xDirAdj to text.yDirAdj))
 					)
 				}
 			}
