@@ -210,6 +210,8 @@ val allowedWordsOnRight = arrayOf(
 	Regex("""→""")
 )
 
+
+
 val smallNumbersRuleBuilder1 = WordRuleBuilder()		//for nearest words
 	.called(smallNumbersRuleName)
 	.inArea(smallNumbersRuleArea)
@@ -254,7 +256,22 @@ val RULE_SHORTENED_URLS = URLRuleBuilder()
 			}
 		}.map { it.second }
 	}.getRule()
-val mutableListNames: MutableList<String> = mutableListOf<String>()
+val RULE_URLS_UNIFORMITY=URLRuleBuilder()
+	.called("Ссылки разных видов")
+	.disallow { urls ->
+		val filteredUrls : List<Pair<String,Line>> = urls.filter { pair ->
+				val url = pair.first
+				!url.startsWith("htt")
+		}
+		if (urls.size==filteredUrls.size)
+		{
+			filteredUrls.filter {	pair ->
+					val url = pair.first
+					!url.startsWith("www")
+			}
+		}
+		filteredUrls.map { it.second }
+	}.getRule()
 
 
 
