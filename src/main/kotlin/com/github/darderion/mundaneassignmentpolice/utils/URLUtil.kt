@@ -13,11 +13,9 @@ class URLUtil {
                 throw IllegalArgumentException("Incorrect URL: $url", e)
             }
 
-        fun isShortened(url: String): Boolean {
-            val currentUrl = getUrl(url)
-            val expandedUrl = getUrl(expand(url))
-            return !expandedUrl.host.contains(currentUrl.host, true)
-        }
+        fun isShortened(url: String): Boolean = listOf(url, expand(url))
+            .map { getUrl(it).host.removePrefix("www.") }
+            .let { !it.first().equals(it.last(), true) }
 
         fun expand(shortenedUrl: String): String {
             val url = getUrl(shortenedUrl)

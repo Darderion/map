@@ -36,7 +36,6 @@ class URLRule(
             it.area == PDFArea.BIBLIOGRAPHY
         }.getOrNull(1)?.text?.getOrNull(2)?.position?.x ?: -1.0f
 
-
         val linesInsideArea = document.text.filter { it.area!! inside area }
         var lineIndex = 0
         while (lineIndex < linesInsideArea.size) {
@@ -58,7 +57,7 @@ class URLRule(
                 var nextLine = linesInsideArea[lineIndex + 1]
                 var nextWord = nextLine.first ?: ""
 
-                while (currentWord.last() in ":/._-" && nextWord.isNotEmpty() && nextLine.area == currentArea) {
+                while (currentWord.last() in ":/._-%" && nextWord.isNotEmpty() && nextLine.area == currentArea) {
                     if (currentArea == PDFArea.FOOTNOTE && !nextLine.text.first().font.size.nearby(currentFontSize))
                         break
                     if (currentArea == PDFArea.BIBLIOGRAPHY && !nextLine.position.x.nearby(bibliographyIndent))
@@ -75,11 +74,10 @@ class URLRule(
                     nextLine = linesInsideArea[lineIndex + 1]
                     nextWord = nextLine.first ?: ""
                 }
-                multilineUrl = multilineUrl.dropLastWhile { it == '.' }
                 urls.add(multilineUrl to urlLines)
             }
             lineIndex++
         }
-        return urls
+        return urls.map { pair -> pair.first.dropLastWhile { it == '.' || it == ',' } to pair.second }
     }
 }
