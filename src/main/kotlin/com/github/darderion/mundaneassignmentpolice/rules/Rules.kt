@@ -64,9 +64,10 @@ val RULE_MEDIUM_DASH = SymbolRuleBuilder()
 	.ignoringIfIndex(0)
 	.getRule()
 
-val TwoIdenticalWordsRule = TwoIdenticalWordsRuleBuilder()
+val RULE_TWO_IDENTICAL_WORDS = WordRuleBuilder()
 	.inArea(PDFRegion.EVERYWHERE.except(PDFArea.TABLE_OF_CONTENT))
 	.called("Два одинаковых слова подряд")
+	.itIsTwoIdenticalWordsRule(true)
 	.getRule()
 
 
@@ -254,32 +255,6 @@ val RULE_SHORTENED_URLS = URLRuleBuilder()
 		}.map { it.second }
 	}.getRule()
 val mutableListNames: MutableList<String> = mutableListOf<String>()
-val LinkUniformityRule=URLRuleBuilder()
-	.called("Ссылки разных видов")
-	.disallow { urls ->
-		val urls2 : List<Pair<String,Line>> = urls.filter { pair ->
-		try {
-				val url = pair.first
-				!url.startsWith("htt")
-			} catch (_: Exception) {
-				false
-			}
-		}
-		if (urls.size==urls2.size)
-		{
-			urls2.filter {	pair ->
-				try {
-					val url = pair.first
-
-					!url.startsWith("www")
-				} catch (_: Exception) {
-					false
-				}
-			}
-		}
-		urls2.map { it.second }
-			}.getRule()
-
 
 
 

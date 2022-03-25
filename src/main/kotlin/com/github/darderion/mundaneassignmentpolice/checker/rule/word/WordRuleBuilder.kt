@@ -32,6 +32,7 @@ class WordRuleBuilder {
 	private var direction: Direction = Direction.BIDIRECTIONAL
 	private var neighborhoodSize: Int = 1
 	private var numberOfNeighbors: Int = 1
+	private var itIsTwoIdenticalWordsRule: Boolean = false
 	private var type: RuleViolationType = RuleViolationType.Error
 	private var name: String = "Rule name"
 	private var region: PDFRegion = PDFRegion.EVERYWHERE
@@ -96,6 +97,8 @@ class WordRuleBuilder {
 
 	fun shouldHaveNumberOfNeighbors(number: Int) = this.also { this.numberOfNeighbors = number }
 
+	fun itIsTwoIdenticalWordsRule(itIsTwoIdenticalWordsRule: Boolean)=this.also { this.itIsTwoIdenticalWordsRule = itIsTwoIdenticalWordsRule }
+
 	fun getRule() = BasicWordRule(
 		word,
 		ignoredNeighbors,
@@ -108,6 +111,7 @@ class WordRuleBuilder {
 		direction,
 		neighborhoodSize,
 		numberOfNeighbors,
+		itIsTwoIdenticalWordsRule,
 		type,
 		region,
 		name
