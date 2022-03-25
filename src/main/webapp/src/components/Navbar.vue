@@ -1,7 +1,9 @@
 
 <template>
 	<div id="navbar">
+		<!--
 		<UploadFileComponent id="uploadFileComponent"/>
+		-->
 		<MenuComponent id="menuComponent"/>
 		<div id="div_i18n">
 			<a id="div_i18n_1" href="#" @click="setLocale('en')"><CountryFlag country='gb' size='big'/></a>
@@ -37,6 +39,9 @@ export default class NavbarComponent extends Vue {
 	display: grid;
 	grid-template-columns: 10% 80% 10%;
 }
+#menuComponent {
+	grid-column: 2;
+}
 #uploadFileComponent {
 	float: left;
 	margin-left: 5%;
@@ -45,6 +50,8 @@ export default class NavbarComponent extends Vue {
 	margin: auto;
 	display: grid;
 	grid-template-columns: 40% 20% 40%;
+	border: solid 24px #abc;
+	background: #abc;
 }
 #div_i18n_2 {
 	grid-column: 3;

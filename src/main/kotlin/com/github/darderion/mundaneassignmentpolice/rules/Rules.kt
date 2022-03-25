@@ -82,7 +82,7 @@ val RULE_CLOSING_QUOTATION = SymbolRuleBuilder()
     .symbol(closingQuote)
     .ignoringEveryCharacterExcept(*"$closingQuote$openingQuote".toCharArray())
     .fromLeft().shouldHaveNeighbor(openingQuote)
-    .inNeighborhood(20)
+    .inNeighborhood(2)
     .called("Неправильное использование закрывающей кавычки")
     .getRule()
 

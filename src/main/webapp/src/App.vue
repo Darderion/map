@@ -29,7 +29,7 @@ import pdf from 'vue-pdf'
 export default class AppComponent extends Vue {
 	updatePdfName() {
 		// this.$store.dispatch("setPdfName", this.$route.query.pdfName? (this.$route.query.pdfName as string): "")
-		fetch(`api/getPDFSize?pdfName=${this.$store.getters.getPdfName}`)
+		fetch(`api/getPDFSize?pdfName=${this.$route.query.pdfName}`)
 			.then(numPages => {
 				this.$store.commit('setNumPages', {
 					pages: numPages
@@ -38,19 +38,15 @@ export default class AppComponent extends Vue {
 	}
 
 	updated() {
-		this.$store.commit('setPdfName', {
-			name: this.$route.query.pdfName
-		})
-
 		if (this.$store.getters.getNumPages == 0) {
-			fetch(`api/getPDFSize?pdfName=${this.$store.getters.getPdfName}`)
+			fetch(`api/getPDFSize?pdfName=${this.$route.query.pdfName}`)
 				.then(response => response.json())
 				.then(numPages => {
 					this.$store.commit('setNumPages', {
 						pages: numPages
 					})
 				});
-			fetch(`api/viewRuleViolations?pdfName=${this.$store.getters.getPdfName}`)
+			fetch(`api/viewRuleViolations?pdfName=${this.$route.query.pdfName}`)
 				.then(response => response.json())
 				.then(ruleViolations => {
 					this.$store.commit('setRuleViolations', {
@@ -67,7 +63,7 @@ export default class AppComponent extends Vue {
 
 <style lang="scss">
 body {
-	background-color: #abc;
+	background-color: #f7f7f7;
 }
 
 #app {

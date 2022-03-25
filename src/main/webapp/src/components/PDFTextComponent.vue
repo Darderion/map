@@ -44,7 +44,7 @@ export default class PDFTextComponent extends Vue {
 			this.pdfLines.forEach(it => {
 				if (!document.getElementById(`pdfLine${it.index}-${it.page}`)) {
 				}
-				document.getElementById(`pdfLine${it.index}-${it.page}`)!.style.backgroundColor = '#abc'
+				document.getElementById(`pdfLine${it.index}-${it.page}`)!.style.backgroundColor = '#f7f7f7'
 				document.getElementById(`pdfLine${it.index}-${it.page}`)!.style.color = 'black'
 			})
 			if (this.viewMode == ViewMode.Rules) {
@@ -100,16 +100,16 @@ export default class PDFTextComponent extends Vue {
 			.then((response) => response.text().then(this.setPDFText));
 			*/
 
-		fetch(`api/viewPDFLines?pdfName=${this.$store.getters.getPdfName}`)
+		fetch(`api/viewPDFLines?pdfName=${this.$route.query.pdfName}`)
 			.then((response) => response.text().then(this.setPDFLines));
 
-		fetch(`api/viewRuleViolations?pdfName=${this.$store.getters.getPdfName}`)
+		fetch(`api/viewRuleViolations?pdfName=${this.$route.query.pdfName}`)
 			.then((response) => response.text().then(this.setPDFRuleViolations));
 			
-		fetch(`api/viewPDFImages?pdfName=${this.$store.getters.getPdfName}`)
+		fetch(`api/viewPDFImages?pdfName=${this.$route.query.pdfName}`)
 			.then((response) => response.text().then(this.setPDFImages));
 
-		fetch(`api/viewPDFSections?pdfName=${this.$store.getters.getPdfName}`)
+		fetch(`api/viewPDFSections?pdfName=${this.$route.query.pdfName}`)
 			.then((response) => response.text().then(text => {
 				this.pdfSections = JSON.parse(text)
 			}));

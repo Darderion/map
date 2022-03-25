@@ -12,7 +12,7 @@
 				<b-row v-if="file.response.ruleViolations.filter(ruleViolation => ruleViolation.type == 'System').length == 0">
 					<b-col md="5">{{file.response.ruleViolations.filter(ruleViolation => ruleViolation.type == 'Error').length}} {{ $t('page.uploadMultipleFiles.errorsFound') }}</b-col>
 					<b-col md="5">{{file.response.ruleViolations.filter(ruleViolation => ruleViolation.type == 'Warning').length}} {{ $t('page.uploadMultipleFiles.warningsFound') }}</b-col>
-					<b-col md="2"><a :href="`#/viewPDFText?pdfName=${file.response.name}&locale=${getLocale()}`">PDF</a></b-col>
+					<b-col md="2"><a :href="`#/viewPDFText?pdfName=${file.response.name}&locale=${getLocale()}`" target="_blank">PDF</a></b-col>
 				</b-row>
 			</b-col>
 		</b-row>
@@ -38,12 +38,12 @@
 			v-model="files"
 			ref="upload">
 			<i class="fa fa-plus"></i>
-			{{ $t('page.uploadMultipleFiles.addPDF')}}
+			{{ $t('page.uploadMultipleFiles.addPDF') }}
 		</file-upload>
 		<div>
 		<button type="button" class="btn btn-success mb1" v-if="!$refs.upload || !$refs.upload.active" @click.prevent="$refs.upload.active = true">
 			<i class="fa fa-arrow-up" aria-hidden="true"></i>
-			{{ $t('page.uploadMultipleFiles.startUploading')}}
+			{{ $t('page.uploadMultipleFiles.startUploading') }}
 		</button>
 		<button type="button" class="btn btn-danger"  v-else @click.prevent="$refs.upload.active = false">
 			<i class="fa fa-stop" aria-hidden="true"></i>
@@ -69,11 +69,17 @@ import { Component, Vue } from 'vue-property-decorator';
 export default class MultipleFileUpload extends Vue {
 	files: any[] = [];
 
+	updated() {
+		this.$store.commit('setFileNames', {
+			fileNames: this.files.map(it => it.name)
+		})
+	}
+
 	getFileName(fileName: string) {
-		if (fileName.length < 25) {
+		if (fileName.length < 15) {
 			return fileName;
 		} else {
-			return fileName.substr(0, 25) + '...'
+			return fileName.substr(0, 15) + '...'
 		}
 	}
 
@@ -90,11 +96,14 @@ export default class MultipleFileUpload extends Vue {
 
 <style scoped>
 
+* {
+	text-align: center;
+}
+
 .upload {
 	display: grid;
 	grid-template-columns: 1fr 3fr 1fr;
 	grid-template-rows: 200px auto 500px;
-	align-items: center;
 }
 
 .upload .uploadDiv {
@@ -110,6 +119,10 @@ export default class MultipleFileUpload extends Vue {
 .uploadFilesDiv {
 	grid-column: 2;
 	grid-row: 1;
+}
+
+.uploadFilesDiv * {
+	font-size: 32px;
 }
 
 </style>

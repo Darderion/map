@@ -2,7 +2,13 @@
 	"page": {
 		"home": {
 			"title": "Home",
+			"ruleViolations": "Supported Violations:",
+			"ruleViolations1": "Incorrect usage of dashes, citing and quotes.",
+			"ruleViolations2": "And even more.",
 			"instruction": "How to use:",
+			"instruction1": "Upload one or more files.",
+			"instruction2": "Review PDFs.",
+			"instruction3": "Inspect the list of violations.",
 			"instruction_chooseFile": "Select a PDF file containing qualification work by pressing",
 			"instruction_viewPDF": "Uploaded PDF is available in section",
 			"instruction_rulesViolations": "List of rules' violations is available in section",
@@ -52,7 +58,7 @@
 		},
 		"uploadMultipleFiles": {
 			"title": "Upload multiple files",
-			"uploadFiles1": "Drop files anywhere to upload",
+			"uploadFiles1": "Drop files HERE to upload",
 			"options": "or",
 			"selectFiles": "Select Files",
 			"errorsFound": "errors found",

@@ -6,6 +6,7 @@
 			:key="i"
 			:src="pdfURL"
 			:page="i"
+			@loaded="pdfView"
 			style="display: inline-block; width: 55%"
 		></pdf>
 	</div>
@@ -24,6 +25,7 @@ import pdf from 'vue-pdf'
 
 export default class PDFComponent extends Vue {
 	@Prop() private pdfURL!: string
+	@Prop() pdfView!: () => void;
 }
 </script>
 
