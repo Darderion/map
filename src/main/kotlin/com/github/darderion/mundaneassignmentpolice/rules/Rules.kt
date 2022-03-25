@@ -2,7 +2,6 @@ package com.github.darderion.mundaneassignmentpolice.rules
 
 import com.github.darderion.mundaneassignmentpolice.checker.RuleViolationType
 import com.github.darderion.mundaneassignmentpolice.checker.rule.list.ListRuleBuilder
-import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.SymbolRule
 import com.github.darderion.mundaneassignmentpolice.checker.rule.regex.RegexRuleBuilder
 import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.SymbolRuleBuilder
 import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.and
@@ -239,6 +238,7 @@ val RULES_SMALL_NUMBERS = List<WordRule>(9) { index ->
 
 val RULE_SHORTENED_URLS = URLRuleBuilder()
 	.called("Сокращённая ссылка")
+	.inArea(PDFRegion.NOWHERE.except(PDFArea.FOOTNOTE, PDFArea.BIBLIOGRAPHY))
 	.disallow { urls ->
 		urls.filter { pair ->
 			try {

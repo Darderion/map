@@ -8,27 +8,34 @@ import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFDocument
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFRegion
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.inside
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Line
+import com.github.darderion.mundaneassignmentpolice.utils.nearby
 
 class URLRule(
-    val predicates: List<(urls: List<Pair<String, Line>>) -> List<Line>>,
+    val predicates: List<(urls: List<Pair<String, List<Line>>>) -> List<List<Line>>>,
     type: RuleViolationType,
-    name: String,
-): Rule(PDFRegion.NOWHERE.except(PDFArea.FOOTNOTE, PDFArea.BIBLIOGRAPHY), name, type) {
+    area: PDFRegion,
+    name: String
+): Rule(area, name, type) {
     override fun process(document: PDFDocument): List<RuleViolation> {
         val ruleViolations: MutableList<RuleViolation> = mutableListOf()
 
-        val urls = getAllUrls(document, area)
+        val urls = getAllUrls(document)
         predicates.forEach { predicate ->
-            predicate(urls).map { RuleViolation(listOf(it), name, type) }.forEach {
+            predicate(urls).map { RuleViolation(it, name, type) }.forEach {
                 ruleViolations.add(it)
             }
         }
         return ruleViolations
     }
 
-    private fun getAllUrls(document: PDFDocument, area: PDFRegion): List<Pair<String, Line>> {
-        val urls: MutableList<Pair<String, Line>> = mutableListOf()
+    private fun getAllUrls(document: PDFDocument): List<Pair<String, List<Line>>> {
+        val urls: MutableList<Pair<String, List<Line>>> = mutableListOf()
         val urlRegex = Regex("""^((https?:)|(www\.))[^\s]*""")
+
+        val bibliographyIndent = document.text.filter {
+            it.area == PDFArea.BIBLIOGRAPHY
+        }.getOrNull(1)?.text?.getOrNull(2)?.position?.x ?: -1.0f
+
 
         val linesInsideArea = document.text.filter { it.area!! inside area }
         var lineIndex = 0
@@ -37,25 +44,39 @@ class URLRule(
             line.text.map { it.text }.forEachIndexed forEachWord@{ wordIndex, word ->
                 if (!urlRegex.matches(word)) return@forEachWord
 
-                if (wordIndex != line.text.lastIndex) {
-                    urls.add(word to line)
+                if (wordIndex != line.text.lastIndex || lineIndex == linesInsideArea.lastIndex) {
+                    urls.add(word to listOf(line))
                     return@forEachWord
                 }
 
                 var multilineUrl = word
+                val urlLines = mutableListOf(line)
                 var currentWord = word
-                var nextLine = linesInsideArea[lineIndex + 1]
-                var nextWord = nextLine.text.first().text
+                val currentArea = line.area
+                val currentFontSize = line.text.last().font.size
 
-                while (currentWord.last() in ":/._-" && nextWord.isNotEmpty()) {
+                var nextLine = linesInsideArea[lineIndex + 1]
+                var nextWord = nextLine.first ?: ""
+
+                while (currentWord.last() in ":/._-" && nextWord.isNotEmpty() && nextLine.area == currentArea) {
+                    if (currentArea == PDFArea.FOOTNOTE && !nextLine.text.first().font.size.nearby(currentFontSize))
+                        break
+                    if (currentArea == PDFArea.BIBLIOGRAPHY && !nextLine.position.x.nearby(bibliographyIndent))
+                        break
+
                     currentWord = nextWord
                     multilineUrl += currentWord
-                    if (nextLine.text.size > 1) break
+                    urlLines.add(nextLine)
+
+                    if (nextLine.text.size > 1 || lineIndex == linesInsideArea.lastIndex)
+                        break
+
                     lineIndex++
                     nextLine = linesInsideArea[lineIndex + 1]
-                    nextWord = nextLine.text.first().text
+                    nextWord = nextLine.first ?: ""
                 }
-                urls.add(multilineUrl to line)
+                multilineUrl = multilineUrl.dropLastWhile { it == '.' }
+                urls.add(multilineUrl to urlLines)
             }
             lineIndex++
         }

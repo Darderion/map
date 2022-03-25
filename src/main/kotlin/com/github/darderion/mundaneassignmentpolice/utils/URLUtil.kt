@@ -10,7 +10,7 @@ class URLUtil {
             try {
                 URL(url)
             } catch (e: MalformedURLException) {
-                throw IllegalArgumentException("Incorrect url: $url", e)
+                throw IllegalArgumentException("Incorrect URL: $url", e)
             }
 
         fun isShortened(url: String): Boolean {
@@ -38,9 +38,10 @@ class URLUtil {
             with(connection) {
                 instanceFollowRedirects = true
                 requestMethod = "HEAD"
+                connectTimeout = 2000
                 connect()
                 return when (responseCode) {
-                    301 -> {  // HttpURLConnection doesn't automatically follow redirects from a protocol to another
+                    in 300..399 -> {  // HttpURLConnection doesn't automatically follow redirects from one protocol to another
                         val redirect = headerFields.filter {
                             it.key.equals("location", true)
                         }.map { it.value.first() }.first()
