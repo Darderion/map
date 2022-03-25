@@ -52,7 +52,7 @@ class RulesTests : StringSpec({
 		RULE_ORDER_OF_REFERENCES.process(PDFBox().getPDF(filePathOrderOfReferences)).count() shouldBeExactly 3
 	}
 	"Regex rule should detect using different versions of the abbreviation"{
-		RULE_VARIOUS_ABBREVIATIONS.process(PDFBox().getPDF(filePathVariousAbbreviations)).count() shouldBeExactly 6
+		RULE_VARIOUS_ABBREVIATIONS.process(PDFBox().getPDF(filePathVariousAbbreviations)).count() shouldBeExactly 8
 	}
 }) {
 	companion object {

@@ -274,7 +274,8 @@ val RULE_VARIOUS_ABBREVIATIONS = RegexRuleBuilder()
 		val allWords = hashMapOf<String, HashSet<String>>()
 		matches.forEach { pair ->
 			val word = pair.first
-			if (word.count { it.isUpperCase() } > 1)
+			if (word.slice(IntRange(1, word.length - 1))
+					.count { it.isUpperCase() } > 0)
 				abbreviations.add(word.uppercase())
 			if (!allWords.containsKey(word.lowercase()))
 				allWords.put(word.lowercase(), hashSetOf())
