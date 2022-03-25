@@ -2,7 +2,6 @@ package com.github.darderion.mundaneassignmentpolice.rules
 
 import com.github.darderion.mundaneassignmentpolice.checker.RuleViolationType
 import com.github.darderion.mundaneassignmentpolice.checker.rule.list.ListRuleBuilder
-import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.SymbolRule
 import com.github.darderion.mundaneassignmentpolice.checker.rule.regex.RegexRuleBuilder
 import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.SymbolRuleBuilder
 import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.and
@@ -263,5 +262,29 @@ val RULE_ORDER_OF_REFERENCES = RegexRuleBuilder()
 				.split(Regex(""","""))
 				.map { it.trim().toInt() }
 			referencesInIntList != referencesInIntList.sorted()
+		}.map { it.second }
+	}.getRule()
+
+val RULE_VARIOUS_ABBREVIATIONS = RegexRuleBuilder()
+	.called("Использованы различные версии сокращения")
+	.regex(Regex("""[a-zA-Zа-яА-Я]+"""))
+	.inArea(PDFRegion.EVERYWHERE.except(PDFArea.BIBLIOGRAPHY))
+	.disallow { matches ->
+		val abbreviations = hashSetOf<String>()
+		val allWords = hashMapOf<String, HashSet<String>>()
+		matches.forEach { pair ->
+			val word = pair.first
+			if (word.count { it.isUpperCase() } > 1)
+				abbreviations.add(word.uppercase())
+			if (!allWords.containsKey(word.lowercase()))
+				allWords.put(word.lowercase(), hashSetOf())
+			allWords[word.lowercase()]?.add(word)
+		}
+		matches.filter { pair ->
+			val word = pair.first
+			if (abbreviations.contains(word.uppercase()))
+				allWords[word.lowercase()]?.size!! > 1
+			else
+				false
 		}.map { it.second }
 	}.getRule()
