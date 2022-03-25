@@ -64,11 +64,6 @@ val RULE_MEDIUM_DASH = SymbolRuleBuilder()
 	.ignoringIfIndex(0)
 	.getRule()
 
-val RULE_TWO_IDENTICAL_WORDS = WordRuleBuilder()
-	.inArea(PDFRegion.EVERYWHERE.except(PDFArea.TABLE_OF_CONTENT))
-	.called("Два одинаковых слова подряд")
-	.itIsTwoIdenticalWordsRule(true)
-	.getRule()
 
 
 val longDash = '—'

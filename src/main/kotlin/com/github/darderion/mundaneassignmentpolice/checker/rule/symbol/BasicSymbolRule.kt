@@ -49,7 +49,6 @@ class BasicSymbolRule(
 				.map { it.filterNot { ignoredNeighbors.contains(it) } })    // Remove ignored symbols
 				.filter { it.isNotEmpty() }                                // Remove empty lines
 				.map { it.first() }
-
 			if (neighbors.any { disallowedNeighbors.contains(it) } ||
 				(requiredNeighbors.isNotEmpty() && (neighbors.isEmpty() || neighbors.any { !requiredNeighbors.contains(it) }))) {
 				return true

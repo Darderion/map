@@ -17,7 +17,6 @@ class BasicWordRule(
 	private val direction: Direction,
 	private val neighborhoodSize: Int,
 	private val numberOfNeighbors: Int,
-	private val itIsTwoIdenticalWordsRule: Boolean,
 	type: RuleViolationType,
 	area: PDFRegion,
 	name: String
@@ -53,14 +52,8 @@ class BasicWordRule(
 				.filter { it.isNotEmpty() }                                // Remove empty lines
 				.map { it.slice(IntRange(0, numberOfNeighbors - 1)) }
 				.flatten()
-			if (itIsTwoIdenticalWordsRule)
-			{
-				if(neighbors[0]==neighbors[1]&&neighbors[0].first().isLetter())
-				{
-					return true
-				}
-			}
-			else{
+
+
 				if (neighbors.any { word ->
 						disallowedNeighbors.any { regex -> regex.matches(word) }
 					} ||
@@ -70,7 +63,7 @@ class BasicWordRule(
 							}))) {
 					return true
 				}
-}}
+}
 		return false
 	}
 }
