@@ -13,6 +13,7 @@ import com.github.darderion.mundaneassignmentpolice.checker.rule.word.WordRuleBu
 import com.github.darderion.mundaneassignmentpolice.checker.rule.word.or
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFArea
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFRegion
+import com.github.darderion.mundaneassignmentpolice.utils.InvalidOperationException
 import com.github.darderion.mundaneassignmentpolice.utils.URLUtil
 import java.util.*
 
@@ -245,7 +246,7 @@ val RULE_SHORTENED_URLS = URLRuleBuilder()
 				var url = pair.first
 				if (!url.startsWith("http")) url = "https://$url"
 				URLUtil.isShortened(url)
-			} catch (_: Exception) {
+			} catch (_: InvalidOperationException) {
 				false
 			}
 		}.map { it.second }
@@ -261,7 +262,9 @@ val RULE_ORDER_OF_REFERENCES = RegexRuleBuilder()
 			val referencesInIntList = references
 				.slice(IntRange(1, references.length - 2))
 				.split(Regex(""","""))
-				.map { it.trim().toInt() }
+				.map { it.trim() }
+				.filter { it.isNotEmpty() }
+				.map { it.toInt() }
 			referencesInIntList != referencesInIntList.sorted()
 		}.map { it.second }
 	}.getRule()

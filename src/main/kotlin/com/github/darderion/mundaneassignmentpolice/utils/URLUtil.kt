@@ -39,7 +39,8 @@ class URLUtil {
                 connectTimeout = 2000
                 connect()
                 return when (responseCode) {
-                    in 300..399 -> {  // HttpURLConnection doesn't automatically follow redirects from one protocol to another
+                    in 300..399 -> {
+                        // HttpURLConnection doesn't automatically follow redirects from one protocol to another
                         val redirect = headerFields.filter {
                             it.key.equals("location", true)
                         }.map { it.value.first() }.first()
