@@ -268,3 +268,28 @@ val RULE_ORDER_OF_REFERENCES = RegexRuleBuilder()
 			referencesInIntList != referencesInIntList.sorted()
 		}.map { it.second }
 	}.getRule()
+
+val RULE_VARIOUS_ABBREVIATIONS = RegexRuleBuilder()
+	.called("Использованы различные версии сокращения")
+	.regex(Regex("""[a-zA-Zа-яА-Я]+"""))
+	.inArea(PDFRegion.EVERYWHERE.except(PDFArea.BIBLIOGRAPHY))
+	.disallow { matches ->
+		val abbreviations = hashSetOf<String>()
+		val allWords = hashMapOf<String, HashSet<String>>()
+		matches.forEach { pair ->
+			val word = pair.first
+			if (word.slice(IntRange(1, word.length - 1))
+					.count { it.isUpperCase() } > 0)
+				abbreviations.add(word.uppercase())
+			if (!allWords.containsKey(word.lowercase()))
+				allWords.put(word.lowercase(), hashSetOf())
+			allWords[word.lowercase()]?.add(word)
+		}
+		matches.filter { pair ->
+			val word = pair.first
+			if (abbreviations.contains(word.uppercase()))
+				allWords[word.lowercase()]?.size!! > 1
+			else
+				false
+		}.map { it.second }
+	}.getRule()
