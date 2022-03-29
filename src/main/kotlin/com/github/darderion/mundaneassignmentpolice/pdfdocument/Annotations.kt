@@ -12,14 +12,14 @@ class Annotations {
 			var document = PDFBox().getDocument(pdf.name)
 			lines.forEach { line ->
 				document = PDFBox().addLine(document, line.page,
-					Coordinate(line.position.x to (pdf.height - (line.position.y + 2))),
+					Coordinate(line.position.x to (pdf.height - (line.text.maxOf { it.position.y } + 2))),
 					(pdf.width - (line.position.x + 50)).toInt()
 				)
 			}
 			Files.createDirectories(Paths.get("build/ruleviolations/"))
 			val fileName = "build/ruleviolations/${
 				pdf.name.split('/')[pdf.name.split('/').count() - 1].replace(".pdf", "")
-			}${lines[0].index}-${lines[0].page}.pdf"
+			}${lines.first().index}-${lines.last().index}(${lines[0].page}).pdf"
 			document.save(fileName)
 			return fileName
 		}

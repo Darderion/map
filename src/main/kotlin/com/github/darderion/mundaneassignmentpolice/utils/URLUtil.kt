@@ -10,14 +10,12 @@ class URLUtil {
             try {
                 URL(url)
             } catch (e: MalformedURLException) {
-                throw IllegalArgumentException("Incorrect url: $url", e)
+                throw IllegalArgumentException("Incorrect URL: $url", e)
             }
 
-        fun isShortened(url: String): Boolean {
-            val currentUrl = getUrl(url)
-            val expandedUrl = getUrl(expand(url))
-            return !expandedUrl.host.contains(currentUrl.host, true)
-        }
+        fun isShortened(url: String): Boolean = listOf(url, expand(url))
+            .map { getUrl(it).host.removePrefix("www.") }
+            .let { !it.first().equals(it.last(), true) }
 
         fun expand(shortenedUrl: String): String {
             val url = getUrl(shortenedUrl)
@@ -38,9 +36,11 @@ class URLUtil {
             with(connection) {
                 instanceFollowRedirects = true
                 requestMethod = "HEAD"
+                connectTimeout = 2000
                 connect()
                 return when (responseCode) {
-                    301 -> {  // HttpURLConnection doesn't automatically follow redirects from one protocol to another
+                    in 300..399 -> {
+                        // HttpURLConnection doesn't automatically follow redirects from one protocol to another
                         val redirect = headerFields.filter {
                             it.key.equals("location", true)
                         }.map { it.value.first() }.first()
