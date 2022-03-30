@@ -1,8 +1,8 @@
 package com.github.darderion.mundaneassignmentpolice.checker
 
 import com.github.darderion.mundaneassignmentpolice.TestsConfiguration
-import com.github.darderion.mundaneassignmentpolice.checker.rule.section.SectionSizeRule
-import com.github.darderion.mundaneassignmentpolice.checker.rule.section.SectionTitle
+import com.github.darderion.mundaneassignmentpolice.checker.rule.section.SectionName
+import com.github.darderion.mundaneassignmentpolice.checker.rule.section.size.SectionSizeRule
 import com.github.darderion.mundaneassignmentpolice.rules.*
 import com.github.darderion.mundaneassignmentpolice.wrapper.PDFBox
 import io.kotest.core.spec.style.StringSpec
@@ -57,19 +57,19 @@ class RulesTests : StringSpec({
 		RULE_VARIOUS_ABBREVIATIONS.process(PDFBox().getPDF(filePathVariousAbbreviations)).count() shouldBeExactly 8
 	}
 	"Section rules should detect sections whose size exceeds specified limit" {
-		val introductionSizeRule = RULES_SECTION_SIZE.first { it.title == SectionTitle.Introduction }
+		val introductionSizeRule = RULES_SECTION_SIZE.first { it.sectionName == SectionName.INTRO }
 		(introductionSizeRule as SectionSizeRule).percentageLimit!!.toInt() shouldBeExactly 20
 		introductionSizeRule.process(PDFBox().getPDF(filePathIntroductionSize)).count() shouldBeExactly 1
 
-		val problemStatementSizeRule = RULES_SECTION_SIZE.first { it.title == SectionTitle.ProblemStatement }
+		val problemStatementSizeRule = RULES_SECTION_SIZE.first { it.sectionName == SectionName.TASK }
 		(problemStatementSizeRule as SectionSizeRule).pageLimit!! shouldBeExactly 1
 		problemStatementSizeRule.process(PDFBox().getPDF(filePathProblemStatementSize)).count() shouldBeExactly 1
 
-		val overviewSizeRule = RULES_SECTION_SIZE.first { it.title == SectionTitle.Overview }
+		val overviewSizeRule = RULES_SECTION_SIZE.first { it.sectionName == SectionName.RELATED_WORKS }
 		(overviewSizeRule as SectionSizeRule).percentageLimit!!.toInt() shouldBeExactly 50
 		overviewSizeRule.process(PDFBox().getPDF(filePathOverviewSize)).count() shouldBeExactly 1
 
-		val conclusionSizeRule = RULES_SECTION_SIZE.first { it.title == SectionTitle.Conclusion }
+		val conclusionSizeRule = RULES_SECTION_SIZE.first { it.sectionName == SectionName.CONCLUSION }
 		(conclusionSizeRule as SectionSizeRule).pageLimit!! shouldBeExactly 2
 		conclusionSizeRule.process(PDFBox().getPDF(filePathConclusionSize)).count() shouldBeExactly 1
 	}

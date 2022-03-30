@@ -2,9 +2,9 @@ package com.github.darderion.mundaneassignmentpolice.rules
 
 import com.github.darderion.mundaneassignmentpolice.checker.RuleViolationType
 import com.github.darderion.mundaneassignmentpolice.checker.rule.list.ListRuleBuilder
-import com.github.darderion.mundaneassignmentpolice.checker.rule.section.SectionSizeRuleBuilder
-import com.github.darderion.mundaneassignmentpolice.checker.rule.section.SectionTitle.*
 import com.github.darderion.mundaneassignmentpolice.checker.rule.regex.RegexRuleBuilder
+import com.github.darderion.mundaneassignmentpolice.checker.rule.section.SectionName.*
+import com.github.darderion.mundaneassignmentpolice.checker.rule.section.size.SectionSizeRuleBuilder
 import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.SymbolRuleBuilder
 import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.and
 import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.or
@@ -17,7 +17,6 @@ import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFArea
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFRegion
 import com.github.darderion.mundaneassignmentpolice.utils.InvalidOperationException
 import com.github.darderion.mundaneassignmentpolice.utils.URLUtil
-import jdk.internal.joptsimple.util.RegexMatcher.regex
 import java.util.*
 
 private val enLetters = "abcdefghijklmnopqrstuvwxyz"
@@ -241,21 +240,21 @@ val RULES_SMALL_NUMBERS = List<WordRule>(9) { index ->
 }
 
 private val sectionsWithLimits = mapOf(
-    Introduction to (null to 20),
-    ProblemStatement to (1 to null),
-    Overview to (null to 50),
-    Conclusion to (2 to null)
+    INTRO to (null to 20),
+    TASK to (1 to null),
+    RELATED_WORKS to (null to 50),
+    CONCLUSION to (2 to null)
 )
 
 val RULES_SECTION_SIZE = sectionsWithLimits
     .mapKeys {
         SectionSizeRuleBuilder().called("Слишком длинная секция")
             .section(it.key)
-            .shouldBeLessThanOrEqualTo()
+            .shouldBeLessThanOrEqual()
     }.mapKeys { entry ->
-        entry.value.first?.let { entry.key.pageLimit(it) } ?: entry.key
+        entry.value.first?.let { entry.key.limitByPages(it) } ?: entry.key
     }.mapKeys { entry ->
-        entry.value.second?.let { entry.key.percentageLimit(it) } ?: entry.key
+        entry.value.second?.let { entry.key.limitByPercentage(it) } ?: entry.key
     }.map { it.key.getRule() }
 
 val RULE_SHORTENED_URLS = URLRuleBuilder()

@@ -1,24 +1,24 @@
-package com.github.darderion.mundaneassignmentpolice.checker.rule.section
+package com.github.darderion.mundaneassignmentpolice.checker.rule.section.size
 
 import com.github.darderion.mundaneassignmentpolice.checker.RuleViolationType
-import com.github.darderion.mundaneassignmentpolice.checker.rule.section.ComparisonType.*
+import com.github.darderion.mundaneassignmentpolice.checker.rule.section.SectionName
+import com.github.darderion.mundaneassignmentpolice.checker.rule.section.SectionRule
+import com.github.darderion.mundaneassignmentpolice.checker.rule.section.size.ComparisonType.*
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFArea
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFDocument
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Section
 import com.github.darderion.mundaneassignmentpolice.utils.floatEquals
-
-enum class ComparisonType {
-    LESS_THAN, LESS_THAN_OR_EQUAL_TO, EQUAL_TO, GREATER_THAN_OR_EQUAL_TO, GREATER_THAN
-}
+import com.github.darderion.mundaneassignmentpolice.utils.greaterOrEqual
+import com.github.darderion.mundaneassignmentpolice.utils.lessOrEqual
 
 class SectionSizeRule(
     name: String,
     type: RuleViolationType,
-    title: SectionTitle,
+    sectionName: SectionName,
     val comparisonType: ComparisonType,
     val pageLimit: Int?,
     val percentageLimit: Number?
-): SectionRule(name, type, title) {
+) : SectionRule(name, type, sectionName) {
     init {
         if (pageLimit == null && percentageLimit == null) throw Exception("Size limit was not specified")
     }
@@ -35,54 +35,54 @@ class SectionSizeRule(
             }
         } else emptyList()
 
-        val firstPageOfSections = text[sections.first().titleIndex].page
         val lastPageOfSections = text[text.indexOfFirst { it.area == PDFArea.BIBLIOGRAPHY } - 1].page
 
         val firstSectionPage = text[section.titleIndex].page
         val lastSectionPage = when {
             subsections.isNotEmpty() && subsections.last() == sections.last()
-                || section == sections.last()  -> lastPageOfSections
+                || section == sections.last() -> lastPageOfSections
             else -> {
                 val nextSection = sections[sectionIndex + subsections.size + 1]
                 text[nextSection.titleIndex - 1].page
             }
         }
 
-        val totalPagesOfSections = lastPageOfSections - firstPageOfSections + 1
+        val totalPages = text.last().page + 1
         val sectionSize = lastSectionPage - firstSectionPage + 1
-        return isViolated(sectionSize, totalPagesOfSections)
+        return isLimitViolated(sectionSize, totalPages)
     }
 
-    private fun isViolated(sectionSize: Int, totalPages: Int): Boolean {
+    private fun isLimitViolated(sectionSize: Int, totalPages: Int): Boolean {
         var isViolatedPageLimit = false
         var isViolatedPercentageLimit = false
-        val percentage = sectionSize.toDouble() / totalPages * 100
+        val percentage = sectionSize.toFloat() / totalPages * 100
 
-        when(comparisonType) {
+        when (comparisonType) {
             LESS_THAN -> {
                 pageLimit?.let { isViolatedPageLimit = sectionSize >= it }
-                percentageLimit?.let { isViolatedPercentageLimit = percentage >= it.toDouble() }
+                percentageLimit?.toFloat()?.let { isViolatedPercentageLimit = percentage.greaterOrEqual(it) }
             }
-            LESS_THAN_OR_EQUAL_TO -> {
+            LESS_THAN_OR_EQUAL -> {
                 pageLimit?.let { isViolatedPageLimit = sectionSize > it }
-                percentageLimit?.let { isViolatedPercentageLimit = percentage > it.toDouble() }
+                percentageLimit?.toFloat()?.let { isViolatedPercentageLimit = percentage > it }
             }
-            EQUAL_TO -> {
+            EQUAL -> {
                 pageLimit?.let { isViolatedPageLimit = sectionSize != it }
-                percentageLimit?.let { isViolatedPercentageLimit = !floatEquals(percentage, it.toFloat()) }
+                percentageLimit?.toFloat()?.let { isViolatedPercentageLimit = !floatEquals(percentage, it) }
             }
-            GREATER_THAN_OR_EQUAL_TO -> {
+            NOT_EQUAL -> {
+                pageLimit?.let { isViolatedPageLimit = sectionSize == it }
+                percentageLimit?.toFloat()?.let { isViolatedPercentageLimit = floatEquals(percentage, it) }
+            }
+            GREATER_THAN_OR_EQUAL -> {
                 pageLimit?.let { isViolatedPageLimit = sectionSize < it }
-                percentageLimit?.let { isViolatedPercentageLimit = percentage < it.toDouble() }
+                percentageLimit?.toFloat()?.let { isViolatedPercentageLimit = percentage < it }
             }
             GREATER_THAN -> {
                 pageLimit?.let { isViolatedPageLimit = sectionSize <= it }
-                percentageLimit?.let { isViolatedPercentageLimit = percentage <= it.toDouble() }
+                percentageLimit?.toFloat()?.let { isViolatedPercentageLimit = percentage.lessOrEqual(it) }
             }
         }
-        if (pageLimit != null && percentageLimit != null)
-            return isViolatedPageLimit && isViolatedPercentageLimit
-
         return isViolatedPageLimit || isViolatedPercentageLimit
     }
 }
