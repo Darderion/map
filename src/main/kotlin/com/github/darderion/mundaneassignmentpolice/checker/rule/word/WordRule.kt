@@ -9,11 +9,14 @@ import com.github.darderion.mundaneassignmentpolice.pdfdocument.inside
 
 abstract class WordRule(
 	val word: String,
+	open val ruleBody: (neighbors: List<String>, requiredNeighbors: MutableList<Regex>, disallowedNeighbors: MutableList<Regex>) -> Boolean,
 	type: RuleViolationType,
 	area: PDFRegion,
 	name: String
 ): Rule(area, name, type) {
-	abstract fun isViolated(document: PDFDocument, line: Int, index: Int): Boolean
+
+
+	abstract fun isViolated(document: PDFDocument, line: Int, index: Int, lambda :(neighbors:List<String>,requiredNeighbors: MutableList<Regex>,disallowedNeighbors: MutableList<Regex>) -> Boolean): Boolean
 
 	override fun process(document: PDFDocument): List<RuleViolation> {
 		val rulesViolations: MutableList<RuleViolation> = mutableListOf()
@@ -22,12 +25,11 @@ abstract class WordRule(
 			splitToWordsAndPunctuations(line.content)
 				.mapIndexed { wordIndex, wordText -> if (wordText == this.word) wordIndex else -1 }
 				.filter { it != -1 }.forEach {
-					if (isViolated(document, lineIndex, it)) {
+					if (isViolated(document, lineIndex, it , ruleBody)) {
 						rulesViolations.add(RuleViolation(listOf(line), name, type))
 					}
 				}
 		}
-
 		return rulesViolations
 	}
 }

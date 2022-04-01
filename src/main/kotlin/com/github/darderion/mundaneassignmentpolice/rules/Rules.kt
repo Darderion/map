@@ -7,9 +7,7 @@ import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.and
 import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.or
 import com.github.darderion.mundaneassignmentpolice.checker.rule.tableofcontent.TableOfContentRuleBuilder
 import com.github.darderion.mundaneassignmentpolice.checker.rule.url.URLRuleBuilder
-import com.github.darderion.mundaneassignmentpolice.checker.rule.word.WordRule
-import com.github.darderion.mundaneassignmentpolice.checker.rule.word.WordRuleBuilder
-import com.github.darderion.mundaneassignmentpolice.checker.rule.word.or
+import com.github.darderion.mundaneassignmentpolice.checker.rule.word.*
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFArea
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFRegion
 import com.github.darderion.mundaneassignmentpolice.utils.URLUtil
@@ -22,6 +20,8 @@ private val EN = enLetters + enCapitalLetters
 private val rusLetters = "абвгдеёжзийклмнопрстуфхцчшщъыьэюя"
 private val rusCapitalLetters = rusLetters.uppercase(Locale.getDefault())
 private val RU = rusLetters + rusCapitalLetters
+
+
 
 private val numbers = "0123456789"
 
@@ -64,6 +64,19 @@ val RULE_MEDIUM_DASH = SymbolRuleBuilder()
 	.inArea(PDFRegion.EVERYWHERE.except(PDFArea.BIBLIOGRAPHY, PDFArea.FOOTNOTE))
 	.ignoringIfIndex(0)
 	.getRule()
+
+val RULE_TWO_IDENTICAL_WORDS = WordRuleBuilder()
+	.inArea(PDFRegion.EVERYWHERE.except(PDFArea.TABLE_OF_CONTENT))
+	.called("Два одинаковых слова подряд")
+	.setRuleBody { neighbors : List<String>, requiredNeighbors: MutableList<Regex>, disallowedNeighbors: MutableList<Regex> ->
+		if (neighbors[0] == neighbors[1] && neighbors[0].first().isLetter()) {
+			return@setRuleBody true
+		}
+		return@setRuleBody false
+	}
+	.getRule()
+
+
 
 val longDash = '—'
 
@@ -208,6 +221,18 @@ val smallNumbersRuleBuilder1 = WordRuleBuilder()		//for nearest words
 	.called(smallNumbersRuleName)
 	.inArea(smallNumbersRuleArea)
 	.ignoringAdjusting(Regex("""\s"""), Regex("""\."""))
+	.setRuleBody{ neighbors : List<String>, requiredNeighbors: MutableList<Regex>, disallowedNeighbors: MutableList<Regex> ->
+		if (neighbors.any { word ->
+				disallowedNeighbors.any { regex -> regex.matches(word) }
+			} ||
+			(requiredNeighbors.isNotEmpty() && (neighbors.isEmpty() ||
+					neighbors.any { word ->
+						!requiredNeighbors.any { regex -> regex.matches(word) }
+					}))) {
+			return@setRuleBody true
+		}
+		return@setRuleBody false
+	}
 	.ignoringIfIndex(0)
 
 val smallNumbersRuleBuilder2 = WordRuleBuilder()		//for decimal fractions and version numbers
@@ -215,12 +240,36 @@ val smallNumbersRuleBuilder2 = WordRuleBuilder()		//for decimal fractions and ve
 	.inArea(smallNumbersRuleArea)
 	.shouldHaveNeighbor(Regex("""\."""), Regex(""","""),
 		Regex("""[0-9]+"""))
+	.setRuleBody{ neighbors : List<String>, requiredNeighbors: MutableList<Regex>, disallowedNeighbors: MutableList<Regex> ->
+		if (neighbors.any { word ->
+				disallowedNeighbors.any { regex -> regex.matches(word) }
+			} ||
+			(requiredNeighbors.isNotEmpty() && (neighbors.isEmpty() ||
+					neighbors.any { word ->
+						!requiredNeighbors.any { regex -> regex.matches(word) }
+					}))) {
+			return@setRuleBody  true
+		}
+		return@setRuleBody false
+	}
 	.shouldHaveNumberOfNeighbors(2)
 
 val smallNumbersRuleBuilder3 = WordRuleBuilder()		//for links
 	.called(smallNumbersRuleName)
 	.inArea(smallNumbersRuleArea)
 	.fromLeft()
+	.setRuleBody{ neighbors : List<String>, requiredNeighbors: MutableList<Regex>, disallowedNeighbors: MutableList<Regex> ->
+		if (neighbors.any { word ->
+				disallowedNeighbors.any { regex -> regex.matches(word) }
+			} ||
+			(requiredNeighbors.isNotEmpty() && (neighbors.isEmpty() ||
+					neighbors.any { word ->
+						!requiredNeighbors.any { regex -> regex.matches(word) }
+					}))) {
+			return@setRuleBody true
+		}
+		return@setRuleBody false
+	}
 	.ignoringWords(true)
 	.ignoringAdjusting(Regex(""","""), Regex("""\s"""))
 	.shouldHaveNeighbor(Regex("""\["""))
@@ -228,11 +277,11 @@ val smallNumbersRuleBuilder3 = WordRuleBuilder()		//for links
 val RULES_SMALL_NUMBERS = List<WordRule>(9) { index ->
 	smallNumbersRuleBuilder1.word((index + 1).toString())
 		.fromLeft().shouldHaveNeighbor(*allowedWordsOnLeft).getRule() or
-	smallNumbersRuleBuilder1.word((index + 1).toString())
-		.fromRight().shouldHaveNeighbor(*allowedWordsOnRight).getRule() or
-	smallNumbersRuleBuilder2.word((index + 1).toString()).fromLeft().getRule() or
-	smallNumbersRuleBuilder2.fromRight().getRule() or
-	smallNumbersRuleBuilder3.word((index + 1).toString()).getRule()
+			smallNumbersRuleBuilder1.word((index + 1).toString())
+				.fromRight().shouldHaveNeighbor(*allowedWordsOnRight).getRule() or
+			smallNumbersRuleBuilder2.word((index + 1).toString()).fromLeft().getRule() or
+			smallNumbersRuleBuilder2.fromRight().getRule() or
+			smallNumbersRuleBuilder3.word((index + 1).toString()).getRule()
 }
 
 val RULE_SHORTENED_URLS = URLRuleBuilder()

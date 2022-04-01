@@ -44,9 +44,12 @@ class RulesTests: StringSpec({
 	}
 	"URLRule should detect shortened URLs" {
 		RULE_SHORTENED_URLS.process(PDFBox().getPDF(filePathShortenedUrls)).count() shouldBeExactly 3
-  }
+	}
 	"Rule should detect incorrect symbols in section names" {
 		RULE_SYMBOLS_IN_SECTION_NAMES.process(PDFBox().getPDF(filePathSymbolsInSectionNames)).count() shouldBeExactly 4
+	}
+	"Rule should detect two identical words in text"{
+		RULE_TWO_IDENTICAL_WORDS.process(PDFBox().getPDF(filePathTwoIdenticalWords)).count() shouldBeExactly 2
 	}
 }) {
 	companion object {
@@ -59,5 +62,6 @@ class RulesTests: StringSpec({
 		const val filePathCitation = "${TestsConfiguration.resourceFolder}checker/SymbolRuleTestsCitation.pdf"
 		const val filePathShortenedUrls = "${TestsConfiguration.resourceFolder}checker/URLRuleShortenedUrls.pdf"
 		const val filePathSymbolsInSectionNames = "${TestsConfiguration.resourceFolder}checker/RulesTestsSymbolsInSectionNames.pdf"
+		const val filePathTwoIdenticalWords = "${TestsConfiguration.resourceFolder}checker/WordRuleTestsTwoIdenticalWords.pdf"
 	}
 }

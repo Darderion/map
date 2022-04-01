@@ -32,6 +32,7 @@ class WordRuleBuilder {
 	private var direction: Direction = Direction.BIDIRECTIONAL
 	private var neighborhoodSize: Int = 1
 	private var numberOfNeighbors: Int = 1
+	private var ruleBody  = { neighbors : List<String>, requiredNeighbors: MutableList<Regex>, disallowedNeighbors: MutableList<Regex> -> false	}
 	private var type: RuleViolationType = RuleViolationType.Error
 	private var name: String = "Rule name"
 	private var region: PDFRegion = PDFRegion.EVERYWHERE
@@ -74,10 +75,12 @@ class WordRuleBuilder {
 		)
 	}
 
+	fun setRuleBody(deliveredRuleBody: (neighbors: List<String>, requiredNeighbors: MutableList<Regex>, disallowedNeighbors: MutableList<Regex>) -> Boolean) = this.also { this.ruleBody=deliveredRuleBody }
+
 	fun shouldNotHaveNeighbor(vararg words: Regex) =
 		this.also { disallowedNeighbors.addAll(words.toList()) }
 
-	fun shouldHaveNeighbor(vararg words: Regex) =
+	fun shouldHaveNeighbor(vararg words:  Regex) =
 		this.also { requiredNeighbors.addAll(words.toList()) }
 
 	fun fromLeft() = this.also { direction = Direction.LEFT }
@@ -96,6 +99,7 @@ class WordRuleBuilder {
 
 	fun shouldHaveNumberOfNeighbors(number: Int) = this.also { this.numberOfNeighbors = number }
 
+
 	fun getRule() = BasicWordRule(
 		word,
 		ignoredNeighbors,
@@ -108,6 +112,7 @@ class WordRuleBuilder {
 		direction,
 		neighborhoodSize,
 		numberOfNeighbors,
+		ruleBody,
 		type,
 		region,
 		name
