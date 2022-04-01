@@ -54,6 +54,9 @@ class RulesTests : StringSpec({
 	"Regex rule should detect using different versions of the abbreviation"{
 		RULE_VARIOUS_ABBREVIATIONS.process(PDFBox().getPDF(filePathVariousAbbreviations)).count() shouldBeExactly 8
 	}
+	"Table of content rule should detect incorrect order of sections"{
+		RULE_SECTIONS_ORDER.process(PDFBox().getPDF(filePathOrderOfSections)).count() shouldBeExactly 5
+	}
 }) {
 	companion object {
 		const val filePathQuestionMarkAndDashes =
@@ -73,5 +76,7 @@ class RulesTests : StringSpec({
 			"${TestsConfiguration.resourceFolder}checker/RegexRuleTestsOrderOfReferences.pdf"
 		const val filePathVariousAbbreviations =
 			"${TestsConfiguration.resourceFolder}checker/RegexRuleTestsVariousAbbreviations.pdf"
+		const val filePathOrderOfSections =
+			"${TestsConfiguration.resourceFolder}checker/TableOfContentRuleTestsSectionsOrder.pdf"
 	}
 }
