@@ -16,6 +16,7 @@ import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFRegion
 import com.github.darderion.mundaneassignmentpolice.utils.InvalidOperationException
 import com.github.darderion.mundaneassignmentpolice.utils.URLUtil
 import java.util.*
+import kotlin.collections.HashSet
 
 private val enLetters = "abcdefghijklmnopqrstuvwxyz"
 private val enCapitalLetters = enLetters.uppercase(Locale.getDefault())
@@ -188,6 +189,49 @@ val RULE_SYMBOLS_IN_SECTION_NAMES = TableOfContentRuleBuilder()
 			text.contains("[:.,]".toRegex())
 		}
 	}.called("""Символы ":", ".", "," в названии секции""")
+	.getRule()
+
+val sectionsThatMayPrecedeThis = mapOf<String, HashSet<String>>(
+	"Введение" to hashSetOf(""),
+	"Постановка задачи" to hashSetOf("Введение"),
+	"Обзор" to hashSetOf("Постановка задачи"),
+	"Контент" to hashSetOf("Обзор", "Контент"),
+	"Заключение" to hashSetOf("Контент"),
+	"Список литературы" to hashSetOf("Заключение")
+)
+
+val RULE_SECTIONS_ORDER = TableOfContentRuleBuilder()
+	.disallow { listOfLines ->
+		var nameOfPreviousSection = ""
+		listOfLines
+			.filterNot { line ->
+				val words = line.text
+					.filter { it.text.trim().isNotEmpty() }
+					.filterNot { it.text.contains("[0-9]+\\.".toRegex()) }
+				words.isEmpty() || words[0].text == "Оглавление"
+			}
+			.filter { line ->
+				val words = line.text
+					.filter { it.text.trim().isNotEmpty() }
+					.filterNot { it.text.contains("[0-9]+\\.".toRegex()) }
+
+				val sectionName =
+					if (words[0].text == "Список" && words[1].text == "литературы" ||
+						words[0].text == "Постановка" && words[1].text == "задачи"
+					)
+						words[0].text + " " + words[1].text
+					else if (sectionsThatMayPrecedeThis.contains(words[0].text))
+						words[0].text
+					else
+						"Контент"
+
+				val isRuleViolation =
+					!sectionsThatMayPrecedeThis[sectionName]!!.contains(nameOfPreviousSection)
+				nameOfPreviousSection = sectionName
+				isRuleViolation
+			}
+	}
+	.called("Неверный порядок секций")
 	.getRule()
 
 val smallNumbersRuleName = "Неправильное написание целых чисел от 1 до 9"
