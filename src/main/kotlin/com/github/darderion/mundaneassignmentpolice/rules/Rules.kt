@@ -12,6 +12,7 @@ import com.github.darderion.mundaneassignmentpolice.checker.rule.word.WordRuleBu
 import com.github.darderion.mundaneassignmentpolice.checker.rule.word.or
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFArea
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFRegion
+import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Line
 import com.github.darderion.mundaneassignmentpolice.utils.URLUtil
 import java.util.*
 
@@ -247,4 +248,20 @@ val RULE_SHORTENED_URLS = URLRuleBuilder()
 				false
 			}
 		}.map { it.second }
+	}.getRule()
+val RULE_URLS_UNIFORMITY=URLRuleBuilder()
+	.called("Ссылки разных видов")
+	.disallow { urls ->
+		val filteredUrls : List<Pair<String, Line>> = urls.filter { pair ->
+			val url = pair.first
+			!url.startsWith("htt")
+		}
+		if (urls.size==filteredUrls.size)
+		{
+			filteredUrls.filter {	pair ->
+				val url = pair.first
+				!url.startsWith("www")
+			}
+		}
+		filteredUrls.map { it.second }
 	}.getRule()
