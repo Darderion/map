@@ -1,6 +1,9 @@
 package com.github.darderion.mundaneassignmentpolice.wrapper
 
-import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.*
+import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Coordinate
+import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Font
+import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.PostScriptFontType
+import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Symbol
 import org.apache.pdfbox.pdmodel.font.PDType0Font
 import org.apache.pdfbox.pdmodel.font.PDType1CFont
 import org.apache.pdfbox.pdmodel.font.PDType1Font
@@ -18,7 +21,7 @@ class PDFStripper: PDFTextStripper() {
 		for (text: TextPosition in textPositions) {
 			val symbol = text.unicode
 
-			val fontType = when(text.font) {
+			val fontType = when (text.font) {
 				is PDType0Font -> PostScriptFontType.TYPE0
 				is PDType1Font -> PostScriptFontType.TYPE1
 				is PDType1CFont -> PostScriptFontType.TYPE2

@@ -20,4 +20,8 @@ data class Line(val index: Int, val page: Int, val documentIndex: Int,
 	override fun toString() = "[$documentIndex -- $index, p.$page, $area, ${position.x}] --> '$content'"
 
 	fun drop(numberOfItems: Int) = Line(index, page, documentIndex, text.drop(numberOfItems), area)
+
+	fun isEmpty() = text.isEmpty() || text.size == 1 && text.first().text == ""
+
+	fun isNotEmpty() = !isEmpty()
 }
