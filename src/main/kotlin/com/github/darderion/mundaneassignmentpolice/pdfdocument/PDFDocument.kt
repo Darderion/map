@@ -2,7 +2,6 @@ package com.github.darderion.mundaneassignmentpolice.pdfdocument
 
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Line
 import mu.KotlinLogging
-import java.lang.Exception
 
 class PDFDocument(val name: String = "PDF",
 				  val text: List<Line>,
@@ -28,6 +27,10 @@ class PDFDocument(val name: String = "PDF",
 		.filterIndexed { index, pdfText ->
 		index in fromIndex..toIndex
 	}.joinToString("\n ") { it.content }
+
+	fun getLines(fromIndex: Int, count: Int, region: PDFRegion) = text.filter { it.area!! inside region }
+		.dropWhile { it.documentIndex < fromIndex }
+		.take(count)
 
 	fun print() {
 		text.map { "${it.area} | ${it.text.joinToString("--") { "${it.font.size}-${it.text}"}}" }.forEach(::println)
