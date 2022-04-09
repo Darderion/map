@@ -16,11 +16,11 @@ class FormulaPunctuationRule(
 ) : FormulaRule(type, name) {
     override fun getLinesOfViolation(document: PDFDocument, formula: Formula): List<Line> {
         var textAfterFormula = formula.lines.last().text.takeLastWhile { it != formula.text.last() }
-            .joinToString("") { it.text } + "\n"
+            .joinToString("") { it.text } + " "
 
         textAfterFormula +=
             document.getLines(formula.lines.last().documentIndex + 1, 2, area)
-                .joinToString("\n") { it.content }
+                .joinToString(" ") { it.content }
 
         val lastFormulaSymbol = formula.text.last().text.last()
         val firstSymbolAfterFormula = textAfterFormula[0]

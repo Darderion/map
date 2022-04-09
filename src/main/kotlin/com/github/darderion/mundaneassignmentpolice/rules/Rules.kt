@@ -1,8 +1,9 @@
 package com.github.darderion.mundaneassignmentpolice.rules
 
+import com.github.darderion.mundaneassignmentpolice.checker.PunctuationMark
 import com.github.darderion.mundaneassignmentpolice.checker.RuleViolationType
+import com.github.darderion.mundaneassignmentpolice.checker.rule.formula.FormulaPunctuationRuleBuilder
 import com.github.darderion.mundaneassignmentpolice.checker.rule.list.ListRuleBuilder
-import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.SymbolRule
 import com.github.darderion.mundaneassignmentpolice.checker.rule.regex.RegexRuleBuilder
 import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.SymbolRuleBuilder
 import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.and
@@ -265,3 +266,22 @@ val RULE_ORDER_OF_REFERENCES = RegexRuleBuilder()
 			referencesInIntList != referencesInIntList.sorted()
 		}.map { it.second }
 	}.getRule()
+
+private val ignoringSymbolsAfterFormula = " \n($numbers)"
+
+val fullStopAfterFormulaRule = FormulaPunctuationRuleBuilder()
+	.called("Отсутствует точка после формулы")
+	.requiredPunctuationMark(PunctuationMark.FULL_STOP)
+	.indicatorWords("""[A-ZА-Я].*?""".toRegex())
+	.indicatorWords("""$""".toRegex())
+	.ignoringAdjusting(*ignoringSymbolsAfterFormula.toCharArray())
+	.getRule()
+
+val commaAfterFormulaRule = FormulaPunctuationRuleBuilder()
+	.called("Отсутствует запятая после формулы")
+	.requiredPunctuationMark(PunctuationMark.COMMA)
+	.indicatorWords("""где""".toRegex())
+	.ignoringAdjusting(*ignoringSymbolsAfterFormula.toCharArray())
+	.getRule()
+
+val RULES_FORMULA_PUNCTUATION = listOf(fullStopAfterFormulaRule, commaAfterFormulaRule)

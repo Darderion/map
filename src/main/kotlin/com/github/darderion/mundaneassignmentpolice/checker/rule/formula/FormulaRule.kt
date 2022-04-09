@@ -15,7 +15,7 @@ import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Word
 abstract class FormulaRule(
     type: RuleViolationType,
     name: String
-): Rule(PDFRegion.NOWHERE.except(PDFArea.SECTION), name, type) {
+) : Rule(PDFRegion.NOWHERE.except(PDFArea.SECTION), name, type) {
     abstract fun getLinesOfViolation(document: PDFDocument, formula: Formula): List<Line>
 
     override fun process(document: PDFDocument): List<RuleViolation> {
