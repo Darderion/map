@@ -22,16 +22,15 @@ private val rusCapitalLetters = rusLetters.uppercase(Locale.getDefault())
 private val RU = rusLetters + rusCapitalLetters
 
 
-
 private val numbers = "0123456789"
 
 val RULE_LITLINK = SymbolRuleBuilder()
-	.symbol('?')
-	.ignoringAdjusting(*" ,$numbers".toCharArray())
-	.shouldNotHaveNeighbor(*"[]".toCharArray())
-	//.called("Symbol '?' in litlink")
-	.called("Символ ? в ссылке на литературу")
-	.getRule()
+    .symbol('?')
+    .ignoringAdjusting(*" ,$numbers".toCharArray())
+    .shouldNotHaveNeighbor(*"[]".toCharArray())
+    //.called("Symbol '?' in litlink")
+    .called("Символ ? в ссылке на литературу")
+    .getRule()
 
 val shortDash = '-'
 
@@ -39,98 +38,97 @@ val shortDash = '-'
 // one-sided battle
 
 val shortDashRules = SymbolRuleBuilder()
-	.symbol(shortDash)
-	.shouldHaveNeighbor(*EN.toCharArray())
-	.shouldHaveNeighbor(*RU.toCharArray())
-	.shouldHaveNeighbor(*numbers.toCharArray())
-	//.called("Incorrect usage of '-' symbol")
-	.called("Неправильное использование дефиса")
-	.inArea(PDFRegion.EVERYWHERE.except(PDFArea.BIBLIOGRAPHY, PDFArea.FOOTNOTE))
+    .symbol(shortDash)
+    .shouldHaveNeighbor(*EN.toCharArray())
+    .shouldHaveNeighbor(*RU.toCharArray())
+    .shouldHaveNeighbor(*numbers.toCharArray())
+    //.called("Incorrect usage of '-' symbol")
+    .called("Неправильное использование дефиса")
+    .inArea(PDFRegion.EVERYWHERE.except(PDFArea.BIBLIOGRAPHY, PDFArea.FOOTNOTE))
 
 val RULE_SHORT_DASH = shortDashRules.getRule() and (
-		shortDashRules.fromLeft().shouldHaveNeighbor('.')
-			.shouldNotHaveNeighbor(*numbers.toCharArray()).getRule() or
-				shortDashRules.fromRight().shouldHaveNeighbor('\n')
-					.shouldNotHaveNeighbor(*numbers.toCharArray()).getRule()
-		)
+        shortDashRules.fromLeft().shouldHaveNeighbor('.')
+            .shouldNotHaveNeighbor(*numbers.toCharArray()).getRule() or
+                shortDashRules.fromRight().shouldHaveNeighbor('\n')
+                    .shouldNotHaveNeighbor(*numbers.toCharArray()).getRule()
+        )
 
 val mediumDash = '–'
 
 val RULE_MEDIUM_DASH = SymbolRuleBuilder()
-	.symbol(mediumDash)
-	.shouldHaveNeighbor(*numbers.toCharArray())
-	//.called("Incorrect usage of '--' symbol")
-	.called("Неправильное использование короткого тире")
-	.inArea(PDFRegion.EVERYWHERE.except(PDFArea.BIBLIOGRAPHY, PDFArea.FOOTNOTE))
-	.ignoringIfIndex(0)
-	.getRule()
+    .symbol(mediumDash)
+    .shouldHaveNeighbor(*numbers.toCharArray())
+    //.called("Incorrect usage of '--' symbol")
+    .called("Неправильное использование короткого тире")
+    .inArea(PDFRegion.EVERYWHERE.except(PDFArea.BIBLIOGRAPHY, PDFArea.FOOTNOTE))
+    .ignoringIfIndex(0)
+    .getRule()
 
 val RULE_TWO_IDENTICAL_WORDS = WordRuleBuilder()
-	.inArea(PDFRegion.EVERYWHERE.except(PDFArea.TABLE_OF_CONTENT))
-	.called("Два одинаковых слова подряд")
-	.setRuleBody { neighbors : List<String>, requiredNeighbors: MutableList<Regex>, disallowedNeighbors: MutableList<Regex> ->
-		if (neighbors[0] == neighbors[1] && neighbors[0].first().isLetter()) {
-			return@setRuleBody true
-		}
-		return@setRuleBody false
-	}
-	.getRule()
-
+    .inArea(PDFRegion.EVERYWHERE.except(PDFArea.TABLE_OF_CONTENT))
+    .called("Два одинаковых слова подряд")
+    .setRuleBody { neighbors: List<String>, requiredNeighbors: MutableList<Regex>, disallowedNeighbors: MutableList<Regex> ->
+        if (neighbors[0] == neighbors[1] && neighbors[0].first().isLetter()) {
+            return@setRuleBody true
+        }
+        return@setRuleBody false
+    }
+    .getRule()
 
 
 val longDash = '—'
 
 val RULE_LONG_DASH = SymbolRuleBuilder()
-	.symbol(longDash)
-	.ignoringAdjusting(' ')
-	.shouldNotHaveNeighbor(*numbers.toCharArray())
-	//.called("Incorrect usage of '---' symbol")
-	.called("Неправильное использование длинного тире")
-	.inArea(PDFRegion.EVERYWHERE.except(PDFArea.BIBLIOGRAPHY, PDFArea.FOOTNOTE))
-	.getRule() and SymbolRuleBuilder()
-	.symbol(longDash)
-	.shouldHaveNeighbor(' ')
-	.inArea(PDFRegion.EVERYWHERE.except(PDFArea.BIBLIOGRAPHY, PDFArea.FOOTNOTE))
-	.getRule()
+    .symbol(longDash)
+    .ignoringAdjusting(' ')
+    .shouldNotHaveNeighbor(*numbers.toCharArray())
+    //.called("Incorrect usage of '---' symbol")
+    .called("Неправильное использование длинного тире")
+    .inArea(PDFRegion.EVERYWHERE.except(PDFArea.BIBLIOGRAPHY, PDFArea.FOOTNOTE))
+    .getRule() and SymbolRuleBuilder()
+    .symbol(longDash)
+    .shouldHaveNeighbor(' ')
+    .inArea(PDFRegion.EVERYWHERE.except(PDFArea.BIBLIOGRAPHY, PDFArea.FOOTNOTE))
+    .getRule()
 
 val closingQuote = '”'
 val openingQuote = '“'
 
 val RULE_CLOSING_QUOTATION = SymbolRuleBuilder()
-	.symbol(closingQuote)
-	.ignoringEveryCharacterExcept(*"$closingQuote$openingQuote".toCharArray())
-	.fromLeft().shouldHaveNeighbor(openingQuote)
-	.inNeighborhood(20)
-	.called("Неправильное использование закрывающей кавычки")
-	.getRule()
+    .symbol(closingQuote)
+    .ignoringEveryCharacterExcept(*"$closingQuote$openingQuote".toCharArray())
+    .fromLeft().shouldHaveNeighbor(openingQuote)
+    .inNeighborhood(20)
+    .called("Неправильное использование закрывающей кавычки")
+    .getRule()
 
 val RULE_OPENING_QUOTATION = SymbolRuleBuilder()
-	.symbol(openingQuote)
-	.ignoringEveryCharacterExcept(*"$closingQuote$openingQuote".toCharArray())
-	.fromRight().shouldHaveNeighbor(closingQuote)
-	.inNeighborhood(20)
-	.called("Неправильное использование открывающей кавычки")
-	.getRule()
+    .symbol(openingQuote)
+    .ignoringEveryCharacterExcept(*"$closingQuote$openingQuote".toCharArray())
+    .fromRight().shouldHaveNeighbor(closingQuote)
+    .inNeighborhood(20)
+    .called("Неправильное использование открывающей кавычки")
+    .getRule()
 
 const val squareClosingBracket = ']'
 const val squareOpeningBracket = '['
 
 val RULE_MULTIPLE_LITLINKS = SymbolRuleBuilder()
-	.symbol(squareClosingBracket)
-	.ignoringAdjusting(' ', ',')
-	.fromRight().shouldNotHaveNeighbor(squareOpeningBracket)
-	.called("Неправильное оформление нескольких ссылок")
-	.getRule()
+    .symbol(squareClosingBracket)
+    .ignoringAdjusting(' ', ',')
+    .fromRight().shouldNotHaveNeighbor(squareOpeningBracket)
+    .called("Неправильное оформление нескольких ссылок")
+    .getRule()
 
 const val bracket = '('
 
 val RULE_BRACKETS_LETTERS = SymbolRuleBuilder()
-	.symbol(bracket)
-	.ignoringAdjusting(' ')
-	.fromRight().shouldNotHaveNeighbor(*rusCapitalLetters.toCharArray())
-	.called("Большая русская буква после скобки")
-	.type(RuleViolationType.Warning)
-	.getRule()
+    .symbol(bracket)
+    .ignoringAdjusting(' ')
+    .fromRight().shouldNotHaveNeighbor(*rusCapitalLetters.toCharArray())
+    .called("Большая русская буква после скобки")
+    .type(RuleViolationType.Warning)
+    .getRule()
 
 private const val openingBrackets = "([{<"
 private const val closingBrackets = ")]}>"
@@ -138,162 +136,154 @@ private const val closingQuotes = "”»"
 private const val punctuationSymbols = ".,;:!?"
 
 private val spaceAroundBracketsRuleBuilders = List(2) { SymbolRuleBuilder() }
-	.map { it.shouldHaveNeighbor(' ', '\n') }
-	.map { it.called("Отсутствует пробел с внешней стороны скобок") }
-	.apply {
-		// setting up a rule that should look for a space before opening brackets
-		first().fromLeft().ignoringAdjusting(*openingBrackets.toCharArray())
-		// and this rule should look for after closing brackets
-		last().fromRight()
-			.ignoringAdjusting(*"$punctuationSymbols$closingQuotes$closingBrackets".toCharArray())
-	}
+    .map { it.shouldHaveNeighbor(' ', '\n') }
+    .map { it.called("Отсутствует пробел с внешней стороны скобок") }
+    .apply {
+        // setting up a rule that should look for a space before opening brackets
+        first().fromLeft().ignoringAdjusting(*openingBrackets.toCharArray())
+        // and this rule should look for after closing brackets
+        last().fromRight()
+            .ignoringAdjusting(*"$punctuationSymbols$closingQuotes$closingBrackets".toCharArray())
+    }
 
 // For case when round brackets are empty: "function()"
 private val openingRoundBracketExceptionalRule = SymbolRuleBuilder()
-	.symbol('(')
-	.fromRight().shouldHaveNeighbor(')')
-	.getRule()
+    .symbol('(')
+    .fromRight().shouldHaveNeighbor(')')
+    .getRule()
 
 val RULES_SPACE_AROUND_BRACKETS = spaceAroundBracketsRuleBuilders
-	.zip(listOf(openingBrackets, closingBrackets).map { it.toCharArray() })
-	.map { pair -> pair.second.map { pair.first.symbol(it).getRule() } }
-	.flatten()
-	.map {
-		if (it.symbol == '(') it or openingRoundBracketExceptionalRule
-		else it
-	}
+    .zip(listOf(openingBrackets, closingBrackets).map { it.toCharArray() })
+    .map { pair -> pair.second.map { pair.first.symbol(it).getRule() } }
+    .flatten()
+    .map {
+        if (it.symbol == '(') it or openingRoundBracketExceptionalRule
+        else it
+    }
 
 val RULE_CITATION = SymbolRuleBuilder()
-	.symbol('[')
-	.ignoringAdjusting(' ', '\n')
-	.fromLeft().shouldNotHaveNeighbor('.')
-	.called("Некорректное цитирование")
-	.inArea(PDFArea.SECTION)
-	.getRule()
+    .symbol('[')
+    .ignoringAdjusting(' ', '\n')
+    .fromLeft().shouldNotHaveNeighbor('.')
+    .called("Некорректное цитирование")
+    .inArea(PDFArea.SECTION)
+    .getRule()
 
 val RULE_SINGLE_SUBSECTION = ListRuleBuilder()
-	.inArea(PDFRegion.NOWHERE.except(PDFArea.TABLE_OF_CONTENT))
-	//.called("Only 1 subsection in a section")
-	.called("Одна подсекция в секции")
-	.disallow {
-		if (it.nodes.count() == 1) it.nodes.first().getText() else listOf()
-	}.getRule()
+    .inArea(PDFRegion.NOWHERE.except(PDFArea.TABLE_OF_CONTENT))
+    //.called("Only 1 subsection in a section")
+    .called("Одна подсекция в секции")
+    .disallow {
+        if (it.nodes.count() == 1) it.nodes.first().getText() else listOf()
+    }.getRule()
 
 val RULE_TABLE_OF_CONTENT_NUMBERS = TableOfContentRuleBuilder()
-	.disallow {
-		it.filter {
-			// println("${it.text.count()} -> ${it.content}")
-			val text = it.text.filter { it.text.trim().isNotEmpty() }
-			((text.count() == 3 && (text[1].text == "Введение" || text[1].text == "Заключение")) ||
-					(text.count() == 4 && text[1].text == "Список" && text[2].text == "литературы"))
-		}
-	}.called("Введение, заключение и список литературы не нумеруются")
-	.getRule()
+    .disallow {
+        it.filter {
+            // println("${it.text.count()} -> ${it.content}")
+            val text = it.text.filter { it.text.trim().isNotEmpty() }
+            ((text.count() == 3 && (text[1].text == "Введение" || text[1].text == "Заключение")) ||
+                    (text.count() == 4 && text[1].text == "Список" && text[2].text == "литературы"))
+        }
+    }.called("Введение, заключение и список литературы не нумеруются")
+    .getRule()
 
 val RULE_SYMBOLS_IN_SECTION_NAMES = TableOfContentRuleBuilder()
-	.disallow { listOfLines ->
-		listOfLines.filter { line ->
-			val text = line.text.filterNot { it.text == "." }           // remove leaders
-				.filterNot { it.text.contains("[0-9]+\\.".toRegex()) }  // remove numbering
-				.joinToString("")
-			text.contains("[:.,]".toRegex())
-		}
-	}.called("""Символы ":", ".", "," в названии секции""")
-	.getRule()
+    .disallow { listOfLines ->
+        listOfLines.filter { line ->
+            val text = line.text.filterNot { it.text == "." }           // remove leaders
+                .filterNot { it.text.contains("[0-9]+\\.".toRegex()) }  // remove numbering
+                .joinToString("")
+            text.contains("[:.,]".toRegex())
+        }
+    }.called("""Символы ":", ".", "," в названии секции""")
+    .getRule()
 
 val smallNumbersRuleName = "Неправильное написание целых чисел от 1 до 9"
 val smallNumbersRuleArea =
-	PDFRegion.EVERYWHERE.except(PDFArea.PAGE_INDEX, PDFArea.TABLE_OF_CONTENT, PDFArea.BIBLIOGRAPHY)
+    PDFRegion.EVERYWHERE.except(PDFArea.PAGE_INDEX, PDFArea.TABLE_OF_CONTENT, PDFArea.BIBLIOGRAPHY)
 val allowedWordsOnLeft = arrayOf(
-	Regex("""[Рр]ис[a-я]*"""),
-	Regex("""[Тт]абл[a-я]*"""), Regex("""[Сс]х[a-я]*"""),
-	Regex("""[Dd]ef[a-z]*"""), Regex("""[Оо]пр[а-я]*"""),
-	Regex("""[Tt]h[a-z]*"""), Regex("""[Тт]еорема""")
+    Regex("""[Рр]ис[a-я]*"""),
+    Regex("""[Тт]абл[a-я]*"""), Regex("""[Сс]х[a-я]*"""),
+    Regex("""[Dd]ef[a-z]*"""), Regex("""[Оо]пр[а-я]*"""),
+    Regex("""[Tt]h[a-z]*"""), Regex("""[Тт]еорема""")
 )
 val allowedWordsOnRight = arrayOf(
-	Regex("""[Gg][Bb]"""), Regex("""[Гг][Бб]"""),
-	Regex("""[Mm][Bb]"""), Regex("""[Мм][Бб]"""),
-	Regex("""[Gg][Hh][Zz]"""), Regex("""[Гг][Цц]"""),
-	Regex("""→""")
+    Regex("""[Gg][Bb]"""), Regex("""[Гг][Бб]"""),
+    Regex("""[Mm][Bb]"""), Regex("""[Мм][Бб]"""),
+    Regex("""[Gg][Hh][Zz]"""), Regex("""[Гг][Цц]"""),
+    Regex("""→""")
 )
 
-val smallNumbersRuleBuilder1 = WordRuleBuilder()		//for nearest words
-	.called(smallNumbersRuleName)
-	.inArea(smallNumbersRuleArea)
-	.ignoringAdjusting(Regex("""\s"""), Regex("""\."""))
-	.setRuleBody{ neighbors : List<String>, requiredNeighbors: MutableList<Regex>, disallowedNeighbors: MutableList<Regex> ->
-		if (neighbors.any { word ->
-				disallowedNeighbors.any { regex -> regex.matches(word) }
-			} ||
-			(requiredNeighbors.isNotEmpty() && (neighbors.isEmpty() ||
-					neighbors.any { word ->
-						!requiredNeighbors.any { regex -> regex.matches(word) }
-					}))) {
-			return@setRuleBody true
-		}
-		return@setRuleBody false
-	}
-	.ignoringIfIndex(0)
+val smallNumbersRuleBuilder1 = WordRuleBuilder()        //for nearest words
+    .called(smallNumbersRuleName).inArea(smallNumbersRuleArea).ignoringAdjusting(Regex("""\s"""), Regex("""\."""))
+    .setRuleBody { neighbors: List<String>, requiredNeighbors: MutableList<Regex>, disallowedNeighbors: MutableList<Regex> ->
+        if (neighbors.any { word ->
+                disallowedNeighbors.any { regex -> regex.matches(word) }
+            } || (requiredNeighbors.isNotEmpty() && (neighbors.isEmpty() || neighbors.any { word ->
+                !requiredNeighbors.any { regex -> regex.matches(word) }
+            }))) {
+            return@setRuleBody true
+        }
+        return@setRuleBody false
+    }.ignoringIfIndex(0)
 
-val smallNumbersRuleBuilder2 = WordRuleBuilder()		//for decimal fractions and version numbers
-	.called(smallNumbersRuleName)
-	.inArea(smallNumbersRuleArea)
-	.shouldHaveNeighbor(Regex("""\."""), Regex(""","""),
-		Regex("""[0-9]+"""))
-	.setRuleBody{ neighbors : List<String>, requiredNeighbors: MutableList<Regex>, disallowedNeighbors: MutableList<Regex> ->
-		if (neighbors.any { word ->
-				disallowedNeighbors.any { regex -> regex.matches(word) }
-			} ||
-			(requiredNeighbors.isNotEmpty() && (neighbors.isEmpty() ||
-					neighbors.any { word ->
-						!requiredNeighbors.any { regex -> regex.matches(word) }
-					}))) {
-			return@setRuleBody  true
-		}
-		return@setRuleBody false
-	}
-	.shouldHaveNumberOfNeighbors(2)
+val smallNumbersRuleBuilder2 = WordRuleBuilder()        //for decimal fractions and version numbers
+    .called(smallNumbersRuleName)
+    .inArea(smallNumbersRuleArea)
+    .shouldHaveNeighbor(Regex("""\."""), Regex(""","""), Regex("""[0-9]+"""))
+    .setRuleBody { neighbors: List<String>, requiredNeighbors: MutableList<Regex>, disallowedNeighbors: MutableList<Regex> ->
+        if (neighbors.any { word ->
+                disallowedNeighbors.any { regex -> regex.matches(word) }
+            } ||
+            (requiredNeighbors.isNotEmpty() && (neighbors.isEmpty() ||
+                    neighbors.any { word ->
+                        !requiredNeighbors.any { regex -> regex.matches(word) }
+                    }))) {
+            return@setRuleBody true
+        }
+        return@setRuleBody false
+    }
+    .shouldHaveNumberOfNeighbors(2)
 
-val smallNumbersRuleBuilder3 = WordRuleBuilder()		//for links
-	.called(smallNumbersRuleName)
-	.inArea(smallNumbersRuleArea)
-	.fromLeft()
-	.setRuleBody{ neighbors : List<String>, requiredNeighbors: MutableList<Regex>, disallowedNeighbors: MutableList<Regex> ->
-		if (neighbors.any { word ->
-				disallowedNeighbors.any { regex -> regex.matches(word) }
-			} ||
-			(requiredNeighbors.isNotEmpty() && (neighbors.isEmpty() ||
-					neighbors.any { word ->
-						!requiredNeighbors.any { regex -> regex.matches(word) }
-					}))) {
-			return@setRuleBody true
-		}
-		return@setRuleBody false
-	}
-	.ignoringWords(true)
-	.ignoringAdjusting(Regex(""","""), Regex("""\s"""))
-	.shouldHaveNeighbor(Regex("""\["""))
+val smallNumbersRuleBuilder3 = WordRuleBuilder()        //for links
+    .called(smallNumbersRuleName)
+    .inArea(smallNumbersRuleArea)
+    .fromLeft()
+    .setRuleBody { neighbors: List<String>, requiredNeighbors: MutableList<Regex>, disallowedNeighbors: MutableList<Regex> ->
+        if (neighbors.any { word ->
+                disallowedNeighbors.any { regex -> regex.matches(word) }
+            } ||
+            (requiredNeighbors.isNotEmpty() && (neighbors.isEmpty() ||
+                    neighbors.any { word ->
+                        !requiredNeighbors.any { regex -> regex.matches(word) }
+                    }))) {
+            return@setRuleBody true
+        }
+        return@setRuleBody false
+    }
+    .ignoringWords(true)
+    .ignoringAdjusting(Regex(""","""), Regex("""\s"""))
+    .shouldHaveNeighbor(Regex("""\["""))
 
 val RULES_SMALL_NUMBERS = List<WordRule>(9) { index ->
-	smallNumbersRuleBuilder1.word((index + 1).toString())
-		.fromLeft().shouldHaveNeighbor(*allowedWordsOnLeft).getRule() or
-			smallNumbersRuleBuilder1.word((index + 1).toString())
-				.fromRight().shouldHaveNeighbor(*allowedWordsOnRight).getRule() or
-			smallNumbersRuleBuilder2.word((index + 1).toString()).fromLeft().getRule() or
-			smallNumbersRuleBuilder2.fromRight().getRule() or
-			smallNumbersRuleBuilder3.word((index + 1).toString()).getRule()
+    smallNumbersRuleBuilder1.word((index + 1).toString()).fromLeft().shouldHaveNeighbor(*allowedWordsOnLeft).getRule() or
+            smallNumbersRuleBuilder1.word((index + 1).toString()).fromRight().shouldHaveNeighbor(*allowedWordsOnRight).getRule() or
+            smallNumbersRuleBuilder2.word((index + 1).toString()).fromLeft().getRule() or
+            smallNumbersRuleBuilder2.fromRight().getRule() or
+            smallNumbersRuleBuilder3.word((index + 1).toString()).getRule()
 }
 
 val RULE_SHORTENED_URLS = URLRuleBuilder()
-	.called("Сокращённая ссылка")
-	.disallow { urls ->
-		urls.filter { pair ->
-			try {
-				var url = pair.first
-				if (!url.startsWith("http")) url = "https://$url"
-				URLUtil.isShortened(url)
-			} catch (_: Exception) {
-				false
-			}
-		}.map { it.second }
-	}.getRule()
+    .called("Сокращённая ссылка")
+    .disallow { urls ->
+        urls.filter { pair ->
+            try {
+                var url = pair.first
+                if (!url.startsWith("http")) url = "https://$url"
+                URLUtil.isShortened(url)
+            } catch (_: Exception) {
+                false
+            }
+        }.map { it.second }
+    }.getRule()
