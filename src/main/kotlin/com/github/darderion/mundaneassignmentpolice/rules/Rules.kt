@@ -75,7 +75,6 @@ val RULE_TWO_IDENTICAL_WORDS = WordRuleBuilder()
     }
     .getRule()
 
-
 val longDash = '—'
 
 val RULE_LONG_DASH = SymbolRuleBuilder()
@@ -267,8 +266,10 @@ val smallNumbersRuleBuilder3 = WordRuleBuilder()        //for links
     .shouldHaveNeighbor(Regex("""\["""))
 
 val RULES_SMALL_NUMBERS = List<WordRule>(9) { index ->
-    smallNumbersRuleBuilder1.word((index + 1).toString()).fromLeft().shouldHaveNeighbor(*allowedWordsOnLeft).getRule() or
-            smallNumbersRuleBuilder1.word((index + 1).toString()).fromRight().shouldHaveNeighbor(*allowedWordsOnRight).getRule() or
+    smallNumbersRuleBuilder1.word((index + 1).toString()).fromLeft().shouldHaveNeighbor(*allowedWordsOnLeft)
+        .getRule() or
+            smallNumbersRuleBuilder1.word((index + 1).toString()).fromRight().shouldHaveNeighbor(*allowedWordsOnRight)
+                .getRule() or
             smallNumbersRuleBuilder2.word((index + 1).toString()).fromLeft().getRule() or
             smallNumbersRuleBuilder2.fromRight().getRule() or
             smallNumbersRuleBuilder3.word((index + 1).toString()).getRule()
