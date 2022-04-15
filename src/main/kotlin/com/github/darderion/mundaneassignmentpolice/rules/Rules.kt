@@ -249,18 +249,24 @@ val RULE_SHORTENED_URLS = URLRuleBuilder()
 			}
 		}.map { it.second }
 	}.getRule()
-val RULE_URLS_UNIFORMITY=URLRuleBuilder()
+
+val RULE_URLS_UNIFORMITY = URLRuleBuilder()
 	.called("Ссылки разных видов")
 	.disallow { urls ->
-		val filteredUrls : List<Pair<String, Line>> = urls.filter { pair ->
+		var filteredUrls: List<Pair<String, Line>> = urls.filter { pair ->
 			val url = pair.first
-			!url.startsWith("htt")
+			!url.startsWith("https://www")
 		}
-		if (urls.size==filteredUrls.size)
-		{
-			filteredUrls.filter {	pair ->
+		if (urls.size == filteredUrls.size) {
+			filteredUrls = filteredUrls.filter { pair ->
 				val url = pair.first
 				!url.startsWith("www")
+			}
+			if (urls.size == filteredUrls.size) {
+				filteredUrls = filteredUrls.filter { pair ->
+					val url = pair.first
+					!url.startsWith("htt")
+				}
 			}
 		}
 		filteredUrls.map { it.second }
