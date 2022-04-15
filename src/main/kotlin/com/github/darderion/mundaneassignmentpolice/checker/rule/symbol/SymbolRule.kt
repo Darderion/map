@@ -9,11 +9,12 @@ import com.github.darderion.mundaneassignmentpolice.pdfdocument.inside
 
 abstract class SymbolRule(
 	val symbol: Char,
+	open val ruleBody: (symbol: Char, document: PDFDocument, line: Int, neighbors: List<Char>, requiredNeighbors: MutableList<Char>, disallowedNeighbors: MutableList<Char>) -> Boolean,
 	type: RuleViolationType,
 	area: PDFRegion,
 	name: String
 ): Rule(area, name, type) {
-	abstract fun isViolated(document: PDFDocument, line: Int, index: Int): Boolean
+	abstract fun isViolated(document: PDFDocument, line: Int, index: Int, ruleBody: (symbol: Char, document: PDFDocument, line: Int, neighbors: List<Char>, requiredNeighbors: MutableList<Char>, disallowedNeighbors: MutableList<Char>) -> Boolean): Boolean
 
 	override fun process(document: PDFDocument): List<RuleViolation> {
 		val rulesViolations: MutableList<RuleViolation> = mutableListOf()
@@ -21,7 +22,7 @@ abstract class SymbolRule(
 		document.text.filter { it.area!! inside area }.forEachIndexed { lineIndex, pdfText ->
 			//val pdfText = document.text.filter { it.area!! inside area }[lineIndex]
 			pdfText.content.indicesOf(symbol.toString()).forEach {
-				if (isViolated(document, lineIndex, it)) {
+				if (isViolated(document, lineIndex, it,ruleBody)) {
 					rulesViolations.add(RuleViolation(listOf(pdfText), name, type))
 				}
 			}

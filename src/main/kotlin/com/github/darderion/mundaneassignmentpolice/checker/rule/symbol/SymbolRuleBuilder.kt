@@ -3,6 +3,7 @@ package com.github.darderion.mundaneassignmentpolice.checker.rule.symbol
 import com.github.darderion.mundaneassignmentpolice.checker.Direction
 import com.github.darderion.mundaneassignmentpolice.checker.RuleViolationType
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFArea
+import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFDocument
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFRegion
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFRegion.Companion.EVERYWHERE
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFRegion.Companion.NOWHERE
@@ -18,6 +19,7 @@ fun CharSequence.indicesOf(input: String): List<Int> =
 
 class SymbolRuleBuilder {
 	private var symbol: Char = ' '
+	private var ruleBody = { symbol: Char, document: PDFDocument, line: Int, neighbors: List<Char>, requiredNeighbors: MutableList<Char>, disallowedNeighbors: MutableList<Char> -> false}
 	private var ignoredNeighbors: MutableList<Char> = mutableListOf()
 	private var notIgnoredNeighbors: MutableList<Char> = mutableListOf()
 	private var ignoredIndexes: MutableList<Int> = mutableListOf()
@@ -50,6 +52,17 @@ class SymbolRuleBuilder {
 	fun fromLeft() = this.also { direction = Direction.LEFT }
 
 	fun fromRight() = this.also { direction = Direction.RIGHT }
+	fun setBasikRuleBody() = this.also {
+		this.ruleBody =
+			{ symbol: Char, document: PDFDocument, line: Int, neighbors: List<Char>, requiredNeighbors: MutableList<Char>, disallowedNeighbors: MutableList<Char> ->
+				neighbors.any { disallowedNeighbors.contains(it) } ||
+						(requiredNeighbors.isNotEmpty() && (neighbors.isEmpty() || neighbors.any {
+							!requiredNeighbors.contains(it)
+						}))
+			}
+	}
+	fun setRuleBody(deliveredRuleBody: ( symbol: Char, document: PDFDocument, line: Int, neighbors: List<Char>, requiredNeighbors: MutableList<Char>, disallowedNeighbors: MutableList<Char>) -> Boolean) =
+		this.also { this.ruleBody = deliveredRuleBody }
 
 	fun fromBothSides() = this.also { direction = Direction.BIDIRECTIONAL }
 
@@ -65,6 +78,7 @@ class SymbolRuleBuilder {
 
 	fun getRule() = BasicSymbolRule(
 		symbol,
+		ruleBody,
 		ignoredNeighbors,
 		notIgnoredNeighbors,
 		ignoredIndexes,

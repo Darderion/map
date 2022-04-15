@@ -11,6 +11,7 @@ import com.github.darderion.mundaneassignmentpolice.checker.rule.word.WordRule
 import com.github.darderion.mundaneassignmentpolice.checker.rule.word.WordRuleBuilder
 import com.github.darderion.mundaneassignmentpolice.checker.rule.word.or
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFArea
+import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFDocument
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFRegion
 import com.github.darderion.mundaneassignmentpolice.utils.URLUtil
 import java.util.*
@@ -31,6 +32,7 @@ val RULE_LITLINK = SymbolRuleBuilder()
 	.shouldNotHaveNeighbor(*"[]".toCharArray())
 	//.called("Symbol '?' in litlink")
 	.called("Символ ? в ссылке на литературу")
+	.setBasikRuleBody()
 	.getRule()
 
 val shortDash = '-'
@@ -45,6 +47,7 @@ val shortDashRules = SymbolRuleBuilder()
 	.shouldHaveNeighbor(*numbers.toCharArray())
 	//.called("Incorrect usage of '-' symbol")
 	.called("Неправильное использование дефиса")
+	.setBasikRuleBody()
 	.inArea(PDFRegion.EVERYWHERE.except(PDFArea.BIBLIOGRAPHY, PDFArea.FOOTNOTE))
 
 val RULE_SHORT_DASH = shortDashRules.getRule() and (
@@ -62,6 +65,7 @@ val RULE_MEDIUM_DASH = SymbolRuleBuilder()
 	//.called("Incorrect usage of '--' symbol")
 	.called("Неправильное использование короткого тире")
 	.inArea(PDFRegion.EVERYWHERE.except(PDFArea.BIBLIOGRAPHY, PDFArea.FOOTNOTE))
+	.setBasikRuleBody()
 	.ignoringIfIndex(0)
 	.getRule()
 
@@ -74,10 +78,12 @@ val RULE_LONG_DASH = SymbolRuleBuilder()
 	//.called("Incorrect usage of '---' symbol")
 	.called("Неправильное использование длинного тире")
 	.inArea(PDFRegion.EVERYWHERE.except(PDFArea.BIBLIOGRAPHY, PDFArea.FOOTNOTE))
+	.setBasikRuleBody()
 	.getRule() and SymbolRuleBuilder()
 	.symbol(longDash)
 	.shouldHaveNeighbor(' ')
 	.inArea(PDFRegion.EVERYWHERE.except(PDFArea.BIBLIOGRAPHY, PDFArea.FOOTNOTE))
+	.setBasikRuleBody()
 	.getRule()
 
 val closingQuote = '”'
@@ -89,6 +95,7 @@ val RULE_CLOSING_QUOTATION = SymbolRuleBuilder()
 	.fromLeft().shouldHaveNeighbor(openingQuote)
 	.inNeighborhood(20)
 	.called("Неправильное использование закрывающей кавычки")
+	.setBasikRuleBody()
 	.getRule()
 
 val RULE_OPENING_QUOTATION = SymbolRuleBuilder()
@@ -97,6 +104,7 @@ val RULE_OPENING_QUOTATION = SymbolRuleBuilder()
 	.fromRight().shouldHaveNeighbor(closingQuote)
 	.inNeighborhood(20)
 	.called("Неправильное использование открывающей кавычки")
+	.setBasikRuleBody()
 	.getRule()
 
 const val squareClosingBracket = ']'
@@ -107,6 +115,7 @@ val RULE_MULTIPLE_LITLINKS = SymbolRuleBuilder()
 	.ignoringAdjusting(' ', ',')
 	.fromRight().shouldNotHaveNeighbor(squareOpeningBracket)
 	.called("Неправильное оформление нескольких ссылок")
+	.setBasikRuleBody()
 	.getRule()
 
 const val bracket = '('
@@ -117,6 +126,7 @@ val RULE_BRACKETS_LETTERS = SymbolRuleBuilder()
 	.fromRight().shouldNotHaveNeighbor(*rusCapitalLetters.toCharArray())
 	.called("Большая русская буква после скобки")
 	.type(RuleViolationType.Warning)
+	.setBasikRuleBody()
 	.getRule()
 
 private const val openingBrackets = "([{<"
@@ -133,12 +143,14 @@ private val spaceAroundBracketsRuleBuilders = List(2) { SymbolRuleBuilder() }
 		// and this rule should look for after closing brackets
 		last().fromRight()
 			.ignoringAdjusting(*"$punctuationSymbols$closingQuotes$closingBrackets".toCharArray())
+			.setBasikRuleBody()
 	}
 
 // For case when round brackets are empty: "function()"
 private val openingRoundBracketExceptionalRule = SymbolRuleBuilder()
 	.symbol('(')
 	.fromRight().shouldHaveNeighbor(')')
+	.setBasikRuleBody()
 	.getRule()
 
 val RULES_SPACE_AROUND_BRACKETS = spaceAroundBracketsRuleBuilders
@@ -154,8 +166,21 @@ val RULE_CITATION = SymbolRuleBuilder()
 	.symbol('[')
 	.ignoringAdjusting(' ', '\n')
 	.fromLeft().shouldNotHaveNeighbor('.')
-	.called("Некорректное цитирование")
+	.called("Некорректное" +
+			" цитирование")
 	.inArea(PDFArea.SECTION)
+	.setBasikRuleBody()
+	.getRule()
+
+val RULE_SYMBOL_OUTSIDE_FIELDS = SymbolRuleBuilder()
+	.inArea(PDFRegion.EVERYWHERE.except(PDFArea.TABLE_OF_CONTENT,PDFArea.TITLE_PAGE))
+	.called("Символ находится за полями")
+	.setRuleBody { symbol: Char, document: PDFDocument, line: Int, neighbors: List<Char>, requiredNeighbors: MutableList<Char>, disallowedNeighbors: MutableList<Char> ->
+		if (document.text[line].text.last().position.x > 580.22) {
+			return@setRuleBody true
+		}
+		return@setRuleBody false
+	}
 	.getRule()
 
 val RULE_SINGLE_SUBSECTION = ListRuleBuilder()

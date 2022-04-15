@@ -16,6 +16,7 @@ import kotlin.reflect.jvm.internal.impl.utils.DFS.Neighbors
  */
 class BasicSymbolRule(
 	symbol: Char,
+	override val ruleBody: (symbol: Char, document: PDFDocument, line: Int, neighbors: List<Char>, requiredNeighbors: MutableList<Char>, disallowedNeighbors: MutableList<Char>) -> Boolean,
 	private val ignoredNeighbors: MutableList<Char>,
 	private val notIgnoredNeighbors: MutableList<Char>,
 	private val ignoredIndexes: MutableList<Int>,
@@ -26,8 +27,8 @@ class BasicSymbolRule(
 	type: RuleViolationType,
 	area: PDFRegion,
 	name: String
-): SymbolRule(symbol, type, area, name) {
-	override fun isViolated(document: PDFDocument, line: Int, index: Int): Boolean {
+): SymbolRule(symbol, ruleBody, type, area, name) {
+	override fun isViolated(document: PDFDocument, line: Int, index: Int, ruleBody: (symbol: Char, document: PDFDocument, line: Int, neighbors: List<Char>, requiredNeighbors: MutableList<Char>, disallowedNeighbors: MutableList<Char>) -> Boolean): Boolean {
 		if (!ignoredIndexes.contains(index)) {
 			val symbolIndex = index + document.getTextFromLines(line - neighborhoodSize, line - 1, area).length +
 					2 * line.coerceAtMost(1).coerceAtMost(neighborhoodSize)
@@ -49,11 +50,8 @@ class BasicSymbolRule(
 				.map { it.filterNot { ignoredNeighbors.contains(it) } })    // Remove ignored symbols
 				.filter { it.isNotEmpty() }                                // Remove empty lines
 				.map { it.first() }
+		return ruleBody(symbol,document,line,neighbors,requiredNeighbors,disallowedNeighbors)
 
-			if (neighbors.any { disallowedNeighbors.contains(it) } ||
-				(requiredNeighbors.isNotEmpty() && (neighbors.isEmpty() || neighbors.any { !requiredNeighbors.contains(it) }))) {
-				return true
-			}
 		}
 		return false
 	}

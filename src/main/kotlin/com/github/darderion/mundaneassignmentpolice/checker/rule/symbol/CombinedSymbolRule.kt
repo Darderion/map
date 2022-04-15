@@ -19,11 +19,12 @@ class CombinedSymbolRule(
 	private val predicateType: PredicateType
 ): SymbolRule(
 	rules.first().symbol,
+	rules.first().ruleBody,
 	rules.first().type,
 	rules.first().area,
 	rules.first().name
 ) {
-	override fun isViolated(document: PDFDocument, line: Int, index: Int) = rules.map { it.isViolated(document, line, index) }.reduce {
+	override fun isViolated(document: PDFDocument, line: Int, index: Int,ruleBody: (symbol: Char, document: PDFDocument, line: Int, neighbors: List<Char>, requiredNeighbors: MutableList<Char>, disallowedNeighbors: MutableList<Char>) -> Boolean) = rules.map { it.isViolated(document, line, index,ruleBody) }.reduce {
 			acc, ruleViolation ->
 		when(predicateType) {
 			AND -> acc || ruleViolation
