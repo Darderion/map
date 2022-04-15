@@ -51,6 +51,10 @@ class RulesTests : StringSpec({
 	"Regex rule should detect incorrect order of literature references"{
 		RULE_ORDER_OF_REFERENCES.process(PDFBox().getPDF(filePathOrderOfReferences)).count() shouldBeExactly 3
 	}
+	"Formula punctuation rules should detect the absence of a full stop or a comma after a formula"{
+		fullStopAfterFormulaRule.process(PDFBox().getPDF(filePathFormulaPunctuation)).count() shouldBeExactly 3
+		commaAfterFormulaRule.process(PDFBox().getPDF(filePathFormulaPunctuation)).count() shouldBeExactly 3
+	}
 }) {
 	companion object {
 		const val filePathQuestionMarkAndDashes =
@@ -63,10 +67,12 @@ class RulesTests : StringSpec({
 		const val filePathSpaceAroundBrackets =
 			"${TestsConfiguration.resourceFolder}checker/SymbolRuleTestsSpaceAroundBrackets.pdf"
 		const val filePathCitation = "${TestsConfiguration.resourceFolder}checker/SymbolRuleTestsCitation.pdf"
-		const val filePathShortenedUrls = "${TestsConfiguration.resourceFolder}checker/URLRuleShortenedUrls.pdf"
+		const val filePathShortenedUrls = "${TestsConfiguration.resourceFolder}checker/URLRuleTestsShortenedUrls.pdf"
 		const val filePathSymbolsInSectionNames =
 			"${TestsConfiguration.resourceFolder}checker/RulesTestsSymbolsInSectionNames.pdf"
 		const val filePathOrderOfReferences =
 			"${TestsConfiguration.resourceFolder}checker/RegexRuleTestsOrderOfReferences.pdf"
+		const val filePathFormulaPunctuation =
+			"${TestsConfiguration.resourceFolder}checker/FormulaRuleTestsFormulaPunctuation.pdf"
 	}
 }

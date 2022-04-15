@@ -267,21 +267,26 @@ val RULE_ORDER_OF_REFERENCES = RegexRuleBuilder()
 		}.map { it.second }
 	}.getRule()
 
-private val ignoringSymbolsAfterFormula = " \n($numbers)"
+private val ignoringAfterFormula = listOf(
+	"""\s""".toRegex(),
+	"""\([0-9]+\)""".toRegex()  // ignore formula reference
+)
 
 val fullStopAfterFormulaRule = FormulaPunctuationRuleBuilder()
 	.called("Отсутствует точка после формулы")
 	.requiredPunctuationMark(PunctuationMark.FULL_STOP)
+	// if after a formula there is a capitalized word that indicates the beginning of a new sentence
 	.indicatorWords("""[A-ZА-Я].*?""".toRegex())
+	// if no sentence after a formula
 	.indicatorWords("""$""".toRegex())
-	.ignoringAdjusting(*ignoringSymbolsAfterFormula.toCharArray())
+	.ignoredWords(*ignoringAfterFormula.toTypedArray())
 	.getRule()
 
 val commaAfterFormulaRule = FormulaPunctuationRuleBuilder()
 	.called("Отсутствует запятая после формулы")
 	.requiredPunctuationMark(PunctuationMark.COMMA)
 	.indicatorWords("""где""".toRegex())
-	.ignoringAdjusting(*ignoringSymbolsAfterFormula.toCharArray())
+	.ignoredWords(*ignoringAfterFormula.toTypedArray())
 	.getRule()
 
 val RULES_FORMULA_PUNCTUATION = listOf(fullStopAfterFormulaRule, commaAfterFormulaRule)

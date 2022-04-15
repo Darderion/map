@@ -8,7 +8,7 @@ class FormulaPunctuationRuleBuilder {
     private var name: String = "Rule name"
     private var punctuationMark: PunctuationMark = PunctuationMark.FULL_STOP
     private var indicatorWords: MutableList<Regex> = mutableListOf()
-    private var ignoredSymbols: MutableList<Char> = mutableListOf()
+    private var ignoredWords: MutableList<Regex> = mutableListOf()
 
     infix fun called(name: String) = this.also { this.name = name }
 
@@ -20,13 +20,13 @@ class FormulaPunctuationRuleBuilder {
 
     fun indicatorWords(vararg words: Regex) = this.also { indicatorWords.addAll(words.toList()) }
 
-    fun ignoringAdjusting(vararg symbols: Char) = this.also { ignoredSymbols.addAll(symbols.toList()) }
+    fun ignoredWords(vararg symbols: Regex) = this.also { ignoredWords.addAll(symbols.toList()) }
 
     fun getRule() = FormulaPunctuationRule(
         type,
         name,
         punctuationMark,
         indicatorWords,
-        ignoredSymbols
+        ignoredWords
     ) as FormulaRule
 }

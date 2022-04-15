@@ -22,10 +22,11 @@ abstract class FormulaRule(
         val rulesViolations = mutableListOf<RuleViolation>()
         val formulas = getAllFormulas(document)
 
-        formulas.forEach {
-            val linesOfViolation = getLinesOfViolation(document, it)
-            if (linesOfViolation.isNotEmpty()) {
-                rulesViolations.add(RuleViolation(linesOfViolation, name, type))
+        formulas.forEach { formula ->
+            getLinesOfViolation(document, formula).let {
+                if (it.isNotEmpty()) {
+                    rulesViolations.add(RuleViolation(it, name, type))
+                }
             }
         }
 

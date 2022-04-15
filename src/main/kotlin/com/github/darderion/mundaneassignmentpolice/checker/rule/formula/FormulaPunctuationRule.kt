@@ -4,6 +4,7 @@ import com.github.darderion.mundaneassignmentpolice.checker.PunctuationMark
 import com.github.darderion.mundaneassignmentpolice.checker.RuleViolationType
 import com.github.darderion.mundaneassignmentpolice.checker.isPunctuationMark
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFDocument
+import com.github.darderion.mundaneassignmentpolice.pdfdocument.inside
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Formula
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Line
 
@@ -12,35 +13,36 @@ class FormulaPunctuationRule(
     name: String,
     val expectedPunctuationMark: PunctuationMark,
     val indicatorWords: List<Regex>,
-    val ignoredSymbols: List<Char>
+    val ignoredWords: List<Regex>
 ) : FormulaRule(type, name) {
     override fun getLinesOfViolation(document: PDFDocument, formula: Formula): List<Line> {
-        var textAfterFormula = formula.lines.last().text.takeLastWhile { it != formula.text.last() }
-            .joinToString("") { it.text } + " "
+        val textAfterFormula = formula.lines.last().text
+            .takeLastWhile { it != formula.text.last() }
+            .toMutableList()
 
-        textAfterFormula +=
-            document.getLines(formula.lines.last().documentIndex + 1, 2, area)
-                .joinToString(" ") { it.content }
+        textAfterFormula.addAll(
+            document.text.asSequence().drop(formula.lines.last().documentIndex + 1)
+                .filter { it.area!! inside area && it.isNotEmpty() }
+                .take(2) // take a line with formula reference and a line with words after the formula
+                .map { it.text }.flatten()
+        )
 
-        val lastFormulaSymbol = formula.text.last().text.last()
-        val firstSymbolAfterFormula = textAfterFormula[0]
+        val filteredText = textAfterFormula.filterNot { word -> ignoredWords.any { it.matches(word.text) } }
 
-        val actualPunctuation = when {
-            lastFormulaSymbol.isPunctuationMark() -> lastFormulaSymbol
-            firstSymbolAfterFormula.isPunctuationMark() -> {
-                textAfterFormula = textAfterFormula.drop(1)
-                firstSymbolAfterFormula
-            }
-            else -> ' '
+        val isExpectedSymbolMissing = listOf(
+            formula.text.last().text.last(),   // if a punctuation mark is at the end of the formula
+            filteredText.getOrNull(0)?.text?.first()
+        ).none { it == expectedPunctuationMark.value }
+
+        val wordAfterFormula = when {
+            filteredText.isEmpty() -> ""
+            filteredText.first().text.first().isPunctuationMark() ->
+                filteredText.getOrNull(1)?.text ?: ""
+            else -> filteredText.first().text
         }
 
-        val firstWordAfterFormula = textAfterFormula.filterNot { ignoredSymbols.contains(it) }
-            .split(" ").first()
-
-        if (indicatorWords.any { regex -> regex.matches(firstWordAfterFormula) }) {
-            if (expectedPunctuationMark.value != actualPunctuation) {
-                return listOf(formula.lines.last())
-            }
+        if (indicatorWords.any { regex -> regex.matches(wordAfterFormula) } && isExpectedSymbolMissing) {
+            return listOf(formula.lines.last())
         }
 
         return emptyList()
