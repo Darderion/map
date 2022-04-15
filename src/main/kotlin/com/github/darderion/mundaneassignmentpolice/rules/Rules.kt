@@ -65,6 +65,17 @@ val RULE_MEDIUM_DASH = SymbolRuleBuilder()
 	.ignoringIfIndex(0)
 	.getRule()
 
+val RULE_TWO_IDENTICAL_WORDS = WordRuleBuilder()
+	.inArea(PDFRegion.EVERYWHERE.except(PDFArea.TABLE_OF_CONTENT))
+	.called("Два одинаковых слова подряд")
+	.setRuleBody { neighbors : List<String>, requiredNeighbors: MutableList<Regex>, disallowedNeighbors: MutableList<Regex> ->
+		if (neighbors[0] == neighbors[1] && neighbors[0].first().isLetter()) {
+			return@setRuleBody true
+		}
+		return@setRuleBody false
+	}
+	.getRule()
+
 val longDash = '—'
 
 val RULE_LONG_DASH = SymbolRuleBuilder()
@@ -208,6 +219,18 @@ val smallNumbersRuleBuilder1 = WordRuleBuilder()		//for nearest words
 	.called(smallNumbersRuleName)
 	.inArea(smallNumbersRuleArea)
 	.ignoringAdjusting(Regex("""\s"""), Regex("""\."""))
+	.setRuleBody{ neighbors : List<String>, requiredNeighbors: MutableList<Regex>, disallowedNeighbors: MutableList<Regex> ->
+		if (neighbors.any { word ->
+				disallowedNeighbors.any { regex -> regex.matches(word) }
+			} ||
+			(requiredNeighbors.isNotEmpty() && (neighbors.isEmpty() ||
+					neighbors.any { word ->
+						!requiredNeighbors.any { regex -> regex.matches(word) }
+					}))) {
+			return@setRuleBody true
+		}
+		return@setRuleBody false
+	}
 	.ignoringIfIndex(0)
 
 val smallNumbersRuleBuilder2 = WordRuleBuilder()		//for decimal fractions and version numbers
@@ -215,6 +238,18 @@ val smallNumbersRuleBuilder2 = WordRuleBuilder()		//for decimal fractions and ve
 	.inArea(smallNumbersRuleArea)
 	.shouldHaveNeighbor(Regex("""\."""), Regex(""","""),
 		Regex("""[0-9]+"""))
+	.setRuleBody{ neighbors : List<String>, requiredNeighbors: MutableList<Regex>, disallowedNeighbors: MutableList<Regex> ->
+		if (neighbors.any { word ->
+				disallowedNeighbors.any { regex -> regex.matches(word) }
+			} ||
+			(requiredNeighbors.isNotEmpty() && (neighbors.isEmpty() ||
+					neighbors.any { word ->
+						!requiredNeighbors.any { regex -> regex.matches(word) }
+					}))) {
+			return@setRuleBody true
+		}
+		return@setRuleBody false
+	}
 	.shouldHaveNumberOfNeighbors(2)
 
 val smallNumbersRuleBuilder3 = WordRuleBuilder()		//for links
@@ -223,6 +258,18 @@ val smallNumbersRuleBuilder3 = WordRuleBuilder()		//for links
 	.fromLeft()
 	.ignoringWords(true)
 	.ignoringAdjusting(Regex(""","""), Regex("""\s"""))
+	.setRuleBody{ neighbors : List<String>, requiredNeighbors: MutableList<Regex>, disallowedNeighbors: MutableList<Regex> ->
+		if (neighbors.any { word ->
+				disallowedNeighbors.any { regex -> regex.matches(word) }
+			} ||
+			(requiredNeighbors.isNotEmpty() && (neighbors.isEmpty() ||
+					neighbors.any { word ->
+						!requiredNeighbors.any { regex -> regex.matches(word) }
+					}))) {
+			return@setRuleBody true
+		}
+		return@setRuleBody false
+	}
 	.shouldHaveNeighbor(Regex("""\["""))
 
 val RULES_SMALL_NUMBERS = List<WordRule>(9) { index ->

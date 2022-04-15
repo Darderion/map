@@ -17,11 +17,13 @@ class BasicWordRule(
 	private val direction: Direction,
 	private val neighborhoodSize: Int,
 	private val numberOfNeighbors: Int,
+	override val ruleBody: (neighbors: List<String>, requiredNeighbors: MutableList<Regex>, disallowedNeighbors: MutableList<Regex>) -> Boolean,
 	type: RuleViolationType,
 	area: PDFRegion,
 	name: String
-) : WordRule(word, type, area, name) {
-	override fun isViolated(document: PDFDocument, line: Int, index: Int): Boolean {
+) : WordRule(word, ruleBody, type, area, name) {
+	override fun isViolated(document: PDFDocument, line: Int, index: Int, ruleBody: (neighbors: List<String>, requiredNeighbors: MutableList<Regex>, disallowedNeighbors: MutableList<Regex>) -> Boolean
+	): Boolean {
 		if (!ignoredIndexes.contains(index)) {
 			val wordIndex = index + splitToWordsAndPunctuations(
 				document.getTextFromLines(line - neighborhoodSize, line - 1, area)
@@ -53,15 +55,7 @@ class BasicWordRule(
 				.map { it.slice(IntRange(0, numberOfNeighbors - 1)) }
 				.flatten()
 
-			if (neighbors.any { word ->
-					disallowedNeighbors.any { regex -> regex.matches(word) }
-				} ||
-				(requiredNeighbors.isNotEmpty() && (neighbors.isEmpty() ||
-						neighbors.any { word ->
-							!requiredNeighbors.any { regex -> regex.matches(word) }
-						}))) {
-				return true
-			}
+			return ruleBody(neighbors,requiredNeighbors,disallowedNeighbors)
 		}
 		return false
 	}

@@ -19,12 +19,13 @@ class CombinedWordRule(
 	private val predicateType: PredicateType
 ) : WordRule(
 	rules.first().word,
+	rules.first().ruleBody,
 	rules.first().type,
 	rules.first().area,
 	rules.first().name
 ) {
-	override fun isViolated(document: PDFDocument, line: Int, index: Int) =
-		rules.map { it.isViolated(document, line, index) }.reduce { acc, ruleViolation ->
+	override fun isViolated(document: PDFDocument, line: Int, index: Int, ruleBody :(neighbors:List<String>, requiredNeighbors: MutableList<Regex>, disallowedNeighbors: MutableList<Regex>) -> Boolean) =
+		rules.map { it.isViolated(document, line, index,ruleBody)}.reduce { acc, ruleViolation ->
 			when (predicateType) {
 				AND -> acc || ruleViolation
 				OR -> acc && ruleViolation
