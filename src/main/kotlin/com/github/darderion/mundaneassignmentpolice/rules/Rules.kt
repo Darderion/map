@@ -14,6 +14,7 @@ import com.github.darderion.mundaneassignmentpolice.checker.rule.word.or
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFArea
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFRegion
 import com.github.darderion.mundaneassignmentpolice.utils.InvalidOperationException
+import com.github.darderion.mundaneassignmentpolice.utils.LowQualityConferencesUtil
 import com.github.darderion.mundaneassignmentpolice.utils.URLUtil
 import java.util.*
 
@@ -291,5 +292,20 @@ val RULE_VARIOUS_ABBREVIATIONS = RegexRuleBuilder()
 				allWords[word.lowercase()]?.size!! > 1
 			else
 				false
+		}.map { it.second }
+	}.getRule()
+
+val RULE_LOW_QUALITY_CONFERENCES = URLRuleBuilder()
+	.called("Ссылка на низкокачественную конференцию")
+	.inArea(PDFArea.BIBLIOGRAPHY)
+	.disallow { urls ->
+		val lowQualityConferencesList = LowQualityConferencesUtil.getList()
+			.map {
+				it.removePrefix("http://").removePrefix("https://")
+			}
+		urls.filter { pair ->
+			val url = pair.first
+			lowQualityConferencesList
+				.any { conference -> url.contains(conference) }
 		}.map { it.second }
 	}.getRule()
