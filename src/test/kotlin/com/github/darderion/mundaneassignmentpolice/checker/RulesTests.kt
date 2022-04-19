@@ -54,6 +54,9 @@ class RulesTests : StringSpec({
 	"Regex rule should detect using different versions of the abbreviation"{
 		RULE_VARIOUS_ABBREVIATIONS.process(PDFBox().getPDF(filePathVariousAbbreviations)).count() shouldBeExactly 8
 	}
+	"URLRule should detect links to low quality conferences" {
+		RULE_LOW_QUALITY_CONFERENCES.process(PDFBox().getPDF(filePathLowQualityConferences)).count() shouldBeExactly 3
+	}
 }) {
 	companion object {
 		const val filePathQuestionMarkAndDashes =
@@ -73,5 +76,7 @@ class RulesTests : StringSpec({
 			"${TestsConfiguration.resourceFolder}checker/RegexRuleTestsOrderOfReferences.pdf"
 		const val filePathVariousAbbreviations =
 			"${TestsConfiguration.resourceFolder}checker/RegexRuleTestsVariousAbbreviations.pdf"
+		const val filePathLowQualityConferences =
+			"${TestsConfiguration.resourceFolder}checker/URLRuleTestsLowQualityConferences.pdf"
 	}
 }
