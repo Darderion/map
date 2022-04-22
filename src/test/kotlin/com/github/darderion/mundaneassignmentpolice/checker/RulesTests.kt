@@ -48,6 +48,8 @@ class RulesTests : StringSpec({
 	"Rule should detect incorrect symbols in section names" {
 		RULE_SYMBOLS_IN_SECTION_NAMES.process(PDFBox().getPDF(filePathSymbolsInSectionNames)).count() shouldBeExactly 4
 	}
+	"Rule should detect links of different types" {
+		RULE_URLS_UNIFORMITY.process(PDFBox().getPDF(filePathUniformityUrls)).count() shouldBeExactly 2
 	"Regex rule should detect incorrect order of literature references"{
 		RULE_ORDER_OF_REFERENCES.process(PDFBox().getPDF(filePathOrderOfReferences)).count() shouldBeExactly 3
 	}
@@ -70,6 +72,8 @@ class RulesTests : StringSpec({
 			"${TestsConfiguration.resourceFolder}checker/SymbolRuleTestsSpaceAroundBrackets.pdf"
 		const val filePathCitation = "${TestsConfiguration.resourceFolder}checker/SymbolRuleTestsCitation.pdf"
 		const val filePathShortenedUrls = "${TestsConfiguration.resourceFolder}checker/URLRuleShortenedUrls.pdf"
+		const val filePathSymbolsInSectionNames = "${TestsConfiguration.resourceFolder}checker/RulesTestsSymbolsInSectionNames.pdf"
+		const val filePathUniformityUrls = "${TestsConfiguration.resourceFolder}checker/URLRuleUniformityURL.pdf"
 		const val filePathSymbolsInSectionNames =
 			"${TestsConfiguration.resourceFolder}checker/RulesTestsSymbolsInSectionNames.pdf"
 		const val filePathOrderOfReferences =
