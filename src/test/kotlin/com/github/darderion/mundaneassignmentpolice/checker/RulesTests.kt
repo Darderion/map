@@ -50,11 +50,17 @@ class RulesTests : StringSpec({
 	"Rule should detect incorrect symbols in section names" {
 		RULE_SYMBOLS_IN_SECTION_NAMES.process(PDFBox().getPDF(filePathSymbolsInSectionNames)).count() shouldBeExactly 4
 	}
+	"Rule should detect links of different types" {
+		RULE_URLS_UNIFORMITY.process(PDFBox().getPDF(filePathUniformityUrls)).count() shouldBeExactly 2
+	}
 	"Regex rule should detect incorrect order of literature references"{
 		RULE_ORDER_OF_REFERENCES.process(PDFBox().getPDF(filePathOrderOfReferences)).count() shouldBeExactly 3
 	}
 	"Regex rule should detect using different versions of the abbreviation"{
 		RULE_VARIOUS_ABBREVIATIONS.process(PDFBox().getPDF(filePathVariousAbbreviations)).count() shouldBeExactly 8
+	}
+	"Table of content rule should detect incorrect order of sections"{
+		RULE_SECTIONS_ORDER.process(PDFBox().getPDF(filePathOrderOfSections)).count() shouldBeExactly 5
 	}
 	"Section rules should detect sections whose size exceeds specified limit" {
 		val introductionSizeRule = RULES_SECTION_SIZE.first { it.sectionName == SectionName.INTRO }
@@ -86,12 +92,15 @@ class RulesTests : StringSpec({
 			"${TestsConfiguration.resourceFolder}checker/SymbolRuleTestsSpaceAroundBrackets.pdf"
 		const val filePathCitation = "${TestsConfiguration.resourceFolder}checker/SymbolRuleTestsCitation.pdf"
 		const val filePathShortenedUrls = "${TestsConfiguration.resourceFolder}checker/URLRuleShortenedUrls.pdf"
+		const val filePathUniformityUrls = "${TestsConfiguration.resourceFolder}checker/URLRuleUniformityURL.pdf"
 		const val filePathSymbolsInSectionNames =
 			"${TestsConfiguration.resourceFolder}checker/RulesTestsSymbolsInSectionNames.pdf"
 		const val filePathOrderOfReferences =
 			"${TestsConfiguration.resourceFolder}checker/RegexRuleTestsOrderOfReferences.pdf"
 		const val filePathVariousAbbreviations =
 			"${TestsConfiguration.resourceFolder}checker/RegexRuleTestsVariousAbbreviations.pdf"
+		const val filePathOrderOfSections =
+			"${TestsConfiguration.resourceFolder}checker/TableOfContentRuleTestsSectionsOrder.pdf"
 
 		const val filePathIntroductionSize =
 			"${TestsConfiguration.resourceFolder}checker/SectionRuleTestsIntroductionSize.pdf"
