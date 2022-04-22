@@ -1,13 +1,13 @@
-package com.github.darderion.mundaneassignmentpolice.checker.rule.section.size
+package com.github.darderion.mundaneassignmentpolice.checker.rule.section
 
 import com.github.darderion.mundaneassignmentpolice.checker.RuleViolationType
-import com.github.darderion.mundaneassignmentpolice.checker.rule.section.SectionName
-import com.github.darderion.mundaneassignmentpolice.checker.rule.section.SectionRule
-import com.github.darderion.mundaneassignmentpolice.checker.rule.section.size.ComparisonType.*
+import com.github.darderion.mundaneassignmentpolice.checker.SectionName
+import com.github.darderion.mundaneassignmentpolice.utils.comparator.ComparisonType
+import com.github.darderion.mundaneassignmentpolice.utils.comparator.ComparisonType.*
 
 class SectionSizeRuleBuilder {
     private var ruleName: String = "Rule name"
-    private var type: RuleViolationType = RuleViolationType.Warning
+    private var type: RuleViolationType = RuleViolationType.Error
     private var sectionName: SectionName = SectionName.values().first()
     private var pageLimit: Int? = null
     private var percentageLimit: Number? = null

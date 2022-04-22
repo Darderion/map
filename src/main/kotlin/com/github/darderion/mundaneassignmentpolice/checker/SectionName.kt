@@ -1,6 +1,6 @@
 package com.github.darderion.mundaneassignmentpolice.checker
 
-enum class Section(val title: String) {
+enum class SectionName(val title: String) {
 	TABLE_OF_CONTENT("Оглавление"),
 	INTRODUCTION("Введение"),
 	PROBLEM_STATEMENT("Постановка задачи"),

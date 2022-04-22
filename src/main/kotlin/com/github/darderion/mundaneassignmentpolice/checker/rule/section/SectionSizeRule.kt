@@ -1,15 +1,13 @@
-package com.github.darderion.mundaneassignmentpolice.checker.rule.section.size
+package com.github.darderion.mundaneassignmentpolice.checker.rule.section
 
 import com.github.darderion.mundaneassignmentpolice.checker.RuleViolationType
-import com.github.darderion.mundaneassignmentpolice.checker.rule.section.SectionName
-import com.github.darderion.mundaneassignmentpolice.checker.rule.section.SectionRule
-import com.github.darderion.mundaneassignmentpolice.checker.rule.section.size.ComparisonType.*
+import com.github.darderion.mundaneassignmentpolice.checker.SectionName
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFArea
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFDocument
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Section
+import com.github.darderion.mundaneassignmentpolice.utils.comparator.Comparator
+import com.github.darderion.mundaneassignmentpolice.utils.comparator.ComparisonType
 import com.github.darderion.mundaneassignmentpolice.utils.floatEquals
-import com.github.darderion.mundaneassignmentpolice.utils.greaterOrEqual
-import com.github.darderion.mundaneassignmentpolice.utils.lessOrEqual
 
 class SectionSizeRule(
     name: String,
@@ -57,32 +55,11 @@ class SectionSizeRule(
         var isViolatedPercentageLimit = false
         val percentage = sectionSize.toFloat() / totalPages * 100
 
-        when (comparisonType) {
-            LESS_THAN -> {
-                pageLimit?.let { isViolatedPageLimit = sectionSize >= it }
-                percentageLimit?.toFloat()?.let { isViolatedPercentageLimit = percentage.greaterOrEqual(it) }
-            }
-            LESS_THAN_OR_EQUAL -> {
-                pageLimit?.let { isViolatedPageLimit = sectionSize > it }
-                percentageLimit?.toFloat()?.let { isViolatedPercentageLimit = percentage > it }
-            }
-            EQUAL -> {
-                pageLimit?.let { isViolatedPageLimit = sectionSize != it }
-                percentageLimit?.toFloat()?.let { isViolatedPercentageLimit = !floatEquals(percentage, it) }
-            }
-            NOT_EQUAL -> {
-                pageLimit?.let { isViolatedPageLimit = sectionSize == it }
-                percentageLimit?.toFloat()?.let { isViolatedPercentageLimit = floatEquals(percentage, it) }
-            }
-            GREATER_THAN_OR_EQUAL -> {
-                pageLimit?.let { isViolatedPageLimit = sectionSize < it }
-                percentageLimit?.toFloat()?.let { isViolatedPercentageLimit = percentage < it }
-            }
-            GREATER_THAN -> {
-                pageLimit?.let { isViolatedPageLimit = sectionSize <= it }
-                percentageLimit?.toFloat()?.let { isViolatedPercentageLimit = percentage.lessOrEqual(it) }
-            }
+        pageLimit?.let { isViolatedPageLimit = !Comparator.compare(sectionSize, comparisonType, it) }
+        percentageLimit?.let {
+            isViolatedPercentageLimit = !Comparator.compare(percentage, comparisonType, it.toFloat(), ::floatEquals)
         }
+
         return isViolatedPageLimit || isViolatedPercentageLimit
     }
 }
