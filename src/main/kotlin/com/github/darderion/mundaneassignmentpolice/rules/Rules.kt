@@ -1,7 +1,9 @@
 package com.github.darderion.mundaneassignmentpolice.rules
 
 import com.github.darderion.mundaneassignmentpolice.checker.RuleViolationType
+import com.github.darderion.mundaneassignmentpolice.checker.Section
 import com.github.darderion.mundaneassignmentpolice.checker.rule.list.ListRuleBuilder
+import com.github.darderion.mundaneassignmentpolice.checker.rule.regex.RegexRuleBuilder
 import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.SymbolRuleBuilder
 import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.and
 import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.or
@@ -13,8 +15,10 @@ import com.github.darderion.mundaneassignmentpolice.checker.rule.word.or
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFArea
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFRegion
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Line
+import com.github.darderion.mundaneassignmentpolice.utils.InvalidOperationException
 import com.github.darderion.mundaneassignmentpolice.utils.URLUtil
 import java.util.*
+import kotlin.collections.HashSet
 
 private val enLetters = "abcdefghijklmnopqrstuvwxyz"
 private val enCapitalLetters = enLetters.uppercase(Locale.getDefault())
@@ -172,8 +176,9 @@ val RULE_TABLE_OF_CONTENT_NUMBERS = TableOfContentRuleBuilder()
 		it.filter {
 			// println("${it.text.count()} -> ${it.content}")
 			val text = it.text.filter { it.text.trim().isNotEmpty() }
-			((text.count() == 3 && (text[1].text == "Введение" || text[1].text == "Заключение")) ||
-					(text.count() == 4 && text[1].text == "Список" && text[2].text == "литературы"))
+			((text.count() == 3 && (text[1].text == Section.INTRODUCTION.title ||
+					text[1].text == Section.CONCLUSION.title)) ||
+					(text.count() == 4 && (text[1].text + " " + text[2].text) == Section.BIBLIOGRAPHY.title))
 		}
 	}.called("Введение, заключение и список литературы не нумеруются")
 	.getRule()
@@ -187,6 +192,49 @@ val RULE_SYMBOLS_IN_SECTION_NAMES = TableOfContentRuleBuilder()
 			text.contains("[:.,]".toRegex())
 		}
 	}.called("""Символы ":", ".", "," в названии секции""")
+	.getRule()
+
+val sectionsThatMayPrecedeThis = mapOf<String, HashSet<String>>(
+	Section.INTRODUCTION.title to hashSetOf(""),
+	Section.PROBLEM_STATEMENT.title to hashSetOf(Section.INTRODUCTION.title),
+	Section.REVIEW.title to hashSetOf(Section.PROBLEM_STATEMENT.title),
+	Section.CONTENT.title to hashSetOf(Section.REVIEW.title, Section.CONTENT.title),
+	Section.CONCLUSION.title to hashSetOf(Section.CONTENT.title),
+	Section.BIBLIOGRAPHY.title to hashSetOf(Section.CONCLUSION.title)
+)
+
+val RULE_SECTIONS_ORDER = TableOfContentRuleBuilder()
+	.disallow { listOfLines ->
+		var nameOfPreviousSection = ""
+		listOfLines
+			.filterNot { line ->
+				val words = line.text
+					.filter { it.text.trim().isNotEmpty() }
+					.filterNot { it.text.contains("[0-9]+\\.".toRegex()) }		// remove numbering
+				words.isEmpty() || words[0].text == Section.TABLE_OF_CONTENT.title
+			}
+			.filter { line ->
+				val words = line.text
+					.filter { it.text.trim().isNotEmpty() }
+					.filterNot { it.text.contains("[0-9]+\\.".toRegex()) }		// remove numbering
+
+				val sectionName =
+					if ((words[0].text + " " + words[1].text) == Section.BIBLIOGRAPHY.title ||
+						(words[0].text + " " + words[1].text) == Section.PROBLEM_STATEMENT.title
+					)
+						words[0].text + " " + words[1].text
+					else if (sectionsThatMayPrecedeThis.contains(words[0].text))
+						words[0].text
+					else
+						Section.CONTENT.title
+
+				val isRuleViolation =
+					!sectionsThatMayPrecedeThis[sectionName]!!.contains(nameOfPreviousSection)
+				nameOfPreviousSection = sectionName
+				isRuleViolation
+			}
+	}
+	.called("Неверный порядок секций")
 	.getRule()
 
 val smallNumbersRuleName = "Неправильное написание целых чисел от 1 до 9"
@@ -238,13 +286,14 @@ val RULES_SMALL_NUMBERS = List<WordRule>(9) { index ->
 
 val RULE_SHORTENED_URLS = URLRuleBuilder()
 	.called("Сокращённая ссылка")
+	.inArea(PDFRegion.NOWHERE.except(PDFArea.FOOTNOTE, PDFArea.BIBLIOGRAPHY))
 	.disallow { urls ->
 		urls.filter { pair ->
 			try {
 				var url = pair.first
 				if (!url.startsWith("http")) url = "https://$url"
 				URLUtil.isShortened(url)
-			} catch (_: Exception) {
+			} catch (_: InvalidOperationException) {
 				false
 			}
 		}.map { it.second }
@@ -270,4 +319,46 @@ val RULE_URLS_UNIFORMITY = URLRuleBuilder()
 			}
 		}
 		filteredUrls.map { it.second }
+	}.getRule()
+
+val RULE_ORDER_OF_REFERENCES = RegexRuleBuilder()
+	.called("Неверный порядок ссылок на литературу")
+	.regex(Regex("""\[[0-9,\s]+\]"""))
+	.searchIn(1)
+	.disallow { matches ->
+		matches.filter { pair ->
+			val references = pair.first
+			val referencesInIntList = references
+				.slice(IntRange(1, references.length - 2))
+				.split(Regex(""","""))
+				.map { it.trim() }
+				.filter { it.isNotEmpty() }
+				.map { it.toInt() }
+			referencesInIntList != referencesInIntList.sorted()
+		}.map { it.second }
+	}.getRule()
+
+val RULE_VARIOUS_ABBREVIATIONS = RegexRuleBuilder()
+	.called("Использованы различные версии сокращения")
+	.regex(Regex("""[a-zA-Zа-яА-Я]+"""))
+	.inArea(PDFRegion.EVERYWHERE.except(PDFArea.BIBLIOGRAPHY))
+	.disallow { matches ->
+		val abbreviations = hashSetOf<String>()
+		val allWords = hashMapOf<String, HashSet<String>>()
+		matches.forEach { pair ->
+			val word = pair.first
+			if (word.slice(IntRange(1, word.length - 1))
+					.count { it.isUpperCase() } > 0)
+				abbreviations.add(word.uppercase())
+			if (!allWords.containsKey(word.lowercase()))
+				allWords.put(word.lowercase(), hashSetOf())
+			allWords[word.lowercase()]?.add(word)
+		}
+		matches.filter { pair ->
+			val word = pair.first
+			if (abbreviations.contains(word.uppercase()))
+				allWords[word.lowercase()]?.size!! > 1
+			else
+				false
+		}.map { it.second }
 	}.getRule()
