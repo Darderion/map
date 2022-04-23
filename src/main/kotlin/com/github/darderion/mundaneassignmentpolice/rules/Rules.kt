@@ -14,11 +14,9 @@ import com.github.darderion.mundaneassignmentpolice.checker.rule.word.WordRuleBu
 import com.github.darderion.mundaneassignmentpolice.checker.rule.word.or
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFArea
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFRegion
-import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Line
 import com.github.darderion.mundaneassignmentpolice.utils.InvalidOperationException
 import com.github.darderion.mundaneassignmentpolice.utils.URLUtil
 import java.util.*
-import kotlin.collections.HashSet
 
 private val enLetters = "abcdefghijklmnopqrstuvwxyz"
 private val enCapitalLetters = enLetters.uppercase(Locale.getDefault())
@@ -291,7 +289,7 @@ val RULE_SHORTENED_URLS = URLRuleBuilder()
 		urls.filter { pair ->
 			try {
 				var url = pair.first
-				if (!url.startsWith("http")) url = "https://$url"
+				if (!url.startsWith("http")) url = "http://$url"
 				URLUtil.isShortened(url)
 			} catch (_: InvalidOperationException) {
 				false
@@ -302,7 +300,7 @@ val RULE_SHORTENED_URLS = URLRuleBuilder()
 val RULE_URLS_UNIFORMITY = URLRuleBuilder()
 	.called("Ссылки разных видов")
 	.disallow { urls ->
-		var filteredUrls: List<Pair<String, Line>> = urls.filter { pair ->
+		var filteredUrls = urls.filter { pair ->
 			val url = pair.first
 			!url.startsWith("https://www")
 		}
