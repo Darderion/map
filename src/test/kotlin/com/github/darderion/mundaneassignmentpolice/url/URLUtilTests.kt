@@ -11,12 +11,12 @@ import io.mockk.mockkObject
 import io.mockk.unmockkObject
 
 class URLUtilTests: StringSpec({
-    beforeSpec {
+    beforeTest {
         mockkObject(URLUtil)
         every { URLUtil.expand(any()) } returnsArgument 0
     }
 
-    afterSpec {
+    afterTest {
         unmockkObject(URLUtil)
     }
 
