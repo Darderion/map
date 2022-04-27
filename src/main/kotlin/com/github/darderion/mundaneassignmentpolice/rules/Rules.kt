@@ -1,6 +1,7 @@
 package com.github.darderion.mundaneassignmentpolice.rules
 
 import com.github.darderion.mundaneassignmentpolice.checker.RuleViolationType
+import com.github.darderion.mundaneassignmentpolice.checker.Section
 import com.github.darderion.mundaneassignmentpolice.checker.rule.list.ListRuleBuilder
 import com.github.darderion.mundaneassignmentpolice.checker.rule.regex.RegexRuleBuilder
 import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.SymbolRuleBuilder
@@ -13,10 +14,12 @@ import com.github.darderion.mundaneassignmentpolice.checker.rule.word.WordRuleBu
 import com.github.darderion.mundaneassignmentpolice.checker.rule.word.or
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFArea
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFRegion
+import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Line
 import com.github.darderion.mundaneassignmentpolice.utils.InvalidOperationException
 import com.github.darderion.mundaneassignmentpolice.utils.LowQualityConferencesUtil
 import com.github.darderion.mundaneassignmentpolice.utils.URLUtil
 import java.util.*
+import kotlin.collections.HashSet
 
 private val enLetters = "abcdefghijklmnopqrstuvwxyz"
 private val enCapitalLetters = enLetters.uppercase(Locale.getDefault())
@@ -174,8 +177,9 @@ val RULE_TABLE_OF_CONTENT_NUMBERS = TableOfContentRuleBuilder()
 		it.filter {
 			// println("${it.text.count()} -> ${it.content}")
 			val text = it.text.filter { it.text.trim().isNotEmpty() }
-			((text.count() == 3 && (text[1].text == "Введение" || text[1].text == "Заключение")) ||
-					(text.count() == 4 && text[1].text == "Список" && text[2].text == "литературы"))
+			((text.count() == 3 && (text[1].text == Section.INTRODUCTION.title ||
+					text[1].text == Section.CONCLUSION.title)) ||
+					(text.count() == 4 && (text[1].text + " " + text[2].text) == Section.BIBLIOGRAPHY.title))
 		}
 	}.called("Введение, заключение и список литературы не нумеруются")
 	.getRule()
@@ -189,6 +193,49 @@ val RULE_SYMBOLS_IN_SECTION_NAMES = TableOfContentRuleBuilder()
 			text.contains("[:.,]".toRegex())
 		}
 	}.called("""Символы ":", ".", "," в названии секции""")
+	.getRule()
+
+val sectionsThatMayPrecedeThis = mapOf<String, HashSet<String>>(
+	Section.INTRODUCTION.title to hashSetOf(""),
+	Section.PROBLEM_STATEMENT.title to hashSetOf(Section.INTRODUCTION.title),
+	Section.REVIEW.title to hashSetOf(Section.PROBLEM_STATEMENT.title),
+	Section.CONTENT.title to hashSetOf(Section.REVIEW.title, Section.CONTENT.title),
+	Section.CONCLUSION.title to hashSetOf(Section.CONTENT.title),
+	Section.BIBLIOGRAPHY.title to hashSetOf(Section.CONCLUSION.title)
+)
+
+val RULE_SECTIONS_ORDER = TableOfContentRuleBuilder()
+	.disallow { listOfLines ->
+		var nameOfPreviousSection = ""
+		listOfLines
+			.filterNot { line ->
+				val words = line.text
+					.filter { it.text.trim().isNotEmpty() }
+					.filterNot { it.text.contains("[0-9]+\\.".toRegex()) }		// remove numbering
+				words.isEmpty() || words[0].text == Section.TABLE_OF_CONTENT.title
+			}
+			.filter { line ->
+				val words = line.text
+					.filter { it.text.trim().isNotEmpty() }
+					.filterNot { it.text.contains("[0-9]+\\.".toRegex()) }		// remove numbering
+
+				val sectionName =
+					if ((words[0].text + " " + words[1].text) == Section.BIBLIOGRAPHY.title ||
+						(words[0].text + " " + words[1].text) == Section.PROBLEM_STATEMENT.title
+					)
+						words[0].text + " " + words[1].text
+					else if (sectionsThatMayPrecedeThis.contains(words[0].text))
+						words[0].text
+					else
+						Section.CONTENT.title
+
+				val isRuleViolation =
+					!sectionsThatMayPrecedeThis[sectionName]!!.contains(nameOfPreviousSection)
+				nameOfPreviousSection = sectionName
+				isRuleViolation
+			}
+	}
+	.called("Неверный порядок секций")
 	.getRule()
 
 val smallNumbersRuleName = "Неправильное написание целых чисел от 1 до 9"
@@ -251,6 +298,28 @@ val RULE_SHORTENED_URLS = URLRuleBuilder()
 				false
 			}
 		}.map { it.second }
+	}.getRule()
+
+val RULE_URLS_UNIFORMITY = URLRuleBuilder()
+	.called("Ссылки разных видов")
+	.disallow { urls ->
+		var filteredUrls: List<Pair<String, Line>> = urls.filter { pair ->
+			val url = pair.first
+			!url.startsWith("https://www")
+		}
+		if (urls.size == filteredUrls.size) {
+			filteredUrls = filteredUrls.filter { pair ->
+				val url = pair.first
+				!url.startsWith("www")
+			}
+			if (urls.size == filteredUrls.size) {
+				filteredUrls = filteredUrls.filter { pair ->
+					val url = pair.first
+					!url.startsWith("htt")
+				}
+			}
+		}
+		filteredUrls.map { it.second }
 	}.getRule()
 
 val RULE_ORDER_OF_REFERENCES = RegexRuleBuilder()

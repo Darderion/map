@@ -53,13 +53,18 @@ class RulesTests : StringSpec({
 	"Rule should detect incorrect symbols in section names" {
 		RULE_SYMBOLS_IN_SECTION_NAMES.process(PDFBox().getPDF(filePathSymbolsInSectionNames)).count() shouldBeExactly 4
 	}
+	"Rule should detect links of different types" {
+		RULE_URLS_UNIFORMITY.process(PDFBox().getPDF(filePathUniformityUrls)).count() shouldBeExactly 2
 	"Regex rule should detect incorrect order of literature references"{
 		RULE_ORDER_OF_REFERENCES.process(PDFBox().getPDF(filePathOrderOfReferences)).count() shouldBeExactly 3
 	}
 	"Regex rule should detect using different versions of the abbreviation"{
 		RULE_VARIOUS_ABBREVIATIONS.process(PDFBox().getPDF(filePathVariousAbbreviations)).count() shouldBeExactly 8
 	}
-	"URLRule should detect links to low quality conferences" {
+	"Table of content rule should detect incorrect order of sections"{
+		RULE_SECTIONS_ORDER.process(PDFBox().getPDF(filePathOrderOfSections)).count() shouldBeExactly 5
+	}
+  "URLRule should detect links to low quality conferences" {
 		mockkObject(LowQualityConferencesUtil)
 
 		val lowQualityConferencesList = listOf(
@@ -74,7 +79,7 @@ class RulesTests : StringSpec({
 		verify(exactly = 1) { LowQualityConferencesUtil.getList() }
 
 		unmockkObject(LowQualityConferencesUtil)
-	}
+  }
 }) {
 	companion object {
 		const val filePathQuestionMarkAndDashes =
@@ -88,13 +93,17 @@ class RulesTests : StringSpec({
 			"${TestsConfiguration.resourceFolder}checker/SymbolRuleTestsSpaceAroundBrackets.pdf"
 		const val filePathCitation = "${TestsConfiguration.resourceFolder}checker/SymbolRuleTestsCitation.pdf"
 		const val filePathShortenedUrls = "${TestsConfiguration.resourceFolder}checker/URLRuleShortenedUrls.pdf"
+		const val filePathSymbolsInSectionNames = "${TestsConfiguration.resourceFolder}checker/RulesTestsSymbolsInSectionNames.pdf"
+		const val filePathUniformityUrls = "${TestsConfiguration.resourceFolder}checker/URLRuleUniformityURL.pdf"
 		const val filePathSymbolsInSectionNames =
 			"${TestsConfiguration.resourceFolder}checker/RulesTestsSymbolsInSectionNames.pdf"
 		const val filePathOrderOfReferences =
 			"${TestsConfiguration.resourceFolder}checker/RegexRuleTestsOrderOfReferences.pdf"
 		const val filePathVariousAbbreviations =
 			"${TestsConfiguration.resourceFolder}checker/RegexRuleTestsVariousAbbreviations.pdf"
-		const val filePathLowQualityConferences =
+		const val filePathOrderOfSections =
+			"${TestsConfiguration.resourceFolder}checker/TableOfContentRuleTestsSectionsOrder.pdf"
+    const val filePathLowQualityConferences =
 			"${TestsConfiguration.resourceFolder}checker/URLRuleTestsLowQualityConferences.pdf"
 	}
 }
