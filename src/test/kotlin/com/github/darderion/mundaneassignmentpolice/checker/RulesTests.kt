@@ -2,9 +2,14 @@ package com.github.darderion.mundaneassignmentpolice.checker
 
 import com.github.darderion.mundaneassignmentpolice.TestsConfiguration
 import com.github.darderion.mundaneassignmentpolice.rules.*
+import com.github.darderion.mundaneassignmentpolice.utils.LowQualityConferencesUtil
 import com.github.darderion.mundaneassignmentpolice.wrapper.PDFBox
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.ints.shouldBeExactly
+import io.mockk.every
+import io.mockk.mockkObject
+import io.mockk.unmockkObject
+import io.mockk.verify
 
 class RulesTests : StringSpec({
 	"Symbol rule should detect incorrect symbols ? in links" {
@@ -55,7 +60,20 @@ class RulesTests : StringSpec({
 		RULE_VARIOUS_ABBREVIATIONS.process(PDFBox().getPDF(filePathVariousAbbreviations)).count() shouldBeExactly 8
 	}
 	"URLRule should detect links to low quality conferences" {
+		mockkObject(LowQualityConferencesUtil)
+
+		val lowQualityConferencesList = listOf(
+			"http://www.adpublication.org/",
+			"http://www.lifescienceglobal.com/",
+			"http://www.ijens.org/"
+		)
+		every { LowQualityConferencesUtil.getList() } returns lowQualityConferencesList
+
 		RULE_LOW_QUALITY_CONFERENCES.process(PDFBox().getPDF(filePathLowQualityConferences)).count() shouldBeExactly 3
+
+		verify(exactly = 1) { LowQualityConferencesUtil.getList() }
+
+		unmockkObject(LowQualityConferencesUtil)
 	}
 }) {
 	companion object {
