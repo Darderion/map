@@ -9,6 +9,9 @@ import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFDocument
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFRegion
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.list.PDFList
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Line
+import com.github.darderion.mundaneassignmentpolice.rules.conclusionPages
+import com.github.darderion.mundaneassignmentpolice.rules.tasks
+import com.github.darderion.mundaneassignmentpolice.rules.taskPages
 
 class ListRule(
 	val predicates: List<(list: PDFList<Line>) -> List<Line>>,
@@ -43,7 +46,9 @@ class ListRule(
 				}
 			)
 		}
-
+		taskPages = -1 to -1
+		conclusionPages = -1 to -1
+		tasks = PDFList()
 		return rulesViolations.toList()
 	}
 }

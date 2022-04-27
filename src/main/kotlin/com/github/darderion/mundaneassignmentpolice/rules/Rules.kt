@@ -13,9 +13,13 @@ import com.github.darderion.mundaneassignmentpolice.checker.rule.word.WordRuleBu
 import com.github.darderion.mundaneassignmentpolice.checker.rule.word.or
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFArea
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFRegion
+import com.github.darderion.mundaneassignmentpolice.pdfdocument.list.PDFList
+import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Line
 import com.github.darderion.mundaneassignmentpolice.utils.InvalidOperationException
 import com.github.darderion.mundaneassignmentpolice.utils.URLUtil
+
 import java.util.*
+import kotlin.collections.HashSet
 
 private val enLetters = "abcdefghijklmnopqrstuvwxyz"
 private val enCapitalLetters = enLetters.uppercase(Locale.getDefault())
@@ -168,6 +172,73 @@ val RULE_SINGLE_SUBSECTION = ListRuleBuilder()
 		if (it.nodes.count() == 1) it.nodes.first().getText() else listOf()
 	}.getRule()
 
+var taskPages = -1 to -1
+var conclusionPages = -1 to -1
+var tasks = PDFList<Line>()
+const val SYMBOLS_AT_THE_AND=5
+fun getSectionsPage(keyWords: Regex, lines: List<Line>): Pair<Int,Int>{
+	var pages = -1 to -1
+	if (lines.size > 1 && lines[0].area == PDFArea.TABLE_OF_CONTENT) {
+		for (i in lines.indices-1) {
+			if (lines[i].text.toString().contains(keyWords)) {
+				pages = if (i != lines.size-1)
+					Regex("""\d{1,2}""").find(lines[i].text.toString(),lines[i].text.toString().length - SYMBOLS_AT_THE_AND)!!.value.toInt() to
+							Regex("""\d{1,2}""").find(lines[i+1].text.toString(),lines[i+1].text.toString().length - SYMBOLS_AT_THE_AND)!!.value.toInt()
+					//looks for 1 or 2 digits at the end of lines
+				else
+					Regex("""\d{1,2}""").find(lines[i].text.toString(),lines[i].text.toString().length - SYMBOLS_AT_THE_AND)!!.value.toInt() to -1
+					//looks for 1 or 2 digits at the end of a line
+				break
+			}
+		}
+	}
+	return pages
+}
+fun getTaskFromLines(task : PDFList<Line>) : String
+{
+	var taskText =""
+	for (j in 0 until task.value.size) {
+		taskText += if (j == 0)
+			task.value[j].text.filterIndexed { index, _ -> index > 2 }.toString().drop(1).dropLast(1)
+		else task.value[j].text.toString().drop(1).dropLast(1)
+		if (taskText.isNotEmpty() && taskText.last() == '-')
+			taskText = taskText.replace(Regex("-"),"")
+		else taskText += ", ,"
+	}
+	return taskText
+}
+
+val RULE_TASK_MAPPING = ListRuleBuilder()
+	.called("Задачи не совпадают c результатами или не выделены в содержании")
+	.inArea(PDFRegion.NOWHERE.except(PDFArea.TABLE_OF_CONTENT,PDFArea.SECTION))
+	.disallow {
+		if (taskPages == -1 to -1)
+			taskPages = getSectionsPage(Regex("""[Зз]адачи"""), it.getText())
+		if (conclusionPages == -1 to -1)
+			conclusionPages = getSectionsPage(Regex("""Заключение"""), it.getText())
+
+		val resultNodes = mutableListOf<Line>()
+
+		if (it.nodes.isNotEmpty() && it.nodes[0].value[0].page >= taskPages.first-1 &&
+			it.nodes.last().value[0].page < taskPages.second-1)
+			tasks = it
+
+		if (it.nodes.isNotEmpty() && taskPages == -1 to -1 &&
+			it.nodes[0].value[0].page >= conclusionPages.first-1 && conclusionPages.first != -1)
+			it.getText()
+		else if (it.nodes.isNotEmpty() && tasks.nodes.isNotEmpty() && taskPages != -1 to -1 &&
+				it.nodes[0].value[0].page >= conclusionPages.first-1) {
+			if (it.nodes.size == tasks.nodes.size) {
+				it.nodes.forEachIndexed { index, pdfList ->
+					if (getTaskFromLines(tasks.nodes[index]) != getTaskFromLines(pdfList))
+						resultNodes.addAll(pdfList.getText())
+				}
+				if (resultNodes.size>0) resultNodes.toList() else listOf()
+			} else it.getText()
+		} else listOf()
+	}
+	.getRule()
+
 val RULE_TABLE_OF_CONTENT_NUMBERS = TableOfContentRuleBuilder()
 	.disallow {
 		it.filter {
@@ -189,6 +260,7 @@ val RULE_SYMBOLS_IN_SECTION_NAMES = TableOfContentRuleBuilder()
 		}
 	}.called("""Символы ":", ".", "," в названии секции""")
 	.getRule()
+
 
 val smallNumbersRuleName = "Неправильное написание целых чисел от 1 до 9"
 val smallNumbersRuleArea =
