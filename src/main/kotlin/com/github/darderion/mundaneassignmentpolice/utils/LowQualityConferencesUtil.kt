@@ -1,6 +1,7 @@
 package com.github.darderion.mundaneassignmentpolice.utils
 
 import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
 import java.time.Duration
 import java.time.LocalDateTime
 
@@ -20,16 +21,16 @@ class LowQualityConferencesUtil {
 				Duration.between(lastDataUpdatingTime, LocalDateTime.now())
 
 			if (timeElapsedSinceLastParsing.toHours() > dataValidityPeriodInHours) {
-				lowQualityConferencesList = parseBeallslist()
+				lowQualityConferencesList =
+					parseBeallslist(Jsoup.connect(beallslistURL).get())
 				lastDataUpdatingTime = LocalDateTime.now()
 			}
 
 			return lowQualityConferencesList
 		}
 
-		private fun parseBeallslist(): List<String> {
-			val document = Jsoup.connect(beallslistURL).get()
-			val beallslist = document.getElementsByClass("wp-block-column")
+		private fun parseBeallslist(beallslistDocument: Document): List<String> {
+			val beallslist = beallslistDocument.getElementsByClass("wp-block-column")
 				.first()!!.getElementsByTag("ul")
 				.slice(IntRange(0, 1))
 				.map { ul ->
