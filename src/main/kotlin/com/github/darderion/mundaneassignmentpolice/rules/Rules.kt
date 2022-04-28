@@ -293,7 +293,7 @@ private val sectionsWithLimits = mapOf(
 val RULES_SECTION_SIZE = sectionsWithLimits
     .mapKeys {
         SectionSizeRuleBuilder().called("Слишком длинная секция")
-            .section(it.key)
+            .sections(it.key)
             .shouldBeLessThanOrEqual()
     }.mapKeys { entry ->
         entry.value.first?.let { entry.key.limitByPages(it) } ?: entry.key

@@ -8,7 +8,7 @@ import com.github.darderion.mundaneassignmentpolice.utils.comparator.ComparisonT
 class SectionSizeRuleBuilder {
     private var ruleName: String = "Rule name"
     private var type: RuleViolationType = RuleViolationType.Error
-    private var sectionName: SectionName = SectionName.values().first()
+    private var sections: MutableList<SectionName> = mutableListOf()
     private var pageLimit: Int? = null
     private var percentageLimit: Number? = null
     private var comparisonType: ComparisonType = LESS_THAN
@@ -17,7 +17,7 @@ class SectionSizeRuleBuilder {
 
     infix fun type(type: RuleViolationType) = this.also { this.type = type }
 
-    infix fun section(name: SectionName) = this.also { this.sectionName = name }
+    fun sections(vararg names: SectionName) = this.also { this.sections.addAll(names) }
 
     fun shouldBeLessThan() = this.also { this.comparisonType = LESS_THAN }
     fun shouldNotBeLessThan() = this.also { this.comparisonType = GREATER_THAN_OR_EQUAL }
@@ -35,22 +35,22 @@ class SectionSizeRuleBuilder {
     fun shouldNotBeGreaterThan() = this.also { this.comparisonType = LESS_THAN_OR_EQUAL }
 
     infix fun limitByPages(limit: Int) = this.also {
-        if (limit < 0) throw IllegalArgumentException("Page limit must not be negative")
+        if (limit <= 0) throw IllegalArgumentException("Page limit must be positive")
         this.pageLimit = limit
     }
 
     infix fun limitByPercentage(limit: Number) = this.also {
-        if (limit.toDouble() < 0 || limit.toDouble() > 100)
-            throw IllegalArgumentException("Percentage limit must be between 0 and 100")
+        if (limit.toFloat() <= 0 || limit.toFloat() > 100)
+            throw IllegalArgumentException("Percentage limit must be positive and less than 100")
         this.percentageLimit = limit
     }
 
     fun getRule() = SectionSizeRule(
         ruleName,
         type,
-        sectionName,
+        sections,
         comparisonType,
         pageLimit,
         percentageLimit
-    ) as SectionRule
+    )
 }

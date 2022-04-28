@@ -7,5 +7,9 @@ enum class SectionName(val title: String) {
 	REVIEW("Обзор"),
 	CONTENT("Контент"),
 	CONCLUSION("Заключение"),
-	BIBLIOGRAPHY("Список литературы")
+	BIBLIOGRAPHY("Список литературы");
+
+	companion object {
+		infix fun getByTitle(title: String) = values().find { it.title == title } ?: CONTENT
+	}
 }
