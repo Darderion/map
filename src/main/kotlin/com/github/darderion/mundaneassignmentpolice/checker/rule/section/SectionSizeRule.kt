@@ -1,5 +1,6 @@
 package com.github.darderion.mundaneassignmentpolice.checker.rule.section
 
+import com.github.darderion.mundaneassignmentpolice.checker.ComparisonType
 import com.github.darderion.mundaneassignmentpolice.checker.RuleViolation
 import com.github.darderion.mundaneassignmentpolice.checker.RuleViolationType
 import com.github.darderion.mundaneassignmentpolice.checker.SectionName
@@ -9,8 +10,6 @@ import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFArea
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFDocument
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFRegion
 import com.github.darderion.mundaneassignmentpolice.statisticsservice.statistics.StatisticsBuilder
-import com.github.darderion.mundaneassignmentpolice.utils.comparator.Comparator
-import com.github.darderion.mundaneassignmentpolice.utils.comparator.ComparisonType
 import com.github.darderion.mundaneassignmentpolice.utils.floatEquals
 
 class SectionSizeRule(
@@ -52,13 +51,13 @@ class SectionSizeRule(
         return ruleViolations
     }
 
-    private fun isLimitViolated(sectionSize: Int, percentage: Float): Boolean {
+    private fun isLimitViolated(sectionSize: Int, sectionPercentage: Float): Boolean {
         var isViolatedPageLimit = false
         var isViolatedPercentageLimit = false
 
-        pageLimit?.let { isViolatedPageLimit = !Comparator.compare(sectionSize, comparisonType, it) }
+        pageLimit?.let { isViolatedPageLimit = !comparisonType.compare(sectionSize, it) }
         percentageLimit?.let {
-            isViolatedPercentageLimit = !Comparator.compare(percentage, comparisonType, it.toFloat(), ::floatEquals)
+            isViolatedPercentageLimit = !comparisonType.compare(sectionPercentage, it.toFloat(), ::floatEquals)
         }
 
         return isViolatedPageLimit || isViolatedPercentageLimit
