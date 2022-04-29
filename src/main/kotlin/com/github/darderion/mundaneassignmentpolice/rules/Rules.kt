@@ -283,23 +283,36 @@ val RULES_SMALL_NUMBERS = List<WordRule>(9) { index ->
 	smallNumbersRuleBuilder3.word((index + 1).toString()).getRule()
 }
 
-private val sectionsWithLimits = mapOf(
-	SectionName.INTRODUCTION to (null to 20),
-	SectionName.PROBLEM_STATEMENT to (1 to null),
-	SectionName.REVIEW to (null to 50),
-	SectionName.CONCLUSION to (2 to null)
-)
+private const val sectionSizeRuleName = "Слишком длинная секция"
 
-val RULES_SECTION_SIZE = sectionsWithLimits
-    .mapKeys {
-        SectionSizeRuleBuilder().called("Слишком длинная секция")
-            .sections(it.key)
-            .shouldBeLessThanOrEqual()
-    }.mapKeys { entry ->
-        entry.value.first?.let { entry.key.limitByPages(it) } ?: entry.key
-    }.mapKeys { entry ->
-        entry.value.second?.let { entry.key.limitByPercentage(it) } ?: entry.key
-    }.map { it.key.getRule() }
+val introductionAndConclusionSizeRuleError = SectionSizeRuleBuilder()
+	.called(sectionSizeRuleName)
+	.sections(SectionName.INTRODUCTION, SectionName.CONCLUSION)
+	.shouldBeLessThan()
+	.limitByPages(4)
+	.type(RuleViolationType.Error)
+	.getRule()
+
+val introductionAndConclusionSizeRuleWarning = SectionSizeRuleBuilder()
+	.called(sectionSizeRuleName)
+	.sections(SectionName.INTRODUCTION, SectionName.CONCLUSION)
+	.shouldNotBeEqual()
+	.limitByPages(3)
+	.type(RuleViolationType.Warning)
+	.getRule()
+
+val sectionsSizeRule = SectionSizeRuleBuilder()
+	.called(sectionSizeRuleName)
+	.sections(SectionName.PROBLEM_STATEMENT, SectionName.REVIEW, SectionName.CONTENT, SectionName.BIBLIOGRAPHY)
+	.shouldNotBeGreaterThan()
+	.limitByPercentage(50)
+	.getRule()
+
+val RULES_SECTION_SIZE = listOf(
+	introductionAndConclusionSizeRuleError,
+	introductionAndConclusionSizeRuleWarning,
+	sectionsSizeRule
+)
 
 val RULE_SHORTENED_URLS = URLRuleBuilder()
 	.called("Сокращённая ссылка")

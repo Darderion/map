@@ -4,7 +4,13 @@ import com.github.darderion.mundaneassignmentpolice.TestsConfiguration
 import com.github.darderion.mundaneassignmentpolice.rules.*
 import com.github.darderion.mundaneassignmentpolice.wrapper.PDFBox
 import io.kotest.core.spec.style.StringSpec
+import io.kotest.data.forAll
+import io.kotest.data.headers
+import io.kotest.data.row
+import io.kotest.data.table
+import io.kotest.inspectors.forAll
 import io.kotest.matchers.ints.shouldBeExactly
+import io.kotest.matchers.shouldBe
 
 class RulesTests : StringSpec({
 	"Symbol rule should detect incorrect symbols ? in links" {
@@ -61,21 +67,22 @@ class RulesTests : StringSpec({
 		RULE_SECTIONS_ORDER.process(PDFBox().getPDF(filePathOrderOfSections)).count() shouldBeExactly 5
 	}
 	"Section rules should detect sections whose size exceeds specified limit" {
-		val introductionSizeRule = RULES_SECTION_SIZE.first { it.sections.first() == SectionName.INTRODUCTION }
-		introductionSizeRule.percentageLimit!!.toInt() shouldBeExactly 20
-		introductionSizeRule.process(PDFBox().getPDF(filePathIntroductionSize)).count() shouldBeExactly 1
+		forAll(
+			table(
+				headers("filePath", "expected number of violations", "expected violation type"),
+				row(filePathIntroductionAndConclusionSizeError, 2, RuleViolationType.Error),
+				row(filePathIntroductionAndConclusionSizeWarning, 2, RuleViolationType.Warning),
+				row(filePathBibliographySize, 1, RuleViolationType.Error),
+				row(filePathProblemStatementSize, 1, RuleViolationType.Error)
+			)
+		) { filePath: String, numberOfViolations: Int, violationType: RuleViolationType ->
+			val violations = RULES_SECTION_SIZE.map {
+				it.process(PDFBox().getPDF(filePath))
+			}.flatten()
 
-		val problemStatementSizeRule = RULES_SECTION_SIZE.first { it.sections.first() == SectionName.PROBLEM_STATEMENT }
-		problemStatementSizeRule.pageLimit!! shouldBeExactly 1
-		problemStatementSizeRule.process(PDFBox().getPDF(filePathProblemStatementSize)).count() shouldBeExactly 1
-
-		val overviewSizeRule = RULES_SECTION_SIZE.first { it.sections.first() == SectionName.REVIEW }
-		overviewSizeRule.percentageLimit!!.toInt() shouldBeExactly 50
-		overviewSizeRule.process(PDFBox().getPDF(filePathOverviewSize)).count() shouldBeExactly 1
-
-		val conclusionSizeRule = RULES_SECTION_SIZE.first { it.sections.first() == SectionName.CONCLUSION }
-		conclusionSizeRule.pageLimit!! shouldBeExactly 2
-		conclusionSizeRule.process(PDFBox().getPDF(filePathConclusionSize)).count() shouldBeExactly 1
+			violations.count() shouldBeExactly numberOfViolations
+			violations.forAll { it.type shouldBe violationType }
+		}
 	}
 }) {
 	companion object {
@@ -100,12 +107,13 @@ class RulesTests : StringSpec({
 		const val filePathOrderOfSections =
 			"${TestsConfiguration.resourceFolder}checker/TableOfContentRuleTestsSectionsOrder.pdf"
 
-		const val filePathIntroductionSize =
-			"${TestsConfiguration.resourceFolder}checker/SectionRuleTestsIntroductionSize.pdf"
+		const val filePathIntroductionAndConclusionSizeError =
+			"${TestsConfiguration.resourceFolder}checker/SectionSizeRuleTestsIntroductionAndConclusionError.pdf"
+		const val filePathIntroductionAndConclusionSizeWarning =
+			"${TestsConfiguration.resourceFolder}checker/SectionSizeRuleTestsIntroductionAndConclusionWarning.pdf"
+		const val filePathBibliographySize =
+			"${TestsConfiguration.resourceFolder}checker/SectionSizeRuleTestsBibliography.pdf"
 		const val filePathProblemStatementSize =
-			"${TestsConfiguration.resourceFolder}checker/SectionRuleTestsProblemStatementSize.pdf"
-		const val filePathOverviewSize = "${TestsConfiguration.resourceFolder}checker/SectionRuleTestsOverviewSize.pdf"
-		const val filePathConclusionSize =
-			"${TestsConfiguration.resourceFolder}checker/SectionRuleTestsConclusionSize.pdf"
+			"${TestsConfiguration.resourceFolder}checker/SectionSizeRuleTestsProblemStatement.pdf"
 	}
 }

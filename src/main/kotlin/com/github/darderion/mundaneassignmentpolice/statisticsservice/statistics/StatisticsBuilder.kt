@@ -104,7 +104,7 @@ class StatisticsBuilder
             val sectionSizeInPage: Int = if (i != newPdfStructure.size - 1) {
                 pdf.text[newPdfStructure[i + 1].titleIndex].page - pdf.text[newPdfStructure[i].titleIndex].page
             } else {
-                max(pdfSize - pdf.text[newPdfStructure[i].titleIndex].page, 1)
+                pdf.text.first { it.area == PDFArea.BIBLIOGRAPHY }.page - pdf.text[newPdfStructure[i].titleIndex].page
             }
             sectionStatistic.add(SectionStatistics(newPdfStructure[i], sectionSizeInPage, pdfSize))
         }
