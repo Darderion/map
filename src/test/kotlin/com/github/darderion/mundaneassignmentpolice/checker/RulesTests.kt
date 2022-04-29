@@ -2,9 +2,14 @@ package com.github.darderion.mundaneassignmentpolice.checker
 
 import com.github.darderion.mundaneassignmentpolice.TestsConfiguration
 import com.github.darderion.mundaneassignmentpolice.rules.*
+import com.github.darderion.mundaneassignmentpolice.utils.LowQualityConferencesUtil
 import com.github.darderion.mundaneassignmentpolice.wrapper.PDFBox
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.ints.shouldBeExactly
+import io.mockk.every
+import io.mockk.mockkObject
+import io.mockk.unmockkObject
+import io.mockk.verify
 
 class RulesTests : StringSpec({
 	"Symbol rule should detect incorrect symbols ? in links" {
@@ -59,6 +64,22 @@ class RulesTests : StringSpec({
 	"Table of content rule should detect incorrect order of sections"{
 		RULE_SECTIONS_ORDER.process(PDFBox().getPDF(filePathOrderOfSections)).count() shouldBeExactly 5
 	}
+  "URLRule should detect links to low quality conferences" {
+		mockkObject(LowQualityConferencesUtil)
+
+		val lowQualityConferencesList = listOf(
+			"http://www.adpublication.org/",
+			"http://www.lifescienceglobal.com/",
+			"http://www.ijens.org/"
+		)
+		every { LowQualityConferencesUtil.getList() } returns lowQualityConferencesList
+
+		RULE_LOW_QUALITY_CONFERENCES.process(PDFBox().getPDF(filePathLowQualityConferences)).count() shouldBeExactly 3
+
+		verify(exactly = 1) { LowQualityConferencesUtil.getList() }
+
+		unmockkObject(LowQualityConferencesUtil)
+  }
 }) {
 	companion object {
 		const val filePathQuestionMarkAndDashes =
@@ -82,5 +103,7 @@ class RulesTests : StringSpec({
 			"${TestsConfiguration.resourceFolder}checker/RegexRuleTestsVariousAbbreviations.pdf"
 		const val filePathOrderOfSections =
 			"${TestsConfiguration.resourceFolder}checker/TableOfContentRuleTestsSectionsOrder.pdf"
+    const val filePathLowQualityConferences =
+			"${TestsConfiguration.resourceFolder}checker/URLRuleTestsLowQualityConferences.pdf"
 	}
 }
