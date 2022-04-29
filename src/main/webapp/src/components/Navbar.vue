@@ -13,7 +13,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Component, Vue } from 'vue-property-decorator';
 
 import UploadFileComponent from './UploadFile.vue'
 import MenuComponent from './Menu.vue'
@@ -28,7 +28,7 @@ import CountryFlag from 'vue-country-flag'
 })
 
 export default class NavbarComponent extends Vue {
-	setLocale(locale: string) {
+	setLocale(locale: string): void {
 		this.$i18n.locale = locale;
 	}
 }

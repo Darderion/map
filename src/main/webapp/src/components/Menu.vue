@@ -23,7 +23,7 @@
 
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Component, Vue } from 'vue-property-decorator';
 
 @Component({
 	components: {
@@ -33,13 +33,13 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 export default class MenuComponent extends Vue {
 	menuMode = 0
 
-	clearFileName() {
+	clearFileName(): void {
 		this.$store.commit('setPdfName', {
 			name: ""
 		})
 	}
 
-	mounted() {
+	mounted(): void {
 		this.$store.commit('setPdfName', {
 			name: this.$route.query.pdfName
 		})

@@ -53,7 +53,8 @@
 			"suggestion_2_1": "Check section",
 			"suggestion_2_2": "If sections are not highlighted then it could be because of incorrect table of contents.",
 			"selectRuleViolation": "Select a rule violation to view PDF page with that rule violation.",
-			"line": "Line",
+			"line": "line",
+			"lines": "lines",
 			"page": "page"
 		},
 		"uploadMultipleFiles": {

@@ -1,6 +1,6 @@
 
 <template>
-	<form :action="`/api/getPDFReview?locale=${getLocale()}`"
+	<form :action="`${this.$store.getters.getAPI}getPDFReview?locale=${getLocale()}`"
 		object="${pdf}" method="post"
 		enctype="multipart/form-data"
 		id="uploadFileForm"
@@ -14,7 +14,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Component, Vue } from 'vue-property-decorator';
 
 import pdf from 'vue-pdf'
 
@@ -25,7 +25,7 @@ import pdf from 'vue-pdf'
 })
 
 export default class UploadFileComponent extends Vue {
-	mounted() {
+	mounted(): void {
 		const actualBtn = document.getElementById('actual-btn') as HTMLInputElement
 
 		const fileChosen = document.getElementById('file-chosen')
@@ -33,7 +33,7 @@ export default class UploadFileComponent extends Vue {
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore: Object is possibly 'null'.
 		if (actualBtn && actualBtn!.files[0]) {
-			actualBtn.addEventListener('change', _ => {
+			actualBtn.addEventListener('change', () => {
 				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 				// @ts-ignore: Object is possibly 'null'.
 				fileChosen.textContent = actualBtn!.files[0].name
@@ -51,13 +51,13 @@ export default class UploadFileComponent extends Vue {
 				})
 		}
 
-		actualBtn.onchange = _ => {
+		actualBtn.onchange = () => {
 			const uploadFileButton = document.getElementById("uploadFileComponent") as HTMLFormElement
 			uploadFileButton.submit()
 		};
 	}
 
-	getLocale() {
+	getLocale(): string {
 		return this.$i18n.locale
 	}
 }

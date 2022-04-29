@@ -31,7 +31,7 @@
 	<div class="uploadSection" v-show="files.length > 0">
 		<file-upload
 			class="btn btn-primary"
-			post-action="/api/uploadPDF"
+			:post-action="`${this.$store.getters.getAPI}uploadPDF`"
 			:multiple="true"
 			:drop="true"
 			:drop-directory="true"
@@ -69,13 +69,13 @@ import { Component, Vue } from 'vue-property-decorator';
 export default class MultipleFileUpload extends Vue {
 	files: any[] = [];
 
-	updated() {
+	updated(): void {
 		this.$store.commit('setFileNames', {
 			fileNames: this.files.map(it => it.name)
 		})
 	}
 
-	getFileName(fileName: string) {
+	getFileName(fileName: string): string {
 		if (fileName.length < 15) {
 			return fileName;
 		} else {
@@ -83,12 +83,12 @@ export default class MultipleFileUpload extends Vue {
 		}
 	}
 
-	removePDF(file: any) {
+	removePDF(file: any): void {
 		console.log(this.files);
 		this.files = this.files.filter(it => it != file)
 	}
 
-	getLocale() {
+	getLocale(): string {
 		return this.$i18n.locale;
 	}
 }

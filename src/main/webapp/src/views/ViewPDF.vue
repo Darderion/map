@@ -2,7 +2,7 @@
 <template>
 	<div class="about">
 		<b-spinner style="width: 10rem; height: 10rem;" label="" v-show="!pdfComponent"></b-spinner>
-		<PDFComponent :pdfURL="`api/viewPDF.pdf?pdfName=${this.$route.query.pdfName}`" :pdfView="pdfView"></PDFComponent>
+		<PDFComponent :pdfURL="`${this.$store.getters.getAPI}viewPDF.pdf?pdfName=${this.$route.query.pdfName}`" :pdfView="pdfView"></PDFComponent>
 	</div>
 </template>
 

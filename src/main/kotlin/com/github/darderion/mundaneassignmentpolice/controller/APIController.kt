@@ -4,22 +4,19 @@ import com.github.darderion.mundaneassignmentpolice.checker.Checker
 import com.github.darderion.mundaneassignmentpolice.checker.DocumentReport
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.Annotations
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Section
-import com.github.darderion.mundaneassignmentpolice.rules.RuleSet
 import com.github.darderion.mundaneassignmentpolice.rules.*
 import com.github.darderion.mundaneassignmentpolice.utils.FileUploadUtil
 import com.github.darderion.mundaneassignmentpolice.wrapper.PDFBox
 import mu.KotlinLogging
-import org.springframework.util.StringUtils
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.servlet.view.RedirectView
 import java.io.File
-import kotlin.math.abs
-import kotlin.random.Random
 
 const val pdfFolder = "build/"
 
 @RestController
+@CrossOrigin(origins = ["http://localhost:8081"])
 class APIController {
 	val pdfBox = PDFBox()
 	val ruleSet = RULE_SET_RU
@@ -68,21 +65,23 @@ class APIController {
 	@ResponseBody
 	fun getPDF(@RequestParam("pdfName") fileName: String,
 			   @RequestParam("page") page: Int?,
-			   @RequestParam("line") line: Int?
+			   @RequestParam("lines") lines: List<Int>?
 	): ByteArray {
 		val directory = "${pdfFolder}ruleviolations/"
 		FileUploadUtil.removeRandomFile(directory, 1000)
 
 		val pdf = PDFBox().getPDF("$pdfFolder$fileName")
 		val pdf2 = Annotations.underline(pdf,
-			if (page == null || line == null) {
+			if (page == null || lines == null) {
 				Checker().getRuleViolations(fileName, ruleSet).map { it.lines }.flatten()
 			} else
-				listOf(pdf.text.first { it.page == page && it.index == line })
+				pdf.text.filter { it.page == page && it.index >= lines.first() &&
+						it.index <= lines.last() }
+					.sortedBy { line -> line.index }
 		)
 		logger.info("File created: $pdf2")
 
-		return File("${pdfFolder}ruleviolations/${fileName.replace(".pdf", "")}$line-${page}.pdf").readBytes()
+		return File("${pdfFolder}ruleviolations/${fileName.replace(".pdf", "")}${(lines ?: listOf(-1)).first()}-${(lines ?: listOf(0)).last()}(${page}).pdf").readBytes()
 	}
 
 	@GetMapping("/api/getPDFSize")

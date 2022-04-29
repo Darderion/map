@@ -14,7 +14,8 @@ export default new Vuex.Store({
 		noErrorsFound: false,
 		noAreaErrorsFound: false,
 		languages: ['ru', 'en'],
-		fileNames: []
+		fileNames: [],
+		apiURL: 'http://localhost:8080/api/'
 	},
 	mutations: {
 		setPdfName(state, payload) {
@@ -38,6 +39,9 @@ export default new Vuex.Store({
 	},
 	actions: {},
 	getters: {
+		getAPI(state): string {
+			return state.apiURL;
+		},
 		getLanguages(state): string[] {
 			return state.languages;
 		},
