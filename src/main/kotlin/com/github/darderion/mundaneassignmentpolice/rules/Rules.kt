@@ -2,9 +2,7 @@ package com.github.darderion.mundaneassignmentpolice.rules
 
 import com.github.darderion.mundaneassignmentpolice.checker.RuleViolationType
 import com.github.darderion.mundaneassignmentpolice.checker.rule.list.ListRuleBuilder
-import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.SymbolRuleBuilder
-import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.and
-import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.or
+import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.*
 import com.github.darderion.mundaneassignmentpolice.checker.rule.tableofcontent.TableOfContentRuleBuilder
 import com.github.darderion.mundaneassignmentpolice.checker.rule.url.URLRuleBuilder
 import com.github.darderion.mundaneassignmentpolice.checker.rule.word.WordRule
@@ -186,6 +184,13 @@ val RULE_SYMBOLS_IN_SECTION_NAMES = TableOfContentRuleBuilder()
 			text.contains("[:.,]".toRegex())
 		}
 	}.called("""Символы ":", ".", "," в названии секции""")
+	.getRule()
+
+val SymbolFields = 580
+val RULE_SYMBOL_OUTSIDE_FIELDS = PositionSymbolRuleBuilder()
+	.inArea(PDFRegion.EVERYWHERE.except(PDFArea.TABLE_OF_CONTENT, PDFArea.TITLE_PAGE))
+	.called("Символ находится за полями")
+	.xCantBeMore(SymbolFields)
 	.getRule()
 
 val smallNumbersRuleName = "Неправильное написание целых чисел от 1 до 9"
