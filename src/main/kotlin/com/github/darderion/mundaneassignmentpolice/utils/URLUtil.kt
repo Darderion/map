@@ -10,7 +10,7 @@ class URLUtil {
             try {
                 URL(url)
             } catch (e: MalformedURLException) {
-                throw IllegalArgumentException("Incorrect URL: $url", e)
+                throw IllegalArgumentException("""Incorrect URL: "$url"""", e)
             }
 
         fun isShortened(url: String): Boolean = listOf(url, expand(url))
@@ -47,7 +47,7 @@ class URLUtil {
                         expand(redirect)
                     }
                     HttpURLConnection.HTTP_OK -> this.url.toString()
-                    else -> throw InvalidOperationException("Unexpected HTTP status code")
+                    else -> throw InvalidOperationException("Unexpected HTTP status code: $responseCode")
                 }
             }
         }

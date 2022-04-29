@@ -2,6 +2,7 @@ package com.github.darderion.mundaneassignmentpolice.checker
 
 import com.github.darderion.mundaneassignmentpolice.TestsConfiguration
 import com.github.darderion.mundaneassignmentpolice.rules.*
+import com.github.darderion.mundaneassignmentpolice.utils.URLUtil
 import com.github.darderion.mundaneassignmentpolice.utils.LowQualityConferencesUtil
 import com.github.darderion.mundaneassignmentpolice.wrapper.PDFBox
 import io.kotest.core.spec.style.StringSpec
@@ -48,13 +49,34 @@ class RulesTests : StringSpec({
 		RULE_CITATION.process(PDFBox().getPDF(filePathCitation)).count() shouldBeExactly 2
 	}
 	"URLRule should detect shortened URLs" {
+		mockkObject(URLUtil)
+		every { URLUtil.expand(any()) } returnsArgument 0
+
+		val urls = listOf(
+			"https://en.wikipedia.org/wiki/Wikipedia:About" to "https://en.wikipedia.org/wiki/Wikipedia:About",
+			"https://t.ly/dgs5" to "https://en.wikipedia.org/wiki/Wikipedia:About",
+			"https://google.com" to "https://www.google.com/",
+			"https://bit.ly/3tIJmJi." to "https://en.wikipedia.org/wiki/Main_Page",
+			"https://en.wikipedia.org" to "https://en.wikipedia.org/wiki/Main_Page",
+			"https://bit.ly/3tIJmJi" to "https://en.wikipedia.org/wiki/Main_Page",
+			"https://is.gd/gZgSmH" to "https://www.google.com/"
+		)
+
+		urls.forEach { (url, expandedUrl) ->
+			every { URLUtil.expand(url) } returns expandedUrl
+		}
+
 		RULE_SHORTENED_URLS.process(PDFBox().getPDF(filePathShortenedUrls)).count() shouldBeExactly 4
+		verify(atLeast = urls.size) { URLUtil.expand(any()) }
+
+		unmockkObject(URLUtil)
 	}
 	"Rule should detect incorrect symbols in section names" {
 		RULE_SYMBOLS_IN_SECTION_NAMES.process(PDFBox().getPDF(filePathSymbolsInSectionNames)).count() shouldBeExactly 4
 	}
 	"Rule should detect links of different types" {
 		RULE_URLS_UNIFORMITY.process(PDFBox().getPDF(filePathUniformityUrls)).count() shouldBeExactly 2
+	}
 	"Regex rule should detect incorrect order of literature references"{
 		RULE_ORDER_OF_REFERENCES.process(PDFBox().getPDF(filePathOrderOfReferences)).count() shouldBeExactly 3
 	}
@@ -93,7 +115,6 @@ class RulesTests : StringSpec({
 			"${TestsConfiguration.resourceFolder}checker/SymbolRuleTestsSpaceAroundBrackets.pdf"
 		const val filePathCitation = "${TestsConfiguration.resourceFolder}checker/SymbolRuleTestsCitation.pdf"
 		const val filePathShortenedUrls = "${TestsConfiguration.resourceFolder}checker/URLRuleShortenedUrls.pdf"
-		const val filePathSymbolsInSectionNames = "${TestsConfiguration.resourceFolder}checker/RulesTestsSymbolsInSectionNames.pdf"
 		const val filePathUniformityUrls = "${TestsConfiguration.resourceFolder}checker/URLRuleUniformityURL.pdf"
 		const val filePathSymbolsInSectionNames =
 			"${TestsConfiguration.resourceFolder}checker/RulesTestsSymbolsInSectionNames.pdf"

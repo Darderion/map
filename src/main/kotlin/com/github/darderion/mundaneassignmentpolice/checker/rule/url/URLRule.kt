@@ -32,10 +32,6 @@ class URLRule(
         val urls: MutableList<Pair<String, List<Line>>> = mutableListOf()
         val urlRegex = Regex("""^((https?:)|(www\.))[^\s]*""")
 
-        val bibliographyIndent = document.text.filter {
-            it.area == PDFArea.BIBLIOGRAPHY
-        }.getOrNull(1)?.text?.getOrNull(2)?.position?.x ?: -1.0f
-
         val linesInsideArea = document.text.filter { it.area!! inside area }
         var lineIndex = 0
         while (lineIndex < linesInsideArea.size) {
@@ -60,7 +56,8 @@ class URLRule(
                 while (currentWord.last() in ":/._-%" && nextWord.isNotEmpty() && nextLine.area == currentArea) {
                     if (currentArea == PDFArea.FOOTNOTE && !nextLine.text.first().font.size.nearby(currentFontSize))
                         break
-                    if (currentArea == PDFArea.BIBLIOGRAPHY && !nextLine.position.x.nearby(bibliographyIndent))
+                                                                // numbering of bibliography item
+                    if (currentArea == PDFArea.BIBLIOGRAPHY && Regex("""\[[0-9]+]""").matches(nextWord))
                         break
 
                     currentWord = nextWord
