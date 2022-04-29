@@ -55,9 +55,9 @@ class SectionSizeRule(
         var isViolatedPageLimit = false
         var isViolatedPercentageLimit = false
 
-        pageLimit?.let { isViolatedPageLimit = !comparisonType.compare(sectionSize, it) }
-        percentageLimit?.let {
-            isViolatedPercentageLimit = !comparisonType.compare(sectionPercentage, it.toFloat(), ::floatEquals)
+        pageLimit?.let { limit -> isViolatedPageLimit = !comparisonType.compare(sectionSize, limit) }
+        percentageLimit?.let { limit ->
+            isViolatedPercentageLimit = !comparisonType.compare(sectionPercentage, limit.toFloat(), ::floatEquals)
         }
 
         return isViolatedPageLimit || isViolatedPercentageLimit

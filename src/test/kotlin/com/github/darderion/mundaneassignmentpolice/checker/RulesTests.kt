@@ -69,7 +69,7 @@ class RulesTests : StringSpec({
 	"Section rules should detect sections whose size exceeds specified limit" {
 		forAll(
 			table(
-				headers("filePath", "expected number of violations", "expected violation type"),
+				headers("file path", "expected number of violations", "expected type of violations"),
 				row(filePathIntroductionAndConclusionSizeError, 2, RuleViolationType.Error),
 				row(filePathIntroductionAndConclusionSizeWarning, 2, RuleViolationType.Warning),
 				row(filePathBibliographySize, 1, RuleViolationType.Error),
