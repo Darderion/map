@@ -1,16 +1,15 @@
 package com.github.darderion.mundaneassignmentpolice.checker.rule.symbol
 
-import com.github.darderion.mundaneassignmentpolice.checker.Direction
 import com.github.darderion.mundaneassignmentpolice.checker.RuleViolationType
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFArea
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFRegion
 
 class PositionSymbolRuleBuilder {
     private var symbol: Char = ' '
-    private var xCantBeMore: Int = 600
-    private var yCantBeMore: Int = 850
-    private var xCantBeLess: Int = 0
-    private var yCantBeLess: Int = 0
+    private var maxX: Int = 600
+    private var maxY: Int = 850
+    private var minX: Int = 0
+    private var minY: Int = 0
     private var type: RuleViolationType = RuleViolationType.Error
     private var name: String = "Rule name"
     private var region: PDFRegion = PDFRegion.EVERYWHERE
@@ -21,22 +20,22 @@ class PositionSymbolRuleBuilder {
 
     infix fun inArea(region: PDFRegion) = this.also { this.region = region }
 
-    fun xCantBeMore(xPosition: Int) = this.also { this.xCantBeMore = xPosition }
+    fun xCantBeMoreThan(xPosition: Int) = this.also { this.maxX = xPosition }
 
-    fun yCantBeMore(yPosition: Int) = this.also { this.yCantBeMore = yPosition }
+    fun yCantBeMoreThan(yPosition: Int) = this.also { this.maxY = yPosition }
 
-    fun xCantBeLess(xPosition: Int) = this.also { this.xCantBeLess = xPosition }
+    fun xCantBeLessThan(xPosition: Int) = this.also { this.minX = xPosition }
 
-    fun yCantBeLess(yPosition: Int) = this.also { this.yCantBeLess = yPosition }
+    fun yCantBeLessThan(yPosition: Int) = this.also { this.minY = yPosition }
 
     infix fun type(type: RuleViolationType) = this.also { this.type = type }
 
     fun getRule() = PositionSymbolRule(
         symbol,
-        xCantBeMore,
-        yCantBeMore,
-        xCantBeLess,
-        yCantBeLess,
+        maxX,
+        maxY,
+        minX,
+        minY,
         type,
         region,
         name

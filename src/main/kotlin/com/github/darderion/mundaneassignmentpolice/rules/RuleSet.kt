@@ -5,7 +5,7 @@ import com.github.darderion.mundaneassignmentpolice.checker.rule.Rule
 val RULE_SET_RU = RuleSet(
     mutableListOf(
         RULE_LITLINK,
-        RULE_SYMBOL_OUTSIDE_FIELDS,
+        RULE_SYMBOL_OUTSIDE_PAGE_MARGIN,
         RULE_SHORT_DASH,
         RULE_MEDIUM_DASH,
         RULE_LONG_DASH,
