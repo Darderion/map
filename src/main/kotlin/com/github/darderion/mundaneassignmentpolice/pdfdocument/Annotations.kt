@@ -12,7 +12,7 @@ class Annotations {
 			var document = PDFBox().getDocument(pdf.name)
 			lines.forEach { line ->
 				document = PDFBox().addLine(document, line.page,
-					Coordinate(line.position.x to (pdf.height - (line.position.y + 2))),
+					Coordinate(line.position.x to (pdf.height - (line.text.maxOf { it.position.y } + 2))),
 					(pdf.width - (line.position.x + 50)).toInt()
 				)
 			}
