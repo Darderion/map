@@ -1,15 +1,15 @@
 package com.github.darderion.mundaneassignmentpolice.statisticsservice.statistics
 
+import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFArea
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFDocument
-import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFStructure
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Line
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Section
-import com.github.darderion.mundaneassignmentpolice.wrapper.PDFBox
+import com.github.darderion.mundaneassignmentpolice.statisticsservice.statistics.area.BibliographyStatistics
+import com.github.darderion.mundaneassignmentpolice.statisticsservice.statistics.area.SectionStatistics
 import java.io.File
 import kotlin.math.floor
 import kotlin.math.max
 import kotlin.math.min
-
 
 class StatisticsBuilder
 {
@@ -80,32 +80,42 @@ class StatisticsBuilder
         val topKWords = allWords.toList().sortedByDescending { (k, v) -> v }.toMap()
         return WordsStatistic(wordCount,topKWords)
     }
-    fun getPageStatistic(pdfName: String,pdf: PDFDocument): PageStatistic {
-        val pdfSections = PDFStructure(pdf.text).sections
-        val pdfSize = PDFBox().getPDFSize(pdfName)
-        val newpdfStructure: MutableList<Section> = mutableListOf()
-        val statistic: MutableList<SectionStatistics> = mutableListOf()
+
+    fun getPageStatistic(pdf: PDFDocument) = PageStatistic(
+        pdf.text.size,
+        getSectionsStatistics(pdf),
+        getBibliographyStatistics(pdf)
+    )
+
+    fun getSectionsStatistics(pdf: PDFDocument): List<SectionStatistics> {
+        val pdfSections = pdf.areas!!.sections
+        val pdfSize = pdf.numberOfPages
+        val newPdfStructure: MutableList<Section> = mutableListOf()
+
         for (section in pdfSections)
             if (section.title[2].isDigit())
                 continue
             else {
-                newpdfStructure.add(section)
+                newPdfStructure.add(section)
             }
-        for (i in 0 until newpdfStructure.size) {
-            var sectionSizeInPage: Int
-            var sectionSizeInPercents: Float
-            if (i != newpdfStructure.size - 1) {
-                sectionSizeInPage =
-                    pdf.text[newpdfStructure[i + 1].titleIndex].page - pdf.text[newpdfStructure[i].titleIndex].page
-                sectionSizeInPercents = sectionSizeInPage / pdfSize.toFloat()
+
+        val sectionStatistic: MutableList<SectionStatistics> = mutableListOf()
+        for (i in 0 until newPdfStructure.size) {
+            val sectionSizeInPage: Int = if (i != newPdfStructure.size - 1) {
+                pdf.text[newPdfStructure[i + 1].titleIndex].page - pdf.text[newPdfStructure[i].titleIndex].page
             } else {
-                sectionSizeInPage = max(pdfSize - pdf.text[newpdfStructure[i].titleIndex].page, 1)
-                sectionSizeInPercents = sectionSizeInPage / pdfSize.toFloat()
+                pdf.text.first { it.area == PDFArea.BIBLIOGRAPHY }.page - pdf.text[newPdfStructure[i].titleIndex].page
             }
-            statistic.add(SectionStatistics(newpdfStructure[i], sectionSizeInPage, sectionSizeInPercents, pdfSize))
+            sectionStatistic.add(SectionStatistics(newPdfStructure[i], sectionSizeInPage, pdfSize))
         }
-        return PageStatistic(pdf.text.size, statistic)
+
+        return sectionStatistic
     }
+
+    fun getBibliographyStatistics(pdf: PDFDocument) = BibliographyStatistics(
+        pdf.numberOfPages - pdf.text.first { it.area == PDFArea.BIBLIOGRAPHY }.page,
+        pdf.numberOfPages
+    )
 
     private fun isSecondHalfOfWord(previousLine : Line): Boolean
     {
@@ -113,5 +123,4 @@ class StatisticsBuilder
                 && previousLine.text[ previousLine.text.size-1 ].text!=""
                 && previousLine.text[ previousLine.text.size-1 ].text.last()=='-')
     }
-
 }

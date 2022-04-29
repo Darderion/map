@@ -4,7 +4,13 @@ import com.github.darderion.mundaneassignmentpolice.TestsConfiguration
 import com.github.darderion.mundaneassignmentpolice.rules.*
 import com.github.darderion.mundaneassignmentpolice.wrapper.PDFBox
 import io.kotest.core.spec.style.StringSpec
+import io.kotest.data.forAll
+import io.kotest.data.headers
+import io.kotest.data.row
+import io.kotest.data.table
+import io.kotest.inspectors.forAll
 import io.kotest.matchers.ints.shouldBeExactly
+import io.kotest.matchers.shouldBe
 
 class RulesTests : StringSpec({
 	"Symbol rule should detect incorrect symbols ? in links" {
@@ -33,12 +39,12 @@ class RulesTests : StringSpec({
 	}
 	"Symbol rule should detect writing integers from one to nine as digits instead of words" {
 		RULES_SMALL_NUMBERS.sumOf { it.process(PDFBox().getPDF(filePathSmallNumbers)).count() } shouldBeExactly 6
-	}
+    }
 	"Symbol rule should detect the lack of space around brackets" {
 		RULES_SPACE_AROUND_BRACKETS.map { it.process(PDFBox().getPDF(filePathSpaceAroundBrackets)) }
 			.flatten()
 			.count() shouldBeExactly 16
-	}
+    }
 	"Symbol rule should detect incorrect citation" {
 		RULE_CITATION.process(PDFBox().getPDF(filePathCitation)).count() shouldBeExactly 2
 	}
@@ -50,6 +56,7 @@ class RulesTests : StringSpec({
 	}
 	"Rule should detect links of different types" {
 		RULE_URLS_UNIFORMITY.process(PDFBox().getPDF(filePathUniformityUrls)).count() shouldBeExactly 2
+	}
 	"Regex rule should detect incorrect order of literature references"{
 		RULE_ORDER_OF_REFERENCES.process(PDFBox().getPDF(filePathOrderOfReferences)).count() shouldBeExactly 3
 	}
@@ -58,6 +65,24 @@ class RulesTests : StringSpec({
 	}
 	"Table of content rule should detect incorrect order of sections"{
 		RULE_SECTIONS_ORDER.process(PDFBox().getPDF(filePathOrderOfSections)).count() shouldBeExactly 5
+	}
+	"Section rules should detect sections whose size exceeds specified limit" {
+		forAll(
+			table(
+				headers("file path", "expected number of violations", "expected type of violations"),
+				row(filePathIntroductionAndConclusionSizeError, 2, RuleViolationType.Error),
+				row(filePathIntroductionAndConclusionSizeWarning, 2, RuleViolationType.Warning),
+				row(filePathBibliographySize, 1, RuleViolationType.Error),
+				row(filePathProblemStatementSize, 1, RuleViolationType.Error)
+			)
+		) { filePath: String, numberOfViolations: Int, violationType: RuleViolationType ->
+			val violations = RULES_SECTION_SIZE.map {
+				it.process(PDFBox().getPDF(filePath))
+			}.flatten()
+
+			violations.count() shouldBeExactly numberOfViolations
+			violations.forAll { it.type shouldBe violationType }
+		}
 	}
 }) {
 	companion object {
@@ -72,7 +97,6 @@ class RulesTests : StringSpec({
 			"${TestsConfiguration.resourceFolder}checker/SymbolRuleTestsSpaceAroundBrackets.pdf"
 		const val filePathCitation = "${TestsConfiguration.resourceFolder}checker/SymbolRuleTestsCitation.pdf"
 		const val filePathShortenedUrls = "${TestsConfiguration.resourceFolder}checker/URLRuleShortenedUrls.pdf"
-		const val filePathSymbolsInSectionNames = "${TestsConfiguration.resourceFolder}checker/RulesTestsSymbolsInSectionNames.pdf"
 		const val filePathUniformityUrls = "${TestsConfiguration.resourceFolder}checker/URLRuleUniformityURL.pdf"
 		const val filePathSymbolsInSectionNames =
 			"${TestsConfiguration.resourceFolder}checker/RulesTestsSymbolsInSectionNames.pdf"
@@ -82,5 +106,14 @@ class RulesTests : StringSpec({
 			"${TestsConfiguration.resourceFolder}checker/RegexRuleTestsVariousAbbreviations.pdf"
 		const val filePathOrderOfSections =
 			"${TestsConfiguration.resourceFolder}checker/TableOfContentRuleTestsSectionsOrder.pdf"
+
+		const val filePathIntroductionAndConclusionSizeError =
+			"${TestsConfiguration.resourceFolder}checker/SectionSizeRuleTestsIntroductionAndConclusionError.pdf"
+		const val filePathIntroductionAndConclusionSizeWarning =
+			"${TestsConfiguration.resourceFolder}checker/SectionSizeRuleTestsIntroductionAndConclusionWarning.pdf"
+		const val filePathBibliographySize =
+			"${TestsConfiguration.resourceFolder}checker/SectionSizeRuleTestsBibliography.pdf"
+		const val filePathProblemStatementSize =
+			"${TestsConfiguration.resourceFolder}checker/SectionSizeRuleTestsProblemStatement.pdf"
 	}
 }
