@@ -186,11 +186,11 @@ val RULE_SYMBOLS_IN_SECTION_NAMES = TableOfContentRuleBuilder()
 	}.called("""Символы ":", ".", "," в названии секции""")
 	.getRule()
 
-val pageMargin = 580
-val RULE_SYMBOL_OUTSIDE_PAGE_MARGIN = PositionSymbolRuleBuilder()
+val SymbolFields = 580
+val RULE_SYMBOL_OUTSIDE_FIELDS = PositionSymbolRuleBuilder()
 	.inArea(PDFRegion.EVERYWHERE.except(PDFArea.TABLE_OF_CONTENT, PDFArea.TITLE_PAGE))
 	.called("Символ находится за полями")
-	.xCantBeMoreThan(pageMargin)
+	.xCantBeMore(SymbolFields)
 	.getRule()
 
 val smallNumbersRuleName = "Неправильное написание целых чисел от 1 до 9"

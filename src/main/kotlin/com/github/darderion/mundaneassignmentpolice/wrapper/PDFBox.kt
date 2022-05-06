@@ -100,8 +100,8 @@ class PDFBox {
 
 		val strippers = listOf(stripper, textStripper)
 
-		var lineIndex = 0
-		for(pageIndex in (0..document.pages.count)) {
+		var lineIndex = -1
+		for (pageIndex in (0 until document.pages.count)) {
 			// For each page
 			strippers.forEach {
 				it.startPage = pageIndex + 1

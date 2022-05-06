@@ -2,7 +2,6 @@ package com.github.darderion.mundaneassignmentpolice.pdfdocument
 
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Line
 import mu.KotlinLogging
-import java.lang.Exception
 
 class PDFDocument(val name: String = "PDF",
 				  val text: List<Line>,
