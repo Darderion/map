@@ -1,5 +1,6 @@
 package com.github.darderion.mundaneassignmentpolice.rules
 
+import com.github.darderion.mundaneassignmentpolice.checker.Direction
 import com.github.darderion.mundaneassignmentpolice.checker.RuleViolationType
 import com.github.darderion.mundaneassignmentpolice.checker.rule.list.ListRuleBuilder
 import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.SymbolRuleBuilder
@@ -7,10 +8,9 @@ import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.and
 import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.or
 import com.github.darderion.mundaneassignmentpolice.checker.rule.tableofcontent.TableOfContentRuleBuilder
 import com.github.darderion.mundaneassignmentpolice.checker.rule.url.URLRuleBuilder
-import com.github.darderion.mundaneassignmentpolice.checker.rule.word.WordRule
-import com.github.darderion.mundaneassignmentpolice.checker.rule.word.WordRuleBuilder
-import com.github.darderion.mundaneassignmentpolice.checker.rule.word.or
+import com.github.darderion.mundaneassignmentpolice.checker.rule.word.*
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFArea
+import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFDocument
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFRegion
 import com.github.darderion.mundaneassignmentpolice.utils.URLUtil
 import java.util.*
@@ -186,6 +186,33 @@ val RULE_SYMBOLS_IN_SECTION_NAMES = TableOfContentRuleBuilder()
 			text.contains("[:.,]".toRegex())
 		}
 	}.called("""Символы ":", ".", "," в названии секции""")
+	.getRule()
+
+val RULE_TWO_IDENTICAL_WORDS = PredicateWordRuleBuilder()
+	.inArea(PDFRegion.EVERYWHERE.except(PDFArea.TABLE_OF_CONTENT))
+	.called("Два одинаковых слова подряд")
+	.setRuleBody { document: PDFDocument, line: Int, index: Int ->
+		val area = PDFRegion.EVERYWHERE.except(PDFArea.TABLE_OF_CONTENT)
+		val wordIndex = index + splitToWordsAndPunctuations(
+			document.getTextFromLines(line - 1, line - 1, area)
+		).size +
+				2 * line.coerceAtMost(1).coerceAtMost(1)
+		val words = splitToWordsAndPunctuations(
+			document.getTextFromLines(line - 1, line + 1, area)
+		)
+		val sideWords = mutableListOf(
+			words.slice(IntRange(0, wordIndex - 1)).reversed(),
+			words.slice(IntRange(wordIndex + 1, words.size - 1))
+		)
+		val neighbors = sideWords
+			.filter { it.isNotEmpty() }
+			.map { it.slice(IntRange(0, 0)) }
+			.flatten()
+		if (neighbors[0] == neighbors[1] && neighbors[0].first().isLetter()) {
+			return@setRuleBody true
+		}
+		return@setRuleBody false
+	}
 	.getRule()
 
 val smallNumbersRuleName = "Неправильное написание целых чисел от 1 до 9"
