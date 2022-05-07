@@ -55,6 +55,11 @@ abstract class FormulaRule(
         if (formulaText.isNotEmpty())
             formulas.add(Formula(formulaText.dropLastWhile { it.text == " " }, formulaLines.toSet()))
 
-        return formulas
+        return filterFormulas(formulas)
     }
+
+    private fun filterFormulas(formulas: List<Formula>) =
+        formulas.filterNot {
+            it.text.size == 1 && it.text[0].text == "∗"   // remove single special characters
+        }
 }
