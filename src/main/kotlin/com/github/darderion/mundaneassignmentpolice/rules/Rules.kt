@@ -2,6 +2,9 @@ package com.github.darderion.mundaneassignmentpolice.rules
 
 import com.github.darderion.mundaneassignmentpolice.checker.RuleViolationType
 import com.github.darderion.mundaneassignmentpolice.checker.rule.list.ListRuleBuilder
+import com.github.darderion.mundaneassignmentpolice.checker.rule.list.conclusionPages
+import com.github.darderion.mundaneassignmentpolice.checker.rule.list.getTaskFromLines
+import com.github.darderion.mundaneassignmentpolice.checker.rule.list.taskPages
 import com.github.darderion.mundaneassignmentpolice.checker.rule.regex.RegexRuleBuilder
 import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.SymbolRuleBuilder
 import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.and
@@ -172,70 +175,47 @@ val RULE_SINGLE_SUBSECTION = ListRuleBuilder()
 		if (it.nodes.count() == 1) it.nodes.first().getText() else listOf()
 	}.getRule()
 
-var taskPages = -1 to -1
-var conclusionPages = -1 to -1
 var tasks = PDFList<Line>()
-const val SYMBOLS_AT_THE_AND=5
-fun getSectionsPage(keyWords: Regex, lines: List<Line>): Pair<Int,Int>{
-	var pages = -1 to -1
-	if (lines.size > 1 && lines[0].area == PDFArea.TABLE_OF_CONTENT) {
-		for (i in lines.indices-1) {
-			if (lines[i].text.toString().contains(keyWords)) {
-				pages = if (i != lines.size-1)
-					Regex("""\d{1,2}""").find(lines[i].text.toString(),lines[i].text.toString().length - SYMBOLS_AT_THE_AND)!!.value.toInt() to
-							Regex("""\d{1,2}""").find(lines[i+1].text.toString(),lines[i+1].text.toString().length - SYMBOLS_AT_THE_AND)!!.value.toInt()
-					//looks for 1 or 2 digits at the end of lines
-				else
-					Regex("""\d{1,2}""").find(lines[i].text.toString(),lines[i].text.toString().length - SYMBOLS_AT_THE_AND)!!.value.toInt() to -1
-					//looks for 1 or 2 digits at the end of a line
-				break
+var results = PDFList<Line>()
+var nodesChecked = false
+val RULE_TASK_MAPPING = ListRuleBuilder()
+	.called("Задачи не совпадают c результатами")
+	.inArea(PDFRegion.NOWHERE.except(PDFArea.SECTION))
+	.disallow {
+		if (taskPages == -1 to -1 || nodesChecked) listOf()
+		else {
+			if (it.nodes.isNotEmpty() && it.nodes[0].value[0].page >= taskPages.first &&
+				it.nodes.last().value[0].page < taskPages.second)
+				tasks = it
+
+			if (it.nodes.isNotEmpty() && it.nodes[0].value[0].page >= conclusionPages.first &&
+				it.nodes.size >= tasks.nodes.size)
+				results = it
+
+			if (tasks.nodes.isNotEmpty() && results.nodes.isNotEmpty()) {
+				val ruleViolationsPDFList = results.nodes.filterIndexed { index, pdfList ->
+					index < tasks.nodes.size
+							&& getTaskFromLines(tasks.nodes[index]) != getTaskFromLines(pdfList)
+				}
+				val ruleViolationsList = mutableListOf<Line>()
+				if (ruleViolationsPDFList.isNotEmpty())
+					ruleViolationsPDFList.forEach { ruleViolationsList.addAll(it.getText()) }
+
+				if (ruleViolationsList.isNotEmpty()) {
+					nodesChecked = true
+					ruleViolationsList
+				} else listOf()
 			}
+			else listOf()
 		}
 	}
-	return pages
-}
-fun getTaskFromLines(task : PDFList<Line>) : String
-{
-	var taskText =""
-	for (j in 0 until task.value.size) {
-		taskText += if (j == 0)
-			task.value[j].text.filterIndexed { index, _ -> index > 2 }.toString().drop(1).dropLast(1)
-		else task.value[j].text.toString().drop(1).dropLast(1)
-		if (taskText.isNotEmpty() && taskText.last() == '-')
-			taskText = taskText.replace(Regex("-"),"")
-		else taskText += ", ,"
-	}
-	return taskText
-}
+	.getRule()
 
-val RULE_TASK_MAPPING = ListRuleBuilder()
-	.called("Задачи не совпадают c результатами или не выделены в содержании")
-	.inArea(PDFRegion.NOWHERE.except(PDFArea.TABLE_OF_CONTENT,PDFArea.SECTION))
+var RULE_NO_TASKS = TableOfContentRuleBuilder()
+	.called("Задачи не выделены в содержании")
 	.disallow {
-		if (taskPages == -1 to -1)
-			taskPages = getSectionsPage(Regex("""[Зз]адачи"""), it.getText())
-		if (conclusionPages == -1 to -1)
-			conclusionPages = getSectionsPage(Regex("""Заключение"""), it.getText())
-
-		val resultNodes = mutableListOf<Line>()
-
-		if (it.nodes.isNotEmpty() && it.nodes[0].value[0].page >= taskPages.first-1 &&
-			it.nodes.last().value[0].page < taskPages.second-1)
-			tasks = it
-
-		if (it.nodes.isNotEmpty() && taskPages == -1 to -1 &&
-			it.nodes[0].value[0].page >= conclusionPages.first-1 && conclusionPages.first != -1)
-			it.getText()
-		else if (it.nodes.isNotEmpty() && tasks.nodes.isNotEmpty() && taskPages != -1 to -1 &&
-				it.nodes[0].value[0].page >= conclusionPages.first-1) {
-			if (it.nodes.size == tasks.nodes.size) {
-				it.nodes.forEachIndexed { index, pdfList ->
-					if (getTaskFromLines(tasks.nodes[index]) != getTaskFromLines(pdfList))
-						resultNodes.addAll(pdfList.getText())
-				}
-				if (resultNodes.size>0) resultNodes.toList() else listOf()
-			} else it.getText()
-		} else listOf()
+		val tasks = it.filter { it.text.toString().contains(Regex("""[Зз]адачи""")) }
+		if (tasks.isEmpty()) listOf(it[0]) else listOf()
 	}
 	.getRule()
 
