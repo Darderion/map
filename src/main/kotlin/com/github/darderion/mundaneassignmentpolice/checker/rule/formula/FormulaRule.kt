@@ -48,6 +48,8 @@ abstract class FormulaRule(
 
     private fun filterFormulas(formulas: List<Formula>) =
         formulas.filterNot {
-            it.text.size == 1 && it.text[0].text == "∗"   // remove single special characters
+            it.text.size == 1 && it.text.first().text == "∗"   // remove single special characters
+        }.filterNot {
+            it.text.size == 1 && it.text.first().text.toDoubleOrNull() != null  // remove numbers
         }
 }

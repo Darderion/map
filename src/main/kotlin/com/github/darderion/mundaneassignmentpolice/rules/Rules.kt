@@ -320,12 +320,17 @@ val commaAfterFormulaRule = FormulaPunctuationRuleBuilder()
 		val (firstAfterFormula, secondAfterFormula) = filteredText.first() to filteredText.getOrNull(1)
 		if (nextFormula != null) {
 			if (firstAfterFormula == nextFormula.text.first()) {
-				return@rule if (lastFormulaSymbol != PunctuationMark.COMMA.value) violationLines else emptyList()
+				return@rule if (lastFormulaSymbol == PunctuationMark.COMMA.value ||
+					lastFormulaSymbol == PunctuationMark.FULL_STOP.value
+				) emptyList()
+				else violationLines
 			}
 
 			if (firstAfterFormula.text.isPunctuationMark() && secondAfterFormula == nextFormula.text.first()) {
-				return@rule if (firstAfterFormula.text.single() != PunctuationMark.COMMA.value) violationLines
-				else emptyList()
+				return@rule if (firstAfterFormula.text.single() == PunctuationMark.COMMA.value ||
+					firstAfterFormula.text.single() == PunctuationMark.FULL_STOP.value
+				) emptyList()
+				else violationLines
 			}
 		}
 
