@@ -6,3 +6,5 @@ enum class PunctuationMark(val value: Char) {
 }
 
 fun Char.isPunctuationMark() = PunctuationMark.values().map { it.value }.contains(this)
+
+fun String.isPunctuationMark() = this.length == 1 && this.single().isPunctuationMark()

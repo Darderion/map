@@ -1,32 +1,31 @@
 package com.github.darderion.mundaneassignmentpolice.checker.rule.formula
 
-import com.github.darderion.mundaneassignmentpolice.checker.PunctuationMark
 import com.github.darderion.mundaneassignmentpolice.checker.RuleViolationType
+import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Formula
+import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Line
+import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Word
 
 class FormulaPunctuationRuleBuilder {
     private var type: RuleViolationType = RuleViolationType.Error
     private var name: String = "Rule name"
-    private var punctuationMark: PunctuationMark = PunctuationMark.FULL_STOP
-    private var indicatorWords: MutableList<Regex> = mutableListOf()
     private var ignoredWords: MutableList<Regex> = mutableListOf()
+    private var ruleBody: (formula: Formula, filteredText: List<Word>, nextFormula: Formula?) -> List<Line> =
+        { _, _, _ -> emptyList() }
 
     infix fun called(name: String) = this.also { this.name = name }
 
     infix fun type(type: RuleViolationType) = this.also { this.type = type }
 
-    infix fun requiredPunctuationMark(punctuationMark: PunctuationMark) = this.also {
-        this.punctuationMark = punctuationMark
-    }
+    fun ignoredWords(vararg regexes: Regex) = this.also { ignoredWords.addAll(regexes) }
 
-    fun indicatorWords(vararg words: Regex) = this.also { indicatorWords.addAll(words.toList()) }
-
-    fun ignoredWords(vararg symbols: Regex) = this.also { ignoredWords.addAll(symbols.toList()) }
+    infix fun rule(
+        ruleBody: (formula: Formula, filteredText: List<Word>, nextFormula: Formula?) -> List<Line>
+    ) = this.also { this.ruleBody = ruleBody }
 
     fun getRule() = FormulaPunctuationRule(
         type,
         name,
-        punctuationMark,
-        indicatorWords,
-        ignoredWords
+        ignoredWords,
+        ruleBody
     ) as FormulaRule
 }

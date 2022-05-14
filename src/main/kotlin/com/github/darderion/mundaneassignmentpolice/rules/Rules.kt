@@ -2,6 +2,7 @@ package com.github.darderion.mundaneassignmentpolice.rules
 
 import com.github.darderion.mundaneassignmentpolice.checker.PunctuationMark
 import com.github.darderion.mundaneassignmentpolice.checker.RuleViolationType
+import com.github.darderion.mundaneassignmentpolice.checker.isPunctuationMark
 import com.github.darderion.mundaneassignmentpolice.checker.rule.formula.FormulaPunctuationRuleBuilder
 import com.github.darderion.mundaneassignmentpolice.checker.rule.list.ListRuleBuilder
 import com.github.darderion.mundaneassignmentpolice.checker.rule.regex.RegexRuleBuilder
@@ -269,24 +270,79 @@ val RULE_ORDER_OF_REFERENCES = RegexRuleBuilder()
 
 private val ignoringAfterFormula = listOf(
 	"""\s""".toRegex(),
-	"""\([0-9]+\)""".toRegex()  // ignore formula reference
+	"""\([0-9]+\)""".toRegex()  // ignore formula reference, e.g. "(1)"
 )
 
 val fullStopAfterFormulaRule = FormulaPunctuationRuleBuilder()
 	.called("Отсутствует точка после формулы")
-	.requiredPunctuationMark(PunctuationMark.FULL_STOP)
-	// if after a formula there is a capitalized word that indicates the beginning of a new sentence
-	.indicatorWords("""[A-ZА-Я].*?""".toRegex())
-	// if no sentence after a formula
-	.indicatorWords("""$""".toRegex())
 	.ignoredWords(*ignoringAfterFormula.toTypedArray())
+	.rule { formula, filteredText, nextFormula ->
+		val violationLines = listOf(formula.lines.last())
+		val lastFormulaSymbol = formula.text.last().text.last()
+
+		if (filteredText.isEmpty()) {
+			return@rule if (lastFormulaSymbol != PunctuationMark.FULL_STOP.value) violationLines else emptyList()
+		}
+
+		val (firstAfterFormula, secondAfterFormula) = filteredText.first() to filteredText.getOrNull(1)
+		if (nextFormula != null &&
+			(firstAfterFormula == nextFormula.text.first() ||
+				firstAfterFormula.text.isPunctuationMark() && secondAfterFormula == nextFormula.text.first())
+		) {
+			return@rule emptyList()
+		}
+
+		val indicator = """[A-ZА-Я].*?""".toRegex()
+		if (indicator.matches(firstAfterFormula.text)) {
+			return@rule if (lastFormulaSymbol != PunctuationMark.FULL_STOP.value) violationLines else emptyList()
+		}
+
+		if (firstAfterFormula.text.isPunctuationMark() &&
+			secondAfterFormula != null && indicator.matches(secondAfterFormula.text)
+		) {
+			return@rule if (firstAfterFormula.text.single() != PunctuationMark.FULL_STOP.value) violationLines
+			else emptyList()
+		}
+
+		return@rule emptyList()
+	}
 	.getRule()
 
 val commaAfterFormulaRule = FormulaPunctuationRuleBuilder()
 	.called("Отсутствует запятая после формулы")
-	.requiredPunctuationMark(PunctuationMark.COMMA)
-	.indicatorWords("""где""".toRegex())
 	.ignoredWords(*ignoringAfterFormula.toTypedArray())
+	.rule { formula, filteredText, nextFormula ->
+		val violationLines = listOf(formula.lines.last())
+		val lastFormulaSymbol = formula.text.last().text.last()
+
+		if (filteredText.isEmpty()) return@rule emptyList()
+
+		val (firstAfterFormula, secondAfterFormula) = filteredText.first() to filteredText.getOrNull(1)
+		if (nextFormula != null) {
+			if (firstAfterFormula == nextFormula.text.first()) {
+				return@rule if (lastFormulaSymbol != PunctuationMark.COMMA.value) violationLines else emptyList()
+			}
+
+			if (firstAfterFormula.text.isPunctuationMark() && secondAfterFormula == nextFormula.text.first()) {
+				return@rule if (firstAfterFormula.text.single() != PunctuationMark.COMMA.value) violationLines
+				else emptyList()
+			}
+		}
+
+		val indicator = """где""".toRegex()
+		if (indicator.matches(firstAfterFormula.text)) {
+			return@rule if (lastFormulaSymbol != PunctuationMark.COMMA.value) violationLines else emptyList()
+		}
+
+		if (firstAfterFormula.text.isPunctuationMark() &&
+			secondAfterFormula != null && indicator.matches(secondAfterFormula.text)
+		) {
+			return@rule if (firstAfterFormula.text.single() != PunctuationMark.COMMA.value) violationLines
+			else emptyList()
+		}
+
+		return@rule emptyList()
+	}
 	.getRule()
 
 val RULES_FORMULA_PUNCTUATION = listOf(fullStopAfterFormulaRule, commaAfterFormulaRule)

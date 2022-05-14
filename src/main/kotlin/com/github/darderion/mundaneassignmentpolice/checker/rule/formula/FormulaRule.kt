@@ -16,22 +16,10 @@ abstract class FormulaRule(
     type: RuleViolationType,
     name: String
 ) : Rule(PDFRegion.NOWHERE.except(PDFArea.SECTION), name, type) {
-    abstract fun getLinesOfViolation(document: PDFDocument, formula: Formula): List<Line>
+    abstract fun getViolations(document: PDFDocument, formulas: List<Formula>): List<RuleViolation>
 
-    override fun process(document: PDFDocument): List<RuleViolation> {
-        val rulesViolations = mutableListOf<RuleViolation>()
-        val formulas = getAllFormulas(document)
-
-        formulas.forEach { formula ->
-            getLinesOfViolation(document, formula).let {
-                if (it.isNotEmpty()) {
-                    rulesViolations.add(RuleViolation(it, name, type))
-                }
-            }
-        }
-
-        return rulesViolations
-    }
+    override fun process(document: PDFDocument) =
+        getViolations(document, getAllFormulas(document))
 
     private fun getAllFormulas(document: PDFDocument): List<Formula> {
         val text = document.text.filter { it.area!! inside area && it.isNotEmpty() }
