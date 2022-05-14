@@ -53,7 +53,7 @@ class RulesTests : StringSpec({
 	}
 	"Formula punctuation rules should detect the absence of a full stop or a comma after a formula"{
 		fullStopAfterFormulaRule.process(PDFBox().getPDF(filePathFormulaPunctuation)).count() shouldBeExactly 3
-		commaAfterFormulaRule.process(PDFBox().getPDF(filePathFormulaPunctuation)).count() shouldBeExactly 3
+		commaAfterFormulaRule.process(PDFBox().getPDF(filePathFormulaPunctuation)).count() shouldBeExactly 4
 	}
 }) {
 	companion object {

@@ -31,6 +31,7 @@ abstract class FormulaRule(
         text.forEach { line ->
             line.text.forEach { word ->
                 if (word.font.type == PostScriptFontType.TYPE2 || word.text == " " && formulaText.isNotEmpty()) {
+                    // also captures some records in tables and code listings
                     formulaText.add(word)
                     formulaLines.add(line)
                 } else if (formulaText.isNotEmpty()) {

@@ -284,6 +284,7 @@ val fullStopAfterFormulaRule = FormulaPunctuationRuleBuilder()
 			return@rule if (lastFormulaSymbol != PunctuationMark.FULL_STOP.value) violationLines else emptyList()
 		}
 
+		// full stop is not required if there is another formula after the formula
 		val (firstAfterFormula, secondAfterFormula) = filteredText.first() to filteredText.getOrNull(1)
 		if (nextFormula != null &&
 			(firstAfterFormula == nextFormula.text.first() ||
@@ -292,11 +293,12 @@ val fullStopAfterFormulaRule = FormulaPunctuationRuleBuilder()
 			return@rule emptyList()
 		}
 
-		val indicator = """[A-ZА-Я].*?""".toRegex()
+		val indicator = """[A-ZА-Я].*?""".toRegex() // capitalized word that indicates the beginning of a new sentence
 		if (indicator.matches(firstAfterFormula.text)) {
 			return@rule if (lastFormulaSymbol != PunctuationMark.FULL_STOP.value) violationLines else emptyList()
 		}
 
+		// case when a punctuation mark is after the formula and not the last symbol of the formula
 		if (firstAfterFormula.text.isPunctuationMark() &&
 			secondAfterFormula != null && indicator.matches(secondAfterFormula.text)
 		) {
@@ -317,6 +319,7 @@ val commaAfterFormulaRule = FormulaPunctuationRuleBuilder()
 
 		if (filteredText.isEmpty()) return@rule emptyList()
 
+		// comma is required if there is another formula after the formula
 		val (firstAfterFormula, secondAfterFormula) = filteredText.first() to filteredText.getOrNull(1)
 		if (nextFormula != null) {
 			if (firstAfterFormula == nextFormula.text.first()) {
@@ -339,6 +342,7 @@ val commaAfterFormulaRule = FormulaPunctuationRuleBuilder()
 			return@rule if (lastFormulaSymbol != PunctuationMark.COMMA.value) violationLines else emptyList()
 		}
 
+		// case when a punctuation mark is after the formula and not the last symbol of the formula
 		if (firstAfterFormula.text.isPunctuationMark() &&
 			secondAfterFormula != null && indicator.matches(secondAfterFormula.text)
 		) {
