@@ -14,8 +14,22 @@ Supported mistakes that can be caught:
 * Incorrect usage of <span style="background-color: #222; color: #55c">⠀-⠀</span>
 * Incorrect usage of <span style="background-color: #222; color: #55c">⠀--⠀</span>
 * Incorrect usage of <span style="background-color: #222; color: #55c">⠀---⠀</span>
+* <span style="background-color: #222; color: #55c">⠀"Quotation marks"⠀</span> instead of <span style="background-color: #222; color: #55c">⠀“Quotation marks”⠀</span>
 * Litlinks <span style="background-color: #222; color: #b55">⠀[?]⠀</span>
+* Litlinks as <span style="background-color: #222; color: #b55">⠀[1] [2]⠀</span> instead of <span style="background-color: #222; color: #55c">⠀[1, 2]⠀</span>
+* <span style="background-color: #222; color: #b55"> Text (Sentence inside brackets)⠀</span> instead of <span style="background-color: #222; color: #55c">⠀Text (sentence inside brackets)⠀</span>
+* <span style="background-color: #222; color: #b55"> Text. [1]⠀</span> instead of <span style="background-color: #222; color: #55c">⠀Text [1].⠀</span>
 * Lists that only contain a single item
+* Indexes for sections titled *INTRODUCTION*, *CONCLUSION*, *BIBLIOGRAPHY*
+* Symbols <span style="background-color: #222; color: #b55"> ":", ".", "," </span> in section's title
+* <span style="background-color: #222; color: #b55">Short URL</span> instead of <span style="background-color: #222; color: #55c">full URL</span>
+* Different styles of URL (https://google.com, http://google.com, www.google.com)
+* Incorrect order of bibliography references
+* Different versions of the same abbreviation (DfS and DFS)
+* Incorrect order of sections
+* "Low-quality conferences" as references (According to https://beallslist.net/)
+* Spaces around brackets
+* Single-digit numbers written as numbers
 
 ### Built With
 
@@ -28,13 +42,11 @@ Supported mistakes that can be caught:
 <!-- USAGE EXAMPLES -->
 ## Usage
 
-* Docker:
-  * `$ docker build -t map .`
-  * `$ docker run --rm -it -p 8080:8080 map:latest`
 * Maven:
   * `$ bash buildscript.sh`
-  * `$ cd target`
-  * `$ java -jar app.jar`
+  * `$ cd build`
+  * `$ bash server.sh`
+  * `$ bash webapp.sh`
 
 1. Upload your PDF file
 2. Review mistakes

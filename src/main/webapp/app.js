@@ -1,5 +1,5 @@
 
-let port = 8081
+let port = 8080
 
 const portIndex = process.argv.indexOf('--port')
 
@@ -22,7 +22,13 @@ fastify.register(require('fastify-static'), {
 
 const start = async () => {
 	try {
-		await fastify.listen(port)
+		await fastify.listen(port, '0.0.0.0', function(err, address) {
+			if (err) {
+				fastify.log.error(err)
+				process.exit(1)
+			}
+			fastify.log.info(`Server listening on ${address}`)
+		})
 	} catch (err) {
 		fastify.log.error(err)
 		process.exit(1)
