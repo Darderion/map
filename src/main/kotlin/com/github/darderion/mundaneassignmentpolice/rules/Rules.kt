@@ -294,7 +294,7 @@ val RULE_SHORTENED_URLS = URLRuleBuilder()
 			} catch (_: InvalidOperationException) {
 				false
 			}
-		}.map { it.lines }
+		}.map { it to it.lines }
 	}.getRule()
 
 val RULE_URLS_UNIFORMITY = URLRuleBuilder()
@@ -314,7 +314,7 @@ val RULE_URLS_UNIFORMITY = URLRuleBuilder()
 				}
 			}
 		}
-		filteredUrls.map { it.lines }
+		filteredUrls.map { it to it.lines }
 	}.getRule()
 
 val RULE_ORDER_OF_REFERENCES = RegexRuleBuilder()
@@ -370,5 +370,5 @@ val RULE_LOW_QUALITY_CONFERENCES = URLRuleBuilder()
 		urls.filter { url ->
 			lowQualityConferencesList
 				.any { conference -> url.text.contains(conference) }
-		}.map { it.lines }
+		}.map { it to it.lines }
 	}.getRule()
