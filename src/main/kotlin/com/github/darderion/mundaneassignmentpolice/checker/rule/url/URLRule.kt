@@ -10,25 +10,25 @@ import com.github.darderion.mundaneassignmentpolice.pdfdocument.inside
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Line
 import com.github.darderion.mundaneassignmentpolice.utils.nearby
 
-class URLRule(
-    val predicates: List<(urls: List<Pair<String, List<Line>>>) -> List<List<Line>>>,
+open class URLRule(
+    val predicates: List<(urls: List<Url>) -> List<List<Line>>>,
     type: RuleViolationType,
     area: PDFRegion,
     name: String
 ): Rule(area, name, type) {
-    override fun process(document: PDFDocument): List<RuleViolation> {
-        val ruleViolations: MutableList<RuleViolation> = mutableListOf()
+    protected fun getRuleViolations(urls: List<Url>): List<RuleViolation> {
+        val ruleViolations = mutableSetOf<RuleViolation>()
 
-        val urls = getAllUrls(document)
         predicates.forEach { predicate ->
-            predicate(urls).map { RuleViolation(it, name, type) }.forEach {
-                ruleViolations.add(it)
-            }
+            predicate(urls).mapTo(ruleViolations) { RuleViolation(it, name, type) }
         }
-        return ruleViolations
+
+        return ruleViolations.toList()
     }
 
-    private fun getAllUrls(document: PDFDocument): List<Pair<String, List<Line>>> {
+    override fun process(document: PDFDocument) = getRuleViolations(getAllUrls(document))
+
+    private fun getAllUrls(document: PDFDocument): List<Url> {
         val urls: MutableList<Pair<String, List<Line>>> = mutableListOf()
         val urlRegex = Regex("""^((https?:)|(www\.))[^\s]*""")
 
@@ -75,6 +75,8 @@ class URLRule(
             }
             lineIndex++
         }
-        return urls.map { pair -> pair.first.dropLastWhile { it == '.' || it == ',' } to pair.second }
+        return urls.map {
+                pair -> pair.first.dropLastWhile { it == '.' || it == ',' } to pair.second
+        }.map { Url(it.first, it.second) }
     }
 }

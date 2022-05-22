@@ -287,37 +287,34 @@ val RULE_SHORTENED_URLS = URLRuleBuilder()
 	.called("Сокращённая ссылка")
 	.inArea(PDFRegion.NOWHERE.except(PDFArea.FOOTNOTE, PDFArea.BIBLIOGRAPHY))
 	.disallow { urls ->
-		urls.filter { pair ->
+		urls.filter { url ->
 			try {
-				var url = pair.first
-				if (!url.startsWith("http")) url = "http://$url"
-				URLUtil.isShortened(url)
+				val urlWithProtocol = if (url.text.startsWith("http")) url.text else "http://${url.text}"
+				URLUtil.isShortened(urlWithProtocol)
 			} catch (_: InvalidOperationException) {
 				false
 			}
-		}.map { it.second }
+		}.map { it.lines }
 	}.getRule()
 
 val RULE_URLS_UNIFORMITY = URLRuleBuilder()
 	.called("Ссылки разных видов")
+	.inArea(PDFRegion.NOWHERE.except(PDFArea.FOOTNOTE, PDFArea.BIBLIOGRAPHY))
 	.disallow { urls ->
-		var filteredUrls = urls.filter { pair ->
-			val url = pair.first
-			!url.startsWith("https://www")
+		var filteredUrls = urls.filter { url ->
+			!url.text.startsWith("https://www")
 		}
 		if (urls.size == filteredUrls.size) {
-			filteredUrls = filteredUrls.filter { pair ->
-				val url = pair.first
-				!url.startsWith("www")
+			filteredUrls = filteredUrls.filter { url ->
+				!url.text.startsWith("www")
 			}
 			if (urls.size == filteredUrls.size) {
-				filteredUrls = filteredUrls.filter { pair ->
-					val url = pair.first
-					!url.startsWith("htt")
+				filteredUrls = filteredUrls.filter { url ->
+					!url.text.startsWith("htt")
 				}
 			}
 		}
-		filteredUrls.map { it.second }
+		filteredUrls.map { it.lines }
 	}.getRule()
 
 val RULE_ORDER_OF_REFERENCES = RegexRuleBuilder()
@@ -370,9 +367,8 @@ val RULE_LOW_QUALITY_CONFERENCES = URLRuleBuilder()
 			.map {
 				it.removePrefix("http://").removePrefix("https://")
 			}
-		urls.filter { pair ->
-			val url = pair.first
+		urls.filter { url ->
 			lowQualityConferencesList
-				.any { conference -> url.contains(conference) }
-		}.map { it.second }
+				.any { conference -> url.text.contains(conference) }
+		}.map { it.lines }
 	}.getRule()
