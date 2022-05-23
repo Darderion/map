@@ -15,18 +15,18 @@ open class URLRule(
     type: RuleViolationType,
     area: PDFRegion,
     name: String
-): Rule(area, name, type) {
-    protected fun getRuleViolations(urls: List<Url>): List<RuleViolation> {
-        val ruleViolations = mutableSetOf<RuleViolation>()
+) : Rule(area, name, type) {
+    open fun getRuleViolations(urls: List<Url>): List<Pair<Url, RuleViolation>> {
+        val ruleViolations = mutableSetOf<Pair<Url, RuleViolation>>()
 
         predicates.forEach { predicate ->
-            predicate(urls).mapTo(ruleViolations) { RuleViolation(it.second, name, type) }
+            predicate(urls).mapTo(ruleViolations) { it.first to RuleViolation(it.second, name, type) }
         }
 
         return ruleViolations.toList()
     }
 
-    override fun process(document: PDFDocument) = getRuleViolations(getAllUrls(document))
+    override fun process(document: PDFDocument) = getRuleViolations(getAllUrls(document)).map { it.second }
 
     private fun getAllUrls(document: PDFDocument): List<Url> {
         val urls: MutableList<Pair<String, List<Line>>> = mutableListOf()
@@ -75,8 +75,8 @@ open class URLRule(
             }
             lineIndex++
         }
-        return urls.map {
-                pair -> pair.first.dropLastWhile { it == '.' || it == ',' } to pair.second
+        return urls.map { pair ->
+            pair.first.dropLastWhile { it == '.' || it == ',' } to pair.second
         }.map { Url(it.first, it.second) }
     }
 }
