@@ -9,6 +9,7 @@ import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.and
 import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.or
 import com.github.darderion.mundaneassignmentpolice.checker.rule.tableofcontent.TableOfContentRuleBuilder
 import com.github.darderion.mundaneassignmentpolice.checker.rule.url.URLRuleBuilder
+import com.github.darderion.mundaneassignmentpolice.checker.rule.url.then
 import com.github.darderion.mundaneassignmentpolice.checker.rule.word.WordRule
 import com.github.darderion.mundaneassignmentpolice.checker.rule.word.WordRuleBuilder
 import com.github.darderion.mundaneassignmentpolice.checker.rule.word.or
@@ -283,19 +284,49 @@ val RULES_SMALL_NUMBERS = List<WordRule>(9) { index ->
 	smallNumbersRuleBuilder3.word((index + 1).toString()).getRule()
 }
 
-val RULE_SHORTENED_URLS = URLRuleBuilder()
-	.called("Сокращённая ссылка")
-	.inArea(PDFRegion.NOWHERE.except(PDFArea.FOOTNOTE, PDFArea.BIBLIOGRAPHY))
+const val shortenedUrlRuleName = "Сокращённая ссылка"
+val shortenedUrlRuleArea = PDFRegion.NOWHERE.except(PDFArea.FOOTNOTE, PDFArea.BIBLIOGRAPHY)
+
+val urlShortenersListRule = URLRuleBuilder()
+	.called(shortenedUrlRuleName)
+	.inArea(shortenedUrlRuleArea)
+	.type(RuleViolationType.Error)
+	.disallow { urls ->
+		val urlShorteners = URLUtil.getUrlShorteners()
+		urls.filter { url ->
+			urlShorteners.any { URLUtil.equalDomain(it, url.text) }
+		}.map { it to it.lines }
+	}.getRule()
+
+val shortUrlRule = URLRuleBuilder()
+	.called(shortenedUrlRuleName)
+	.inArea(shortenedUrlRuleArea)
+	.type(RuleViolationType.Warning)
 	.disallow { urls ->
 		urls.filter { url ->
+			URLUtil.getDomain(url.text).replace(".", "").length in (3..5)
+		}.map { it to it.lines }
+	}.getRule()
+
+val allowedUrlsWithRedirect = listOf("doi.org")
+
+val urlWithRedirectRule = URLRuleBuilder()
+	.called(shortenedUrlRuleName)
+	.inArea(shortenedUrlRuleArea)
+	.type(RuleViolationType.Warning)
+	.disallow { urls ->
+		urls.filterNot { url ->
+			allowedUrlsWithRedirect.any { URLUtil.equalDomain(it, url.text) }
+		}.filter { url ->
 			try {
-				val urlWithProtocol = if (url.text.startsWith("http")) url.text else "http://${url.text}"
-				URLUtil.isShortened(urlWithProtocol)
+				URLUtil.isRedirect(url.text)
 			} catch (_: InvalidOperationException) {
 				false
 			}
 		}.map { it to it.lines }
 	}.getRule()
+
+val RULE_SHORTENED_URLS = urlShortenersListRule then shortUrlRule then urlWithRedirectRule
 
 val RULE_URLS_UNIFORMITY = URLRuleBuilder()
 	.called("Ссылки разных видов")

@@ -19,5 +19,7 @@ class URLRuleBuilder {
 
     infix fun inArea(region: PDFRegion) = this.also { this.region = region }
 
+    infix fun type(type: RuleViolationType) = this.also { this.type = type }
+
     fun getRule() = URLRule(predicates, type, region, name)
 }

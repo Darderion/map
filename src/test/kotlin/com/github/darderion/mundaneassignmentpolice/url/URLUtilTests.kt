@@ -40,7 +40,7 @@ class URLUtilTests: StringSpec({
         every { URLUtil.expand(url) } returns expandedUrl
         every { URLUtil.expand(shortenedUrl) } returns expandedUrl
 
-        URLUtil.isShortened(url).shouldBeFalse()
-        URLUtil.isShortened(shortenedUrl).shouldBeTrue()
+        URLUtil.isRedirect(url).shouldBeFalse()
+        URLUtil.isRedirect(shortenedUrl).shouldBeTrue()
     }
 })
