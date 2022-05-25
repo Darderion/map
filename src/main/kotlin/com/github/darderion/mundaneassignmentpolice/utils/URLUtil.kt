@@ -18,11 +18,11 @@ class URLUtil {
                 throw IllegalArgumentException("""Incorrect URL: "$url"""", e)
             }
 
-        fun getDomain(url: String) = getUrl(url).host.removePrefix("www.")
+        fun getDomainName(url: String) = getUrl(url).host.removePrefix("www.")
 
-        fun equalDomain(urlA: String, urlB: String) = getDomain(urlA).equals(getDomain(urlB), true)
+        fun equalDomainName(urlA: String, urlB: String) = getDomainName(urlA).equals(getDomainName(urlB), true)
 
-        fun isRedirect(url: String) = !equalDomain(url, expand(url))
+        fun isRedirect(url: String) = !equalDomainName(url, expand(url))
 
         fun expand(shortenedUrl: String): String {
             val url = getUrl(shortenedUrl)

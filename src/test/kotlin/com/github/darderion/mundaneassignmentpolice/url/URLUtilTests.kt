@@ -1,7 +1,6 @@
 package com.github.darderion.mundaneassignmentpolice.url
 
 import com.github.darderion.mundaneassignmentpolice.utils.URLUtil
-import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.booleans.shouldBeFalse
 import io.kotest.matchers.booleans.shouldBeTrue
@@ -25,11 +24,16 @@ class URLUtilTests: StringSpec({
         URLUtil.getUrl(url).toString() shouldBe url
     }
 
-    "Function getUrl should throw IllegalArgumentException if url was incorrect" {
-        val url = "justString"
-        shouldThrow<IllegalArgumentException> {
-            URLUtil.getUrl(url)
-        }
+    "Function getDomainName should return a domain name without a subdomain" {
+        val url = "https://www.google.com"
+        val domainName = "google.com"
+        URLUtil.getDomainName(url) shouldBe domainName
+    }
+
+    "Function equalDomainName should return true if domain names are equal ignoring character case" {
+        val urlA = "https://www.google.com"
+        val urlB = "https://www.Google.com"
+        URLUtil.equalDomainName(urlA, urlB).shouldBeTrue()
     }
 
     "URLUtil should distinguish between common and shortened urls" {

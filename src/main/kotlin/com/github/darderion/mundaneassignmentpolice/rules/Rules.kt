@@ -294,7 +294,7 @@ val urlShortenersListRule = URLRuleBuilder()
 	.disallow { urls ->
 		val urlShorteners = URLUtil.getUrlShorteners()
 		urls.filter { url ->
-			urlShorteners.any { URLUtil.equalDomain(it, url.text) }
+			urlShorteners.any { URLUtil.equalDomainName(it, url.text) }
 		}.map { it to it.lines }
 	}.getRule()
 
@@ -304,7 +304,7 @@ val shortUrlRule = URLRuleBuilder()
 	.type(RuleViolationType.Warning)
 	.disallow { urls ->
 		urls.filter { url ->
-			URLUtil.getDomain(url.text).replace(".", "").length in (3..5)
+			URLUtil.getDomainName(url.text).replace(".", "").length in (3..5)
 		}.map { it to it.lines }
 	}.getRule()
 
@@ -316,7 +316,7 @@ val urlWithRedirectRule = URLRuleBuilder()
 	.type(RuleViolationType.Warning)
 	.disallow { urls ->
 		urls.filterNot { url ->
-			allowedUrlsWithRedirect.any { URLUtil.equalDomain(it, url.text) }
+			allowedUrlsWithRedirect.any { URLUtil.equalDomainName(it, url.text) }
 		}.filter { url ->
 			try {
 				URLUtil.isRedirect(url.text)
