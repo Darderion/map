@@ -4,6 +4,13 @@ import com.github.darderion.mundaneassignmentpolice.checker.RuleViolation
 
 infix fun URLRule.then(next: URLRule): URLRule {
     if (next.area != this.area) throw IllegalArgumentException("Areas must be equal")
+
+    if (next is SequenceURLRule)
+        throw IllegalArgumentException("Incorrect order of rules")
+
+    if (this is SequenceURLRule)
+        return SequenceURLRule(this.sequenceOfRules + next)
+
     return SequenceURLRule(listOf(this, next))
 }
 
