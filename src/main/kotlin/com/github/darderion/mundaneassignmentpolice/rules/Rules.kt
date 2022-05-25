@@ -308,7 +308,7 @@ val shortUrlRule = URLRuleBuilder()
 		}.map { it to it.lines }
 	}.getRule()
 
-val allowedUrlsWithRedirect = listOf("doi.org")
+val allowedDomainNamesWithRedirect = listOf("doi.org", "dx.doi.org")
 
 val urlWithRedirectRule = URLRuleBuilder()
 	.called(shortenedUrlRuleName)
@@ -316,7 +316,7 @@ val urlWithRedirectRule = URLRuleBuilder()
 	.type(RuleViolationType.Warning)
 	.disallow { urls ->
 		urls.filterNot { url ->
-			allowedUrlsWithRedirect.any { URLUtil.equalDomainName(it, url.text) }
+			allowedDomainNamesWithRedirect.any { URLUtil.equalDomainName(it, url.text) }
 		}.filter { url ->
 			try {
 				URLUtil.isRedirect(url.text)
