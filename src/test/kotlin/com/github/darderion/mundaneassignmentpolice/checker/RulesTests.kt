@@ -77,16 +77,16 @@ class RulesTests : StringSpec({
 	"Rule should detect links of different types" {
 		RULE_URLS_UNIFORMITY.process(PDFBox().getPDF(filePathUniformityUrls)).count() shouldBeExactly 2
 	}
-	"Regex rule should detect incorrect order of literature references"{
+	"Regex rule should detect incorrect order of literature references" {
 		RULE_ORDER_OF_REFERENCES.process(PDFBox().getPDF(filePathOrderOfReferences)).count() shouldBeExactly 3
 	}
-	"Regex rule should detect using different versions of the abbreviation"{
+	"Regex rule should detect using different versions of the abbreviation" {
 		RULE_VARIOUS_ABBREVIATIONS.process(PDFBox().getPDF(filePathVariousAbbreviations)).count() shouldBeExactly 8
 	}
-	"Table of content rule should detect incorrect order of sections"{
+	"Table of content rule should detect incorrect order of sections" {
 		RULE_SECTIONS_ORDER.process(PDFBox().getPDF(filePathOrderOfSections)).count() shouldBeExactly 5
 	}
-  "URLRule should detect links to low quality conferences" {
+	"URLRule should detect links to low quality conferences" {
 		mockkObject(LowQualityConferencesUtil)
 
 		val lowQualityConferencesList = listOf(
@@ -101,7 +101,10 @@ class RulesTests : StringSpec({
 		verify(exactly = 1) { LowQualityConferencesUtil.getList() }
 
 		unmockkObject(LowQualityConferencesUtil)
-  }
+	}
+	"Short dash should ignore title page" {
+		RULE_SHORT_DASH.process(PDFBox().getPDF(filePathDashTitlePage)).count() shouldBeExactly 0
+	}
 }) {
 	companion object {
 		const val filePathQuestionMarkAndDashes =
@@ -124,7 +127,9 @@ class RulesTests : StringSpec({
 			"${TestsConfiguration.resourceFolder}checker/RegexRuleTestsVariousAbbreviations.pdf"
 		const val filePathOrderOfSections =
 			"${TestsConfiguration.resourceFolder}checker/TableOfContentRuleTestsSectionsOrder.pdf"
-    const val filePathLowQualityConferences =
+		const val filePathLowQualityConferences =
 			"${TestsConfiguration.resourceFolder}checker/URLRuleTestsLowQualityConferences.pdf"
+		const val filePathDashTitlePage =
+			"${TestsConfiguration.resourceFolder}checker/ShortDashAreaTitlePage.pdf"
 	}
 }

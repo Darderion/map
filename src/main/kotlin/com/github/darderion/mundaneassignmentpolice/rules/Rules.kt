@@ -49,7 +49,7 @@ val shortDashRules = SymbolRuleBuilder()
 	.shouldHaveNeighbor(*numbers.toCharArray())
 	//.called("Incorrect usage of '-' symbol")
 	.called("Неправильное использование дефиса")
-	.inArea(PDFRegion.EVERYWHERE.except(PDFArea.BIBLIOGRAPHY, PDFArea.FOOTNOTE))
+	.inArea(PDFRegion.EVERYWHERE.except(PDFArea.BIBLIOGRAPHY, PDFArea.FOOTNOTE, PDFArea.TITLE_PAGE))
 
 val RULE_SHORT_DASH = shortDashRules.getRule() and (
 		shortDashRules.fromLeft().shouldHaveNeighbor('.')
