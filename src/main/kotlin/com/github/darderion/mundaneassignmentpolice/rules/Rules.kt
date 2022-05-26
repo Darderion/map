@@ -115,13 +115,23 @@ val RULE_MULTIPLE_LITLINKS = SymbolRuleBuilder()
 
 const val bracket = '('
 
-val RULE_BRACKETS_LETTERS = SymbolRuleBuilder()
-	.symbol(bracket)
-	.ignoringAdjusting(' ')
-	.fromRight().shouldNotHaveNeighbor(*rusCapitalLetters.toCharArray())
-	.called("Большая русская буква после скобки")
-	.type(RuleViolationType.Warning)
-	.getRule()
+val RULE_BRACKETS_LETTERS = List(2) {
+	SymbolRuleBuilder()
+		.symbol(bracket)
+		.ignoringAdjusting(' ')
+		.called("Большая русская буква после скобки")
+		.type(RuleViolationType.Warning)
+}.apply {
+	first()
+		.fromLeft()
+		.shouldNotHaveNeighbor('.')
+	last()
+		.fromRight()
+		.shouldNotHaveNeighbor(*rusCapitalLetters.toCharArray())
+}.map { it.getRule() }
+	.reduce { acc, symbolRule ->
+		acc and symbolRule
+	}
 
 private const val openingBrackets = "([{<"
 private const val closingBrackets = ")]}>"
