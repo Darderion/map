@@ -14,7 +14,11 @@ import org.springframework.web.servlet.view.RedirectView
 import java.io.File
 
 const val pdfFolder = "uploads/"
-const val url = "http://91.109.207.113"
+
+const val developmentURL = "http://localhost:8080"
+const val deploymentURL = "http://91.109.207.113"
+
+const val url = developmentURL
 
 @RestController
 @CrossOrigin(origins = [url])

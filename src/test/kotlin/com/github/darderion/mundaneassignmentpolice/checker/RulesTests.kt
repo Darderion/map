@@ -25,10 +25,10 @@ class RulesTests : StringSpec({
 	"Symbol rule should detect incorrect usage of --- symbol" {
 		RULE_LONG_DASH.process(PDFBox().getPDF(filePathQuestionMarkAndDashes)).count() shouldBeExactly 2
 	}
-	"Symbol rule should detect use of closing quote instead opening quote" {
+	"Symbol rule should detect use of closing quote instead of opening quote" {
 		RULE_CLOSING_QUOTATION.process(PDFBox().getPDF(filePathQuotes)).count() shouldBeExactly 4
 	}
-	"Symbol rule should detect use of opening quote instead closing quote" {
+	"Symbol rule should detect use of opening quote instead of closing quote" {
 		RULE_OPENING_QUOTATION.process(PDFBox().getPDF(filePathQuotes)).count() shouldBeExactly 2
 	}
 	"Symbol rule should detect incorrect use of multiple links" {
@@ -103,6 +103,16 @@ class RulesTests : StringSpec({
 
 		unmockkObject(LowQualityConferencesUtil)
 	}
+	"Short dash should ignore title page" {
+		RULE_SHORT_DASH.process(PDFBox().getPDF(filePathDashTitlePage)).count() shouldBeExactly 0
+	}
+	"Symbol rule should ignore usage of capital letters inside brackets that are placed after the '.' symbol" {
+		RULE_BRACKETS_LETTERS.process(PDFBox().getPDF(filePathBracketLetters)).count() shouldBeExactly 1
+	}
+	"RULE_OPENING_QUOTATION and RULE_CLOSING_QUOTATION should process multiple lines" {
+		RULE_OPENING_QUOTATION.process(PDFBox().getPDF(filePathMultilineCitation)).count() +
+				RULE_CLOSING_QUOTATION.process(PDFBox().getPDF(filePathMultilineCitation)).count() shouldBeExactly 0
+	}
 }) {
 	companion object {
 		const val filePathQuestionMarkAndDashes =
@@ -125,7 +135,13 @@ class RulesTests : StringSpec({
 			"${TestsConfiguration.resourceFolder}checker/RegexRuleTestsVariousAbbreviations.pdf"
 		const val filePathOrderOfSections =
 			"${TestsConfiguration.resourceFolder}checker/TableOfContentRuleTestsSectionsOrder.pdf"
-    const val filePathLowQualityConferences =
+		const val filePathLowQualityConferences =
 			"${TestsConfiguration.resourceFolder}checker/URLRuleTestsLowQualityConferences.pdf"
+		const val filePathDashTitlePage =
+			"${TestsConfiguration.resourceFolder}checker/ShortDashAreaTitlePage.pdf"
+		const val filePathBracketLetters =
+			"${TestsConfiguration.resourceFolder}checker/BracketLetters.pdf"
+		const val filePathMultilineCitation =
+			"${TestsConfiguration.resourceFolder}checker/MultilineCitation.pdf"
 	}
 }

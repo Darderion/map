@@ -15,7 +15,12 @@ export default new Vuex.Store({
 		noAreaErrorsFound: false,
 		languages: ['ru', 'en'],
 		fileNames: [],
-		apiURL: 'http://91.109.207.113:8081/api/'
+    // DEPLOYMENT_URL:
+		/*
+    apiURL: 'http://91.109.207.113:8081/api/'
+		 */
+    // DEVELOPMENT_URL:
+    apiURL: 'http://localhost:8081/api/'
 	},
 	mutations: {
 		setPdfName(state, payload) {
