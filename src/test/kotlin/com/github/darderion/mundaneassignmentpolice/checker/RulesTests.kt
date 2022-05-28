@@ -2,8 +2,8 @@ package com.github.darderion.mundaneassignmentpolice.checker
 
 import com.github.darderion.mundaneassignmentpolice.TestsConfiguration
 import com.github.darderion.mundaneassignmentpolice.rules.*
-import com.github.darderion.mundaneassignmentpolice.utils.URLUtil
 import com.github.darderion.mundaneassignmentpolice.utils.LowQualityConferencesUtil
+import com.github.darderion.mundaneassignmentpolice.utils.URLUtil
 import com.github.darderion.mundaneassignmentpolice.wrapper.PDFBox
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.ints.shouldBeExactly
@@ -50,7 +50,7 @@ class RulesTests : StringSpec({
 	}
 	"URLRule should detect shortened URLs" {
 		mockkObject(URLUtil)
-		every { URLUtil.expand(any()) } returnsArgument 0
+		every { URLUtil.expand(any()) } returns ""
 
 		val urls = listOf(
 			"https://en.wikipedia.org/wiki/Wikipedia:About" to "https://en.wikipedia.org/wiki/Wikipedia:About",
@@ -59,7 +59,9 @@ class RulesTests : StringSpec({
 			"https://bit.ly/3tIJmJi." to "https://en.wikipedia.org/wiki/Main_Page",
 			"https://en.wikipedia.org" to "https://en.wikipedia.org/wiki/Main_Page",
 			"https://bit.ly/3tIJmJi" to "https://en.wikipedia.org/wiki/Main_Page",
-			"https://is.gd/gZgSmH" to "https://www.google.com/"
+			"https://is.gd/gZgSmH" to "https://www.google.com/",
+			"https://doi.org/10.1016/j.comnet.2014.11.001" to
+				"https://www.sciencedirect.com/science/article/abs/pii/S1389128614003909?via%3Dihub"
 		)
 
 		urls.forEach { (url, expandedUrl) ->
@@ -67,7 +69,6 @@ class RulesTests : StringSpec({
 		}
 
 		RULE_SHORTENED_URLS.process(PDFBox().getPDF(filePathShortenedUrls)).count() shouldBeExactly 4
-		verify(atLeast = urls.size) { URLUtil.expand(any()) }
 
 		unmockkObject(URLUtil)
 	}
@@ -124,7 +125,7 @@ class RulesTests : StringSpec({
 		const val filePathSpaceAroundBrackets =
 			"${TestsConfiguration.resourceFolder}checker/SymbolRuleTestsSpaceAroundBrackets.pdf"
 		const val filePathCitation = "${TestsConfiguration.resourceFolder}checker/SymbolRuleTestsCitation.pdf"
-		const val filePathShortenedUrls = "${TestsConfiguration.resourceFolder}checker/URLRuleShortenedUrls.pdf"
+		const val filePathShortenedUrls = "${TestsConfiguration.resourceFolder}checker/URLRuleTestsShortenedURLs.pdf"
 		const val filePathUniformityUrls = "${TestsConfiguration.resourceFolder}checker/URLRuleUniformityURL.pdf"
 		const val filePathSymbolsInSectionNames =
 			"${TestsConfiguration.resourceFolder}checker/RulesTestsSymbolsInSectionNames.pdf"
