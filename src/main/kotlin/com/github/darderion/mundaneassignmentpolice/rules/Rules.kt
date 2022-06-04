@@ -17,6 +17,7 @@ import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFArea
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFRegion
 import com.github.darderion.mundaneassignmentpolice.utils.InvalidOperationException
 import com.github.darderion.mundaneassignmentpolice.utils.LowQualityConferencesUtil
+import com.github.darderion.mundaneassignmentpolice.utils.ResourcesUtil
 import com.github.darderion.mundaneassignmentpolice.utils.URLUtil
 import java.util.*
 
@@ -297,12 +298,17 @@ val RULES_SMALL_NUMBERS = List<WordRule>(9) { index ->
 const val shortenedUrlRuleName = "Сокращённая ссылка"
 val shortenedUrlRuleArea = PDFRegion.NOWHERE.except(PDFArea.FOOTNOTE, PDFArea.BIBLIOGRAPHY)
 
+fun getUrlShorteners(): List<String> {
+	val urlShortenersFileName = "URLShorteners.txt"
+	return ResourcesUtil.getResourceText(urlShortenersFileName).lines().filterNot { it.isEmpty() }
+}
+
 val urlShortenersListRule = URLRuleBuilder()
 	.called(shortenedUrlRuleName)
 	.inArea(shortenedUrlRuleArea)
 	.type(RuleViolationType.Error)
 	.disallow { urls ->
-		val urlShorteners = URLUtil.getUrlShorteners()
+		val urlShorteners = getUrlShorteners()
 		urls.filter { url ->
 			urlShorteners.any { URLUtil.equalDomainName(it, url.text) }
 		}.map { it to it.lines }
