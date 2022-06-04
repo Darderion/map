@@ -2,6 +2,11 @@ package com.github.darderion.mundaneassignmentpolice.utils
 
 class ResourcesUtil {
     companion object {
-        fun getResourceText(path: String) = this::class.java.classLoader.getResource(path).readText()
+        fun getResourceFileReader(path: String) =
+            this::class.java.classLoader.getResourceAsStream(path).bufferedReader()
+
+        fun getResourceText(path: String) = getResourceFileReader(path).readText()
+
+        fun getResourceLines(path: String) = getResourceFileReader(path).readLines()
     }
 }

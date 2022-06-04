@@ -298,19 +298,14 @@ val RULES_SMALL_NUMBERS = List<WordRule>(9) { index ->
 const val shortenedUrlRuleName = "Сокращённая ссылка"
 val shortenedUrlRuleArea = PDFRegion.NOWHERE.except(PDFArea.FOOTNOTE, PDFArea.BIBLIOGRAPHY)
 
-fun getUrlShorteners(): List<String> {
-	val urlShortenersFileName = "URLShorteners.txt"
-	return ResourcesUtil.getResourceText(urlShortenersFileName).lines().filterNot { it.isEmpty() }
-}
-
 val urlShortenersListRule = URLRuleBuilder()
 	.called(shortenedUrlRuleName)
 	.inArea(shortenedUrlRuleArea)
 	.type(RuleViolationType.Error)
 	.disallow { urls ->
-		val urlShorteners = getUrlShorteners()
+		val urlShorteners = ResourcesUtil.getResourceLines("URLShorteners.txt")
 		urls.filter { url ->
-			urlShorteners.any { URLUtil.equalDomainName(it, url.text) }
+			urlShorteners.any { shortener -> URLUtil.equalDomainName(shortener, url.text) }
 		}.map { it to it.lines }
 	}.getRule()
 
@@ -324,19 +319,16 @@ val shortUrlRule = URLRuleBuilder()
 		}.map { it to it.lines }
 	}.getRule()
 
-val allowedDomainNamesWithRedirect = listOf("doi.org", "dx.doi.org")
-
 val urlWithRedirectRule = URLRuleBuilder()
 	.called(shortenedUrlRuleName)
 	.inArea(shortenedUrlRuleArea)
 	.type(RuleViolationType.Warning)
 	.ignoreIf { url ->
-		allowedDomainNamesWithRedirect.any { allowedUrl -> URLUtil.equalDomainName(allowedUrl, url.text) }
+		val allowedUrls = ResourcesUtil.getResourceLines("AllowedDomainsWithRedirect.txt")
+		allowedUrls.any { allowedUrl -> URLUtil.equalDomainName(allowedUrl, url.text) }
 	}
 	.disallow { urls ->
-		urls.filterNot { url ->
-			allowedDomainNamesWithRedirect.any { URLUtil.equalDomainName(it, url.text) }
-		}.filter { url ->
+		urls.filter { url ->
 			try {
 				URLUtil.isRedirect(url.text)
 			} catch (_: InvalidOperationException) {
