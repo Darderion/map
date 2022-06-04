@@ -330,6 +330,9 @@ val urlWithRedirectRule = URLRuleBuilder()
 	.called(shortenedUrlRuleName)
 	.inArea(shortenedUrlRuleArea)
 	.type(RuleViolationType.Warning)
+	.ignoreIf { url ->
+		allowedDomainNamesWithRedirect.any { allowedUrl -> URLUtil.equalDomainName(allowedUrl, url.text) }
+	}
 	.disallow { urls ->
 		urls.filterNot { url ->
 			allowedDomainNamesWithRedirect.any { URLUtil.equalDomainName(it, url.text) }

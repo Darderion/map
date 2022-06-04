@@ -17,7 +17,8 @@ infix fun URLRule.then(next: URLRule): URLRule {
 private class SequenceURLRule(
     val sequenceOfRules: List<URLRule>
 ) : URLRule(
-    sequenceOfRules.map { it.predicates }.flatten(),
+    emptyList(),
+    emptyList(),
     sequenceOfRules.first().type,
     sequenceOfRules.first().area,
     sequenceOfRules.first().name
