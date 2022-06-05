@@ -13,7 +13,11 @@ class URLUtil {
                 throw IllegalArgumentException("""Incorrect URL: "$url"""", e)
             }
 
+        fun removeProtocol(url: String) = url.removePrefix("http://").removePrefix("https://")
+
         fun getDomainName(url: String) = getUrl(url).host.removePrefix("www.")
+
+        fun partAfterDomain(url: String) = removeProtocol(url).dropWhile { it != '/' }
 
         fun equalDomainName(urlA: String, urlB: String) = getDomainName(urlA).equals(getDomainName(urlB), true)
 

@@ -327,6 +327,12 @@ val urlWithRedirectRule = URLRuleBuilder()
 		val allowedUrls = ResourcesUtil.getResourceLines("AllowedDomainsWithRedirect.txt")
 		allowedUrls.any { allowedUrl -> URLUtil.equalDomainName(allowedUrl, url.text) }
 	}
+	.ignoreIf { url ->
+		URLUtil.getDomainName(url.text).replace(".", "").length >= 10
+	}
+	.ignoreIf { url ->
+		URLUtil.partAfterDomain(url.text).replace("/", "").length >= 10
+	}
 	.disallow { urls ->
 		urls.filter { url ->
 			try {

@@ -12,7 +12,7 @@ import com.github.darderion.mundaneassignmentpolice.utils.nearby
 
 open class URLRule(
     protected val predicates: List<(urls: List<Url>) -> List<Pair<Url, List<Line>>>>,
-    protected val ignorePredicates: List<(url: Url) -> Boolean>,
+    protected val predicatesOfIgnoring: List<(url: Url) -> Boolean>,
     type: RuleViolationType,
     area: PDFRegion,
     name: String
@@ -20,7 +20,7 @@ open class URLRule(
     open fun getRuleViolations(urls: List<Url>): List<Pair<Url, RuleViolation>> {
         val ruleViolations = mutableSetOf<Pair<Url, RuleViolation>>()
 
-        val filteredUrls = urls.filterNot { url -> ignorePredicates.any { predicate -> predicate(url) } }
+        val filteredUrls = urls.filterNot { url -> predicatesOfIgnoring.any { predicate -> predicate(url) } }
         predicates.forEach { predicate ->
             predicate(filteredUrls).mapTo(ruleViolations) { it.first to RuleViolation(it.second, name, type) }
         }
