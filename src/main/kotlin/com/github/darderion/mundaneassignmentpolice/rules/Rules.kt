@@ -309,16 +309,6 @@ val urlShortenersListRule = URLRuleBuilder()
 		}.map { it to it.lines }
 	}.getRule()
 
-val shortUrlRule = URLRuleBuilder()
-	.called(shortenedUrlRuleName)
-	.inArea(shortenedUrlRuleArea)
-	.type(RuleViolationType.Warning)
-	.disallow { urls ->
-		urls.filter { url ->
-			URLUtil.getDomainName(url.text).replace(".", "").length in (3..5)
-		}.map { it to it.lines }
-	}.getRule()
-
 val urlWithRedirectRule = URLRuleBuilder()
 	.called(shortenedUrlRuleName)
 	.inArea(shortenedUrlRuleArea)
@@ -328,10 +318,13 @@ val urlWithRedirectRule = URLRuleBuilder()
 		allowedUrls.any { allowedUrl -> URLUtil.equalDomainName(allowedUrl, url.text) }
 	}
 	.ignoreIf { url ->
-		URLUtil.getDomainName(url.text).replace(".", "").length >= 10
-	}
-	.ignoreIf { url ->
-		URLUtil.partAfterDomain(url.text).replace("/", "").length >= 10
+		// Remain only URLs (potential shortened URLs) that have a domain name no longer 10 characters and
+		// only one part after a domain (token in shortened URL) that is less than 10 characters.
+		val partsAfterDomain = URLUtil.partAfterDomain(url.text).split('/').filter { it.isNotEmpty() }
+		URLUtil.getDomainName(url.text).length > 10 ||
+			partsAfterDomain.isEmpty() ||
+			partsAfterDomain.size > 1 ||
+			partsAfterDomain.first().length >= 10
 	}
 	.disallow { urls ->
 		urls.filter { url ->
@@ -343,7 +336,7 @@ val urlWithRedirectRule = URLRuleBuilder()
 		}.map { it to it.lines }
 	}.getRule()
 
-val RULE_SHORTENED_URLS = urlShortenersListRule then shortUrlRule then urlWithRedirectRule
+val RULE_SHORTENED_URLS = urlShortenersListRule then urlWithRedirectRule
 
 val RULE_URLS_UNIFORMITY = URLRuleBuilder()
 	.called("Ссылки разных видов")
