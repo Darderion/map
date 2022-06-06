@@ -28,8 +28,8 @@ class PDFStripper: PDFTextStripper() {
 						Symbol(it, Font(textPosition.fontSize), Coordinate(textPosition.xDirAdj to textPosition.yDirAdj))
 					)
 				}
-				stringIndex += normalizedText.length
 			}
+			stringIndex += normalizedText.length
 			/*
 			words.add(text.unicode + " [(X=" + text.xDirAdj + ",Y=" +
 						text.yDirAdj + ") height=" + text.heightDir + " width=" +
