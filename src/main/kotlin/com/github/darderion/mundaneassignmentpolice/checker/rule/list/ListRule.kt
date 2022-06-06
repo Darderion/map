@@ -9,9 +9,33 @@ import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFDocument
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFRegion
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.list.PDFList
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Line
+fun getPages(document: PDFDocument, word : String): Pair<Int,Int>
+{
+	var pages = -1 to -1
+	var linesIndexes = -1 to -1
+	var lines = document.text.filter {
+		document.areas!!.sections.forEachIndexed { index , section ->
+			if (section.title.contains(word) && word!="Заключение")
+				linesIndexes = section.contentIndex to document.areas.sections[index+1].contentIndex
+			else if (section.title.contains(word))
+				linesIndexes = section.contentIndex to -1
+		}
+		if (word!="Заключение")
+			linesIndexes.first <= it.documentIndex && it.documentIndex < linesIndexes.second
+		else linesIndexes.first <= it.documentIndex
+	}.toMutableList()
 
+	if (lines.isNotEmpty() && word!="Заключение")
+		pages = lines[0].page to lines.last().page
+	else if (lines.isNotEmpty())
+		pages = lines[0].page to -1
+	return pages
+}
 class ListRule(
-	val predicates: List<(list: PDFList<Line>) -> List<Line>>,
+	val singleListPredicates: MutableList<(list: PDFList<Line>) -> List<Line>> = mutableListOf(),
+	val multipleListsPredicates : MutableList<(lists: List<PDFList<Line>>)->List<Line>> = mutableListOf(),
+	val multipleListsPredicatesWithDocument : MutableList<(lists: List<PDFList<Line>>, document: PDFDocument) -> List<Line>> = mutableListOf(),
+	val listsFilter : MutableList<(lists: List<PDFList<Line>>,document: PDFDocument) -> MutableList<PDFList<Line>>> ,
 	type: RuleViolationType,
 	area: PDFRegion,
 	name: String
@@ -32,9 +56,11 @@ class ListRule(
 
 		if (area.contains(SECTION)) lists.addAll(document.areas!!.lists)
 
-		val pdfLists = lists.map { it.getSublists() }.flatten()
+		var pdfLists = lists.map { it.getSublists() }.flatten()
 
-		predicates.forEach { predicate ->
+		listsFilter.forEach { pdfLists = it(pdfLists, document) }
+
+		singleListPredicates.forEach { predicate ->
 				rulesViolations.addAll(
 				pdfLists.map {
 					predicate(it)
@@ -43,7 +69,13 @@ class ListRule(
 				}
 			)
 		}
-
+		multipleListsPredicates.forEach { predicate ->
+			if (predicate(pdfLists).isNotEmpty()) rulesViolations.add(RuleViolation(predicate(pdfLists),name,type))
+		}
+		multipleListsPredicatesWithDocument.forEach { predicate ->
+			if (predicate(pdfLists,document).isNotEmpty())
+				rulesViolations.add(RuleViolation(predicate(pdfLists,document),name,type))
+		}
 		return rulesViolations.toList()
 	}
 }
