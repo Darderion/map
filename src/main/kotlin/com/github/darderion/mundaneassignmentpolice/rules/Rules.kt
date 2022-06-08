@@ -318,10 +318,10 @@ val urlWithRedirectRule = URLRuleBuilder()
 		allowedUrls.any { allowedUrl -> URLUtil.equalDomainName(allowedUrl, url.text) }
 	}
 	.ignoreIf { url ->
-		// Remain only URLs (potential shortened URLs) that have a domain name no longer 10 characters and
+		// Remain only URLs (potential shortened URLs) that have a domain name no longer 5 characters and
 		// only one part after a domain (token in shortened URL) that is less than 10 characters.
 		val partsAfterDomain = URLUtil.partAfterDomain(url.text).split('/').filter { it.isNotEmpty() }
-		URLUtil.getDomainName(url.text).length > 10 ||
+		URLUtil.getDomainName(url.text).length > 5 ||
 			partsAfterDomain.isEmpty() ||
 			partsAfterDomain.size > 1 ||
 			partsAfterDomain.first().length >= 10
