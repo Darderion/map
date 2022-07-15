@@ -124,38 +124,34 @@ class PDFStructure(text: List<Line>) {
 			.map { it.documentIndex to it.content.clearSymbols()
 			}.dropLast(1)
 
-		val sectionText = listOf(
-			sectionTextLines,
-			sectionTextLines.dropLast(1).mapIndexed { index, pair ->
-				pair.first to pair.second + sectionTextLines[index + 1].second
-			}
-		).flatten()
+		val sectionsIndexed = mutableListOf<Section>()
 
-		val sectionsIndexed = sectionsTitles.map { section ->
-			val sectionItem = sectionText
-				.filter {
-					section.clearSymbols() == it.second
+		val titlesIterator = sectionsTitles.iterator()
+
+		var lineIndex = 0
+		while (titlesIterator.hasNext()) {
+			val title = titlesIterator.next()
+			var numberOfLines = 1
+			var titleLines = sectionTextLines[lineIndex].second
+
+			while (title.clearSymbols() != titleLines) {
+				if (titleLines.isNotEmpty() && title.clearSymbols().startsWith(titleLines)) {
+					titleLines += sectionTextLines[lineIndex + numberOfLines].second
+					numberOfLines++
+				} else {
+					numberOfLines = 1
+					lineIndex++
+					titleLines = sectionTextLines[lineIndex].second
 				}
-			if (sectionItem.isEmpty()) {
-				println("ERR: $section")
-				sectionText
-					.forEach {
-						println("${
-							section.clearSymbols()} -> '${it.second}'"
-						)
-					}
 			}
-			section to sectionItem.first().first
-		}
-		// Sections: List<Pair<String, Int>>
-		//	Section.second --> SectionIndex
-		//	Section.first --> SectionTitle
 
-		sections = sectionsIndexed.map { section -> Section(section.first, section.second,	// Sections: List<Section>
-			sectionText.filter { it.first > section.second }[
-					if (section.first.clearSymbols() == sectionText.first { it.first == section.second }.second) 0 else 1
-				].first
-		) }
+			sectionsIndexed.add(
+				Section(title, sectionTextLines[lineIndex].first, sectionTextLines[lineIndex + numberOfLines].first)
+			)
+			lineIndex += numberOfLines
+		}
+
+		sections = sectionsIndexed
 
 		tableOfContents = PDFList("TABLE_OF_CONTENTS")
 
