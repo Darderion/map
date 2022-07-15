@@ -1,8 +1,8 @@
 package com.github.darderion.mundaneassignmentpolice.pdfdocument
 
-import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Line
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFArea.*
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.list.PDFList
+import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Line
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Section
 import com.github.darderion.mundaneassignmentpolice.utils.floatEquals
 import java.util.*
@@ -18,6 +18,8 @@ class PDFStructure(text: List<Line>) {
 		// Areas
 		var area = TITLE_PAGE
 		var sectionTitle: String? = null
+		var isAfterBibliography = false
+		var sectionAfterBibliographyTitle: String? = null
 		text.forEach {
 			// For each line
 			area = when(area) {
@@ -34,7 +36,16 @@ class PDFStructure(text: List<Line>) {
 					} else {
 						if (sectionTitle != null && it.index == 0 && it.content == sectionTitle) {
 							SECTION
-						} else area
+						} else {
+							if (isAfterBibliography && sectionAfterBibliographyTitle == null) {
+								sectionAfterBibliographyTitle = it.text.filter { it.text.trim().isNotEmpty() }
+									.dropLast(1).joinToString(" ")
+							}
+							if (removeNumberingAndPage(it.content) == BIBLIOGRAPHY_TITLE) {
+								isAfterBibliography = true
+							}
+							area
+						}
 					}
 				}
 				SECTION -> {
@@ -53,6 +64,14 @@ class PDFStructure(text: List<Line>) {
 						} else {
 							SECTION
 						}
+					} else area
+				}
+				BIBLIOGRAPHY -> {
+					if (sectionAfterBibliographyTitle != null &&
+						it.index == 0 &&
+						it.content == sectionAfterBibliographyTitle
+					) {
+						SECTION
 					} else area
 				}
 				else -> area
@@ -81,7 +100,9 @@ class PDFStructure(text: List<Line>) {
 			.drop(1)												// Remove line with TABLE_OF_CONTENT_TITLE
 			.map { it.content }										// filter STRING values
 			.filter { it.isNotEmpty() }								//	remove empty lines
-			.dropLast(1)											//	remove line with BIBLIOGRAPHY_TITLE
+			.filterNot {										//	remove line with BIBLIOGRAPHY_TITLE
+				removeNumberingAndPage(it) == BIBLIOGRAPHY_TITLE
+			}
 			.forEach {
 				if (it[it.length - 1].isDigit() || it[it.length - 2].isDigit()) {
 					sectionsTitlesLines.add(curSectionTitle + it)
@@ -192,5 +213,10 @@ class PDFStructure(text: List<Line>) {
 				line.index == (text.filter { textLine ->
 			textLine.page == line.page && textLine.content.isNotEmpty()
 		}.maxOfOrNull { it.index } ?: -1)
+
+		private fun removeNumberingAndPage(tableOfContentLine: String) = tableOfContentLine
+			.dropWhile { it.isDigit() || it == '.' }
+			.dropLastWhile { it.isDigit() }
+			.trim()
 	}
 }
