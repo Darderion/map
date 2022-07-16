@@ -39,7 +39,8 @@ class PDFStructure(text: List<Line>) {
 						} else {
 							if (isAfterBibliography && sectionAfterBibliographyTitle == null) {
 								sectionAfterBibliographyTitle = it.text.filter { it.text.trim().isNotEmpty() }
-									.dropLast(1).joinToString(" ")
+									.dropLast(1).joinToString(" ").ifBlank { null }
+								isAfterBibliography = false
 							}
 							if (removeNumberingAndPage(it.content) == BIBLIOGRAPHY_TITLE) {
 								isAfterBibliography = true
