@@ -17,6 +17,7 @@ import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFArea
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFRegion
 import com.github.darderion.mundaneassignmentpolice.utils.InvalidOperationException
 import com.github.darderion.mundaneassignmentpolice.utils.LowQualityConferencesUtil
+import com.github.darderion.mundaneassignmentpolice.utils.ResourcesUtil
 import com.github.darderion.mundaneassignmentpolice.utils.URLUtil
 import java.util.*
 
@@ -302,32 +303,31 @@ val urlShortenersListRule = URLRuleBuilder()
 	.inArea(shortenedUrlRuleArea)
 	.type(RuleViolationType.Error)
 	.disallow { urls ->
-		val urlShorteners = URLUtil.getUrlShorteners()
+		val urlShorteners = ResourcesUtil.getResourceLines("URLShorteners.txt")
 		urls.filter { url ->
-			urlShorteners.any { URLUtil.equalDomainName(it, url.text) }
+			urlShorteners.any { shortener -> URLUtil.equalDomainName(shortener, url.text) }
 		}.map { it to it.lines }
 	}.getRule()
-
-val shortUrlRule = URLRuleBuilder()
-	.called(shortenedUrlRuleName)
-	.inArea(shortenedUrlRuleArea)
-	.type(RuleViolationType.Warning)
-	.disallow { urls ->
-		urls.filter { url ->
-			URLUtil.getDomainName(url.text).replace(".", "").length in (3..5)
-		}.map { it to it.lines }
-	}.getRule()
-
-val allowedDomainNamesWithRedirect = listOf("doi.org", "dx.doi.org")
 
 val urlWithRedirectRule = URLRuleBuilder()
 	.called(shortenedUrlRuleName)
 	.inArea(shortenedUrlRuleArea)
 	.type(RuleViolationType.Warning)
+	.ignoreIf { url ->
+		val allowedUrls = ResourcesUtil.getResourceLines("AllowedDomainsWithRedirect.txt")
+		allowedUrls.any { allowedUrl -> URLUtil.equalDomainName(allowedUrl, url.text) }
+	}
+	.ignoreIf { url ->
+		// Remain only URLs (potential shortened URLs) that have a domain name no longer 5 characters and
+		// only one part after a domain (token in shortened URL) that is less than 10 characters.
+		val partsAfterDomain = URLUtil.partAfterDomain(url.text).split('/').filter { it.isNotEmpty() }
+		URLUtil.getDomainName(url.text).length > 5 ||
+			partsAfterDomain.isEmpty() ||
+			partsAfterDomain.size > 1 ||
+			partsAfterDomain.first().length >= 10
+	}
 	.disallow { urls ->
-		urls.filterNot { url ->
-			allowedDomainNamesWithRedirect.any { URLUtil.equalDomainName(it, url.text) }
-		}.filter { url ->
+		urls.filter { url ->
 			try {
 				URLUtil.isRedirect(url.text)
 			} catch (_: InvalidOperationException) {
@@ -336,7 +336,7 @@ val urlWithRedirectRule = URLRuleBuilder()
 		}.map { it to it.lines }
 	}.getRule()
 
-val RULE_SHORTENED_URLS = urlShortenersListRule then shortUrlRule then urlWithRedirectRule
+val RULE_SHORTENED_URLS = urlShortenersListRule then urlWithRedirectRule
 
 val RULE_URLS_UNIFORMITY = URLRuleBuilder()
 	.called("Ссылки разных видов")

@@ -10,6 +10,7 @@ is.gd
 mcaf.ee
 ow.ly
 rb.gy
+shorturl.at
 su.pr
 t.ly
 tiny.cc
