@@ -146,8 +146,10 @@ class PDFStructure(text: List<Line>) {
 				}
 			}
 
+			val titleIndex = sectionTextLines[lineIndex].first
+			val contentIndex = if (text[titleIndex + numberOfLines].area == SECTION) titleIndex + numberOfLines else -1
 			sectionsIndexed.add(
-				Section(title, sectionTextLines[lineIndex].first, sectionTextLines[lineIndex + numberOfLines].first)
+				Section(title, titleIndex, contentIndex)
 			)
 			lineIndex += numberOfLines
 		}
