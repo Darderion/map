@@ -42,7 +42,7 @@ class PDFStructure(text: List<Line>) {
 									.dropLast(1).joinToString(" ").ifBlank { null }
 								isAfterBibliography = false
 							}
-							if (removeNumberingAndPage(it.content) == BIBLIOGRAPHY_TITLE) {
+							else if (removeNumberingAndPage(it.content) == BIBLIOGRAPHY_TITLE) {
 								isAfterBibliography = true
 							}
 							area
