@@ -114,9 +114,9 @@ class PDFStructure(text: List<Line>) {
 			}
 
 		val sectionsTitles = sectionsTitlesLines.map { it
-				.dropLast(2)										//	remove ' ' + NUMBER or NUMBER + NUMBER
-				.dropLastWhile { it == ' ' || it == '.' }			// THIS FILTER ASSUMES THAT DOCUMENT CONTAINS
-		}															//	LESS THAN 100 PAGES
+				.dropLastWhile { it.isDigit() }
+				.dropLastWhile { it == ' ' || it == '.' }
+		}
 
 		val sectionsTitlesWithIndexes = sectionsTitles.map { if (it.contains('.')) it else ". $it" }
 
