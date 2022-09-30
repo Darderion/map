@@ -4,6 +4,8 @@ import com.github.darderion.mundaneassignmentpolice.checker.RuleViolationType
 import com.github.darderion.mundaneassignmentpolice.checker.Section
 import com.github.darderion.mundaneassignmentpolice.checker.rule.list.ListRuleBuilder
 import com.github.darderion.mundaneassignmentpolice.checker.rule.regex.RegexRuleBuilder
+import com.github.darderion.mundaneassignmentpolice.checker.rule.sentence.SentenceRuleBuilder
+import com.github.darderion.mundaneassignmentpolice.checker.rule.sentence.splitIntoSentences
 import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.SymbolRuleBuilder
 import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.and
 import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.or
@@ -15,6 +17,7 @@ import com.github.darderion.mundaneassignmentpolice.checker.rule.word.WordRuleBu
 import com.github.darderion.mundaneassignmentpolice.checker.rule.word.or
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFArea
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFRegion
+import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Line
 import com.github.darderion.mundaneassignmentpolice.utils.InvalidOperationException
 import com.github.darderion.mundaneassignmentpolice.utils.LowQualityConferencesUtil
 import com.github.darderion.mundaneassignmentpolice.utils.URLUtil
@@ -134,10 +137,33 @@ val RULE_BRACKETS_LETTERS = List(2) {
 		acc and symbolRule
 	}
 
+
+val RULE_NO_SPACE_AFTER_PUNCTUATION =  SymbolRuleBuilder()
+		.symbol(',')
+		.fromRight()
+		.shouldHaveNeighbor(' ','\n')
+		.called("Отсутствует пробел после запятой")
+		.inArea(PDFRegion.NOWHERE.except(PDFArea.SECTION))
+		.ignoringAdjusting(*numbers.toCharArray())
+		.getRule()
+
 private const val openingBrackets = "([{<"
 private const val closingBrackets = ")]}>"
 private const val closingQuotes = "”»"
+private const val openingQuotes = "“«"
 private const val punctuationSymbols = ".,;:!?"
+
+
+private const val dotAndComma = ".,"
+
+val RULE_SPACE_BEFORE_PUNCTUATION = List(dotAndComma.length) { SymbolRuleBuilder() }
+		.mapIndexed {index, it ->
+			it.symbol(punctuationSymbols[index])
+					.fromLeft().shouldNotHaveNeighbor(' ','\n')
+					.called("Используется пробел перед точкой или запятой")
+					.inArea(PDFRegion.NOWHERE.except(PDFArea.SECTION))
+					.getRule()
+		}
 
 private val spaceAroundBracketsRuleBuilders = List(2) { SymbolRuleBuilder() }
 	.map { it.shouldHaveNeighbor(' ', '\n') }
@@ -172,6 +198,30 @@ val RULE_CITATION = SymbolRuleBuilder()
 	.called("Некорректное цитирование")
 	.inArea(PDFArea.SECTION)
 	.getRule()
+
+const val maxSentenceLength = 30
+val RULE_LONG_SENTENCE = SentenceRuleBuilder()
+		.called("Длинное предложение")
+		.disallow { lines ->
+			val results = mutableListOf<Line>()
+			splitIntoSentences(lines).forEach { sentence ->
+				var size = 0
+				var isQuote = false
+				sentence.forEachIndexed { index, word ->
+					if (word.text.contains(Regex("[$openingQuotes]")) && index > 0 &&
+							sentence[index-1].text.contains(Regex("[$punctuationSymbols:]")))
+						isQuote = true
+					if (word.text.contains(Regex("[$punctuationSymbols$longDash]")) && index > 0 &&
+							sentence[index-1].text.contains(Regex("[$closingQuotes]")))
+						isQuote = false
+					if (!isQuote) size += 1
+				}
+				if (size > maxSentenceLength) results.addAll(lines)
+			}
+			results.toList()
+		}.getRule()
+
+
 
 val RULE_SINGLE_SUBSECTION = ListRuleBuilder()
 	.inArea(PDFRegion.NOWHERE.except(PDFArea.TABLE_OF_CONTENT))
