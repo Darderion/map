@@ -173,6 +173,16 @@ val RULE_CITATION = SymbolRuleBuilder()
 	.inArea(PDFArea.SECTION)
 	.getRule()
 
+val RULE_SECTION_NUMBERING_FROM_0 = TableOfContentRuleBuilder()
+		.disallow { listOfLines ->
+			listOfLines.filter { line ->
+				val text = line.text
+						.filter { it.text.contains("([0-9])*+\\.".toRegex()) }.joinToString("")
+				text.contains("\\.0\\.".toRegex() ) || text.isNotEmpty() && text.first()=='0' // detect .0. or 0. (not 10.0)
+			}
+		}.called("""Нумерация секций не должна начинаться с нуля""")
+		.getRule()
+
 val RULE_SINGLE_SUBSECTION = ListRuleBuilder()
 	.inArea(PDFRegion.NOWHERE.except(PDFArea.TABLE_OF_CONTENT))
 	//.called("Only 1 subsection in a section")
@@ -293,6 +303,26 @@ val RULES_SMALL_NUMBERS = List<WordRule>(9) { index ->
 	smallNumbersRuleBuilder2.fromRight().getRule() or
 	smallNumbersRuleBuilder3.word((index + 1).toString()).getRule()
 }
+
+val RULE_DISALLOWED_WORDS = WordRuleBuilder()
+		.called("слова \"theorem, definition, lemma\" не должны использоваться")
+		.inArea(PDFRegion.EVERYWHERE.except(PDFArea.BIBLIOGRAPHY,PDFArea.TITLE_PAGE))
+		.fromLeft()
+		.ignoringPunctuation(true)
+		.shouldNotHaveNeighbor(
+				Regex("""[Tt]heorem"""),
+				Regex("""[Dd]efinition"""),
+				Regex("""[Ll]emma"""))
+		.getRule()
+
+val RULE_INCORRECT_ABBREVIATION = WordRuleBuilder()
+		.called("Неправильное написание аббревиатуры \"вуз\"")
+		.inArea(PDFRegion.EVERYWHERE)
+		.ignoringPunctuation(true)
+		.shouldNotHaveNeighbor(
+				Regex("""ВУЗ(\p{Pd})?(.*)""") // detect "ВУЗ-", "ВУЗ", not "вуз","Вуз"
+		)
+		.getRule()
 
 const val shortenedUrlRuleName = "Сокращённая ссылка"
 val shortenedUrlRuleArea = PDFRegion.NOWHERE.except(PDFArea.FOOTNOTE, PDFArea.BIBLIOGRAPHY)
