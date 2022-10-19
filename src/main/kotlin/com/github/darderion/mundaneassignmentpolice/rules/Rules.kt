@@ -2,9 +2,10 @@ package com.github.darderion.mundaneassignmentpolice.rules
 
 import com.github.darderion.mundaneassignmentpolice.checker.RuleViolationType
 import com.github.darderion.mundaneassignmentpolice.checker.Section
+import com.github.darderion.mundaneassignmentpolice.checker.getPages
 import com.github.darderion.mundaneassignmentpolice.checker.rule.list.ListRuleBuilder
-import com.github.darderion.mundaneassignmentpolice.checker.rule.list.getPages
 import com.github.darderion.mundaneassignmentpolice.checker.rule.regex.RegexRuleBuilder
+import com.github.darderion.mundaneassignmentpolice.checker.rule.line.LineRuleBuilder
 import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.SymbolRuleBuilder
 import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.and
 import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.or
@@ -14,13 +15,13 @@ import com.github.darderion.mundaneassignmentpolice.checker.rule.word.WordRule
 import com.github.darderion.mundaneassignmentpolice.checker.rule.word.WordRuleBuilder
 import com.github.darderion.mundaneassignmentpolice.checker.rule.word.or
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFArea
-import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFDocument
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFRegion
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.list.PDFList
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Line
 import com.github.darderion.mundaneassignmentpolice.utils.InvalidOperationException
 import com.github.darderion.mundaneassignmentpolice.utils.LowQualityConferencesUtil
 import com.github.darderion.mundaneassignmentpolice.utils.URLUtil
+import java.io.File
 import java.util.*
 
 private val enLetters = "abcdefghijklmnopqrstuvwxyz"
@@ -450,3 +451,36 @@ val RULE_LOW_QUALITY_CONFERENCES = URLRuleBuilder()
                 .any { conference -> url.contains(conference) }
         }.map { it.second }
     }.getRule()
+
+const val precisionWordCount = 5
+const val fileConfigurationWordsName= "src/main/resources/HardSoftConfigurationWords.txt"
+val RULE_CONFIGURATION_IN_EXPERIMENTS =  LineRuleBuilder()
+        .addLinesFilter { _, document ->
+                var experimentsPages = getPages(document, "ксперимент").first to //Эксперимент, экспериментов, эксперимент
+                        getPages(document, "Заключение").first
+                if (experimentsPages.first == -1)
+                    experimentsPages = getPages(document, "Тестирование").first to getPages(document, "Заключение").first
+
+                if (experimentsPages.first != -1) {
+                    document.text.filter { line ->
+                        line.text.isNotEmpty() && line.page >= experimentsPages.first && line.page < experimentsPages.second
+                    }
+                } else listOf()
+            }
+        .disallowInMultipleLines { lines, _ ->
+            var wordCount = 0
+            val hardConfigurationWords: MutableList<String> = mutableListOf()
+            File(fileConfigurationWordsName).forEachLine { hardConfigurationWords.add(it) }
+
+            lines.forEach { line -> line.text.forEach {
+                    val word = it.text
+                    hardConfigurationWords.forEach { if (word.contains(it)) wordCount += 1 }
+                }
+            }
+
+            if (wordCount < precisionWordCount)
+                listOf(lines.first())
+            else listOf()
+        }
+        .called("Нет hard/soft конфигурации в экспериментах")
+        .getRule()
