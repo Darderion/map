@@ -406,7 +406,10 @@ val RULE_LOW_QUALITY_CONFERENCES = URLRuleBuilder()
 	.disallow { urls ->
 		val lowQualityConferencesList = LowQualityConferencesUtil.getList()
 			.map {
-				it.removePrefix("http://").removePrefix("https://")
+				it.removePrefix("http://")
+					.removePrefix("https://")
+					.removePrefix("www.")
+					.removeSuffix("/")
 			}
 		urls.filter { url ->
 			lowQualityConferencesList
