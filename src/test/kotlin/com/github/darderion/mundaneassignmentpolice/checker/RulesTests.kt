@@ -79,7 +79,7 @@ class RulesTests : StringSpec({
 		RULE_URLS_UNIFORMITY.process(PDFBox().getPDF(filePathUniformityUrls)).count() shouldBeExactly 2
 	}
 	"Regex rule should detect incorrect order of literature references" {
-		RULE_ORDER_OF_REFERENCES.process(PDFBox().getPDF(filePathOrderOfReferences)).count() shouldBeExactly 3
+		RULE_ORDER_OF_REFERENCES.process(PDFBox().getPDF(filePathOrderOfReferences)).count() shouldBeExactly 4
 	}
 	"Regex rule should detect using different versions of the abbreviation" {
 		RULE_VARIOUS_ABBREVIATIONS.process(PDFBox().getPDF(filePathVariousAbbreviations)).count() shouldBeExactly 8

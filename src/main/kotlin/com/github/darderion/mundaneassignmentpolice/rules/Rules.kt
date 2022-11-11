@@ -360,14 +360,14 @@ val RULE_URLS_UNIFORMITY = URLRuleBuilder()
 
 val RULE_ORDER_OF_REFERENCES = RegexRuleBuilder()
 	.called("Неверный порядок ссылок на литературу")
-	.regex(Regex("""\[[0-9,\s]+\]"""))
+	.regex(Regex("""\[[0-9,\-\s]+\]"""))
 	.searchIn(1)
 	.disallow { matches ->
 		matches.filter { pair ->
 			val references = pair.first
 			val referencesInIntList = references
 				.slice(IntRange(1, references.length - 2))
-				.split(Regex(""","""))
+				.split(Regex("""[,\-]"""))
 				.map { it.trim() }
 				.filter { it.isNotEmpty() }
 				.map { it.toInt() }
