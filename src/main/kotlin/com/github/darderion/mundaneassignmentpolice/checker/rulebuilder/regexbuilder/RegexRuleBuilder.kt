@@ -1,16 +1,19 @@
-package com.github.darderion.mundaneassignmentpolice.checker.rule.regex
+package com.github.darderion.mundaneassignmentpolice.checker.rulebuilder.regexbuilder
 
 import com.github.darderion.mundaneassignmentpolice.checker.RuleViolationType
+import com.github.darderion.mundaneassignmentpolice.checker.rule.regex.RegexRule
+import com.github.darderion.mundaneassignmentpolice.checker.rulebuilder.NotRegionRuleBuilder
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFRegion
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Line
 
-class RegexRuleBuilder {
+class RegexRuleBuilder<out TBuilder: RegexRuleBuilder<TBuilder>>(
+        type: RuleViolationType = RuleViolationType.Error,
+        name: String = "Rule name",
+        region: PDFRegion = PDFRegion.EVERYWHERE
+) : NotRegionRuleBuilder<TBuilder>(type,name, region){
 	private var regex: Regex = Regex("")
 	private val predicates: MutableList<(matches: List<Pair<String, List<Line>>>) -> List<List<Line>>> = mutableListOf()
 	private var numberOfNearestLinesToSearch: Int = 0
-	private var type: RuleViolationType = RuleViolationType.Error
-	private var region: PDFRegion = PDFRegion.EVERYWHERE
-	private var name: String = "Rule name"
 
 	fun regex(regex: Regex) = this.also { this.regex = regex }
 
@@ -20,13 +23,8 @@ class RegexRuleBuilder {
 	fun searchIn(numberOfNearestLines: Int) =
 		this.also { this.numberOfNearestLinesToSearch = numberOfNearestLines }
 
-	fun type(type: RuleViolationType) = this.also { this.type = type }
 
-	fun inArea(region: PDFRegion) = this.also { this.region = region }
-
-	fun called(name: String) = this.also { this.name = name }
-
-	fun getRule() = RegexRule(
+	override fun getRule() = RegexRule(
 		regex,
 		predicates,
 		numberOfNearestLinesToSearch,

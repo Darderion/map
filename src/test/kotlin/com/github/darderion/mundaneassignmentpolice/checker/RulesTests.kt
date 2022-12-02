@@ -41,7 +41,8 @@ class RulesTests : StringSpec({
 		RULES_SMALL_NUMBERS.sumOf { it.process(PDFBox().getPDF(filePathSmallNumbers)).count() } shouldBeExactly 6
 	}
 	"Symbol rule should detect the lack of space around brackets" {
-		RULES_SPACE_AROUND_BRACKETS.map { it.process(PDFBox().getPDF(filePathSpaceAroundBrackets)) }
+		RULES_SPACE_AROUND_BRACKETS.map { it.process(PDFBox().getPDF(filePathSpaceAroundBrackets))
+		}
 			.flatten()
 			.count() shouldBeExactly 16
 	}
@@ -145,3 +146,4 @@ class RulesTests : StringSpec({
 			"${TestsConfiguration.resourceFolder}checker/MultilineCitation.pdf"
 	}
 }
+

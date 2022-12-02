@@ -3,6 +3,7 @@ package com.github.darderion.mundaneassignmentpolice.checker.rule.symbol
 import com.github.darderion.mundaneassignmentpolice.checker.RuleViolation
 import com.github.darderion.mundaneassignmentpolice.checker.RuleViolationType
 import com.github.darderion.mundaneassignmentpolice.checker.rule.Rule
+import com.github.darderion.mundaneassignmentpolice.checker.rulebuilder.symbolbuilder.indicesOf
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFDocument
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFRegion
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.inside

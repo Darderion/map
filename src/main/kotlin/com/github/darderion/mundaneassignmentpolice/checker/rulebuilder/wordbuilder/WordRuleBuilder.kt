@@ -1,8 +1,10 @@
-package com.github.darderion.mundaneassignmentpolice.checker.rule.word
+package com.github.darderion.mundaneassignmentpolice.checker.rulebuilder.wordbuilder
 
 import com.github.darderion.mundaneassignmentpolice.checker.Direction
 import com.github.darderion.mundaneassignmentpolice.checker.RuleViolationType
-import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFArea
+import com.github.darderion.mundaneassignmentpolice.checker.rule.word.BasicWordRule
+import com.github.darderion.mundaneassignmentpolice.checker.rule.word.WordRule
+import com.github.darderion.mundaneassignmentpolice.checker.rulebuilder.NotRegionRuleBuilder
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFRegion
 
 fun splitToWordsAndPunctuations(str: String): List<String> {
@@ -20,7 +22,11 @@ fun splitToWordsAndPunctuations(str: String): List<String> {
 	return wordsAndPunctuations.filter { it != "" }
 }
 
-class WordRuleBuilder {
+class WordRuleBuilder<out TBuilder: WordRuleBuilder<TBuilder>>(
+	type: RuleViolationType = RuleViolationType.Error,
+	name: String = "Rule name",
+	region: PDFRegion = PDFRegion.EVERYWHERE
+) : NotRegionRuleBuilder<TBuilder>(type,name, region){
 	private var word: String = " "
 	private var ignoredNeighbors: MutableList<Regex> = mutableListOf()
 	private var notIgnoredNeighbors: MutableList<Regex> = mutableListOf()
@@ -32,13 +38,8 @@ class WordRuleBuilder {
 	private var direction: Direction = Direction.BIDIRECTIONAL
 	private var neighborhoodSize: Int = 1
 	private var numberOfNeighbors: Int = 1
-	private var type: RuleViolationType = RuleViolationType.Error
-	private var name: String = "Rule name"
-	private var region: PDFRegion = PDFRegion.EVERYWHERE
 
 	infix fun word(word: String) = this.also { this.word = word }
-
-	infix fun called(name: String) = this.also { this.name = name }
 
 	fun ignoringAdjusting(vararg words: Regex) = this.also {
 		if (notIgnoredNeighbors.isEmpty()) ignoredNeighbors.addAll(words.toList())
@@ -86,17 +87,11 @@ class WordRuleBuilder {
 
 	fun fromBothSides() = this.also { direction = Direction.BIDIRECTIONAL }
 
-	infix fun inArea(area: PDFArea) = this.also { region = PDFRegion.NOWHERE.except(area) }
-
-	infix fun inArea(region: PDFRegion) = this.also { this.region = region }
-
-	infix fun type(type: RuleViolationType) = this.also { this.type = type }
-
 	fun inNeighborhood(size: Int) = this.also { this.neighborhoodSize = size }
 
 	fun shouldHaveNumberOfNeighbors(number: Int) = this.also { this.numberOfNeighbors = number }
 
-	fun getRule() = BasicWordRule(
+	override fun getRule() = BasicWordRule(
 		word,
 		ignoredNeighbors,
 		notIgnoredNeighbors,
