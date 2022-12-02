@@ -1,11 +1,11 @@
-package com.github.darderion.mundaneassignmentpolice.checker.rule.symbol
+package com.github.darderion.mundaneassignmentpolice.checker.rulebuilder.symbolbuilder
 
 import com.github.darderion.mundaneassignmentpolice.checker.Direction
 import com.github.darderion.mundaneassignmentpolice.checker.RuleViolationType
-import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFArea
+import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.BasicSymbolRule
+import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.SymbolRule
+import com.github.darderion.mundaneassignmentpolice.checker.rulebuilder.NotRegionRuleBuilder
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFRegion
-import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFRegion.Companion.EVERYWHERE
-import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFRegion.Companion.NOWHERE
 import java.util.regex.Pattern
 
 // Extension method
@@ -16,7 +16,12 @@ fun CharSequence.indicesOf(input: String): List<Int> =
 		.map { it.range.first }	// get the index
 		.toCollection(mutableListOf())	// collect the result as list
 
-class SymbolRuleBuilder {
+class SymbolRuleBuilder<out TBuilder: SymbolRuleBuilder<TBuilder>>(
+	type: RuleViolationType = RuleViolationType.Error,
+	name: String = "Rule name",
+	region: PDFRegion = PDFRegion.EVERYWHERE
+): NotRegionRuleBuilder<TBuilder>(type,name, region){
+
 	private var symbol: Char = ' '
 	private var ignoredNeighbors: MutableList<Char> = mutableListOf()
 	private var notIgnoredNeighbors: MutableList<Char> = mutableListOf()
@@ -25,13 +30,8 @@ class SymbolRuleBuilder {
 	private var requiredNeighbors: MutableList<Char> = mutableListOf()
 	private var direction: Direction = Direction.BIDIRECTIONAL
 	private var neighborhoodSize: Int = 1
-	private var type: RuleViolationType = RuleViolationType.Error
-	private var name: String = "Rule name"
-	private var region: PDFRegion = EVERYWHERE
 
 	infix fun symbol(symbol: Char) = this.also { this.symbol = symbol }
-
-	infix fun called(name: String) = this.also { this.name = name }
 
 	fun ignoringAdjusting(vararg symbols: Char) = this.also { if (notIgnoredNeighbors.isEmpty()) ignoredNeighbors.addAll(symbols.toList())
 															  else throw Exception("Up to one of the following methods can be used:" +
@@ -55,15 +55,9 @@ class SymbolRuleBuilder {
 
 	infix fun from(direction: Direction) = this.also { this.direction = direction }
 
-	infix fun inArea(area: PDFArea) = this.also { region = NOWHERE.except(area) }
-
-	infix fun inArea(region: PDFRegion) = this.also { this.region = region }
-
-	infix fun type(type: RuleViolationType) = this.also { this.type = type }
-
 	fun inNeighborhood(size: Int) = this.also { this.neighborhoodSize = size }
 
-	fun getRule() = BasicSymbolRule(
+	override fun getRule() = BasicSymbolRule(
 		symbol,
 		ignoredNeighbors,
 		notIgnoredNeighbors,
