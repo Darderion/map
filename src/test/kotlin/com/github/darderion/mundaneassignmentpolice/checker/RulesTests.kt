@@ -116,10 +116,10 @@ class RulesTests : StringSpec({
 		RULE_OPENING_QUOTATION.process(PDFBox().getPDF(filePathMultilineCitation)).count() +
 				RULE_CLOSING_QUOTATION.process(PDFBox().getPDF(filePathMultilineCitation)).count() shouldBeExactly 0
 	}
-	"RULE_DISALLOWED_WORDS should detect words:\"Theorem,Definition,Lemma\""{
+	"""RULE_DISALLOWED_WORDS should detect words:\"Theorem,Definition,Lemma\""""{
 		RULE_DISALLOWED_WORDS.process(PDFBox().getPDF(filePathDisallowedWords)).count() shouldBeExactly 4
 	}
-	"RULE_INCORRECT_ABBREVIATION should incorrect abbreviation \"вуз\""{
+	"""RULE_INCORRECT_ABBREVIATION should detect incorrect abbreviation \"вуз\""""{
 		RULE_INCORRECT_ABBREVIATION.process(PDFBox().getPDF(filePathIncorrectAbbreviation)).count() shouldBeExactly 9
 	}
 

@@ -180,7 +180,7 @@ val RULE_SECTION_NUMBERING_FROM_0 = TableOfContentRuleBuilder()
 						.filter { it.text.contains("([0-9])*+\\.".toRegex()) }.joinToString("")
 				text.contains("\\.0\\.".toRegex() ) || text.isNotEmpty() && text.first()=='0' // detect .0. or 0. (not 10.0)
 			}
-		}.called("""Нумерация секций не должна начинаться с нуля""")
+		}.called("Нумерация секций не должна начинаться с нуля")
 		.getRule()
 
 val RULE_SINGLE_SUBSECTION = ListRuleBuilder()
