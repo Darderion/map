@@ -197,6 +197,14 @@ class PDFBox {
 		return linkedSetOf(*images.map(::imgToBase64String).toTypedArray())
 	}
 
+	fun getTables(fileName: String){
+		 ProcessBuilder("python3",
+			"src/main/kotlin/com/github/darderion/mundaneassignmentpolice/wrapper/TableExtractionScript.py",
+			"extraction",
+			fileName)
+			 .start()
+	}
+
 	private fun getImagesFromResources(resources: PDResources): List<RenderedImage> {
 		val images: MutableList<RenderedImage> = ArrayList()
 		for (xObjectName in resources.xObjectNames) {
