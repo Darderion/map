@@ -8,7 +8,6 @@ class Checker {
 	fun getRuleViolations(pdfName: String, ruleSet: RuleSet) = getRuleViolations(pdfName, ruleSet.rules)
 	fun getRuleViolations(pdfName: String, rules: List<Rule>): List<RuleViolation> {
 		val document = PDFBox().getPDF(pdfName)
-		PDFBox().getTables(pdfName)
 		if (document.areas == null) return listOf(
 			RuleViolation(
 				listOf(document.text.first()),

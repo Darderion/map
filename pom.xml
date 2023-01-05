@@ -15,7 +15,7 @@
 	<description>Web-app that assists in checking students&apos; assignments</description>
 	<properties>
 		<java.version>11</java.version>
-		<kotlin.version>1.5.31</kotlin.version>
+		<kotlin.version>1.6.21</kotlin.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -84,6 +84,11 @@
 			<artifactId>kotest-property-jvm</artifactId>
 			<version>5.0.0.M1</version>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.jetbrains.kotlinx</groupId>
+			<artifactId>dataframe</artifactId>
+			<version>0.8.0-dev-1005</version>
 		</dependency>
 	</dependencies>
 

@@ -22,17 +22,17 @@ def extraction(path):
         tables = camelot.read_pdf(path, stream=True, pages='all')
 
         for k in range(len(tables)):
-            min_x, min_y, max_x, max_y = 596, 842, 0, 0
+            left_x, left_y, right_x, right_y = 596, 896, 0, 0
             for i in range(len(tables[k].cells)):
                 for j in range(len(tables[k].cells[i])):
-                    min_x = min(min_x, tables[k].cells[i][j].x1)
-                    min_y = min(min_y, tables[k].cells[i][j].y1)
-                    max_x = max(max_x, tables[k].cells[i][j].x2)
-                    max_y = max(max_y, tables[k].cells[i][j].y2)
+                    left_x = min(left_x, tables[k].cells[i][j].x1)
+                    left_y = min(left_y, tables[k].cells[i][j].y1)
+                    right_x = max(right_x, tables[k].cells[i][j].x2)
+                    right_y = max(right_y, tables[k].cells[i][j].y2)
             tables[k].df = pandas.concat([tables[k].df,
                                           pandas.DataFrame(['table information',
                                                             'page', tables[k].page,
-                                                            'table area', min_x, min_y, max_x, max_y,
+                                                            'table area', left_x, left_y, right_x, right_y,
                                                             'rows', len(tables[k].rows),
                                                             'columns', len(tables[k].cols)]
                                                            )],

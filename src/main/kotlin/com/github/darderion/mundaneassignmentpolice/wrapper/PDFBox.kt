@@ -1,6 +1,7 @@
 package com.github.darderion.mundaneassignmentpolice.wrapper
 
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFDocument
+import com.github.darderion.mundaneassignmentpolice.pdfdocument.tables.Table
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.*
 import com.github.darderion.mundaneassignmentpolice.utils.imgToBase64String
 import org.apache.pdfbox.pdmodel.PDDocument
@@ -11,6 +12,12 @@ import org.apache.pdfbox.pdmodel.font.PDType1Font
 import org.apache.pdfbox.pdmodel.graphics.form.PDFormXObject
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject
 import org.apache.pdfbox.text.PDFTextStripper
+import org.jetbrains.kotlinx.dataframe.AnyFrame
+import org.jetbrains.kotlinx.dataframe.DataFrame
+import org.jetbrains.kotlinx.dataframe.api.filter
+import org.jetbrains.kotlinx.dataframe.api.first
+import org.jetbrains.kotlinx.dataframe.api.select
+import org.jetbrains.kotlinx.dataframe.io.read
 import java.awt.Color
 import java.awt.image.RenderedImage
 import java.io.*
@@ -90,6 +97,8 @@ class PDFBox {
 	 * @return PDFDocument
 	 */
 	fun getPDF(fileName: String): PDFDocument {
+		val tables = getTables(fileName)
+
 		val pdfText: MutableList<Line> = mutableListOf()
 
 		val document = getDocument(fileName)
@@ -117,7 +126,7 @@ class PDFBox {
 			var font: Font?
 			var word: String
 			var symb: Symbol
-			val words: MutableList<Word> = mutableListOf()
+			var words: MutableList<Word> = mutableListOf()
 			var contentIndex: Int
 			var contentItem: String
 			var coordinates = Coordinate(0, 0)
@@ -164,15 +173,30 @@ class PDFBox {
 					}
 				}
 				if (font == null && word.isEmpty()) font = Font(0.0f)
-				words.add(Word(word, font!!, coordinates))
-
-				Line(line, pageIndex, lineIndex, words.toList())
+					words.add(Word(word, font!!, coordinates))
+					tables.forEach { table ->
+						words = words.filter {
+							if (isWordInTable(pageIndex, it, table)) {
+								table.tableText.add(it)
+								if (!(table.lineIndexes.contains(lineIndex)))
+									table.lineIndexes.add(lineIndex)
+							}
+							!isWordInTable(pageIndex, it, table)
+						}.toMutableList()
+					}
+					Line(line, pageIndex, lineIndex, words.toList())
 			})
 		}
 
 		document.close()
 
-		return PDFDocument(fileName, pdfText, size.width.toDouble(), size.height.toDouble())
+		return PDFDocument(fileName, pdfText, tables, size.width.toDouble(), size.height.toDouble())
+	}
+
+	private fun isWordInTable(page: Int,word: Word, table: Table): Boolean{
+		return page == table.page - 1 &&
+				word.position.x >= table.x1 && word.position.y <= table.y1 &&
+				word.position.x <= table.x2 && word.position.y >= table.y2
 	}
 
 	fun getPDFSize(fileName: String): Int {
@@ -197,14 +221,6 @@ class PDFBox {
 		return linkedSetOf(*images.map(::imgToBase64String).toTypedArray())
 	}
 
-	fun getTables(fileName: String){
-		 ProcessBuilder("python3",
-			"src/main/kotlin/com/github/darderion/mundaneassignmentpolice/wrapper/TableExtractionScript.py",
-			"extraction",
-			fileName)
-			 .start()
-	}
-
 	private fun getImagesFromResources(resources: PDResources): List<RenderedImage> {
 		val images: MutableList<RenderedImage> = ArrayList()
 		for (xObjectName in resources.xObjectNames) {
@@ -216,5 +232,44 @@ class PDFBox {
 			}
 		}
 		return images
+	}
+
+	private fun getTables(path: String): List<Table>{
+		ProcessBuilder("python3", "TableExtractionScript.py", "extraction", path).start()
+
+		val fileName = path.replace("uploads/","")
+		val tables = mutableListOf<Table>()
+
+		File("uploads/tables/$fileName/").walkBottomUp().filter { it.isFile }.forEach {
+			val df = DataFrame.read(it)
+			tables.add(extractTable(df))
+		}
+		return tables
+	}
+
+	private val defaultPageHeight = 842.0
+
+	private val pageTableIndex = 2
+	private val x1TableIndex = 4
+	private val y1TableIndex = 5
+	private val x2TableIndex = 6
+	private val y2TableIndex = 7
+	private val rowTableIndex = 9
+	private val colTableIndex = 11
+
+	private fun extractTable(df: AnyFrame): Table{
+		val indexTableInf = df.select{ cols(0) }.first { it[0] == "table information"}.index()
+		val tableInf = df.select{cols(0)}.filter { it.index() >= indexTableInf }
+
+		val page = tableInf[pageTableIndex][0].toString().toInt()
+		val x1 = tableInf[x1TableIndex][0].toString().toDouble()
+		val y1 = defaultPageHeight - tableInf[y1TableIndex][0].toString().toDouble()
+		val x2 = tableInf[x2TableIndex][0].toString().toDouble()
+		val y2 = defaultPageHeight - tableInf[y2TableIndex][0].toString().toDouble()
+		val rowCount = tableInf[rowTableIndex][0].toString().toInt()
+		val colCount = tableInf[colTableIndex][0].toString().toInt()
+		val tableData  = df.filter { it.index()<indexTableInf }
+
+		return Table(page, x1,y1,x2,y2,rowCount,colCount,tableData, mutableListOf(), mutableListOf())
 	}
 }
