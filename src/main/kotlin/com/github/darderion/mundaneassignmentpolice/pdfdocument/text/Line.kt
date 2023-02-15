@@ -7,7 +7,8 @@ data class Line(val index: Int, val page: Int, val documentIndex: Int,
 ) {
 	val content: String
 	get() = text.joinToString("") { it.text }
-
+	val positionLast: Coordinate
+		get() = if (text.isNotEmpty()) text.last().position else Coordinate(0, 0)
 	val position: Coordinate
 	get() = if (text.isNotEmpty()) text.first().position else Coordinate(0, 0)
 
