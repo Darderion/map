@@ -22,6 +22,7 @@ import com.github.darderion.mundaneassignmentpolice.utils.ResourcesUtil
 import com.github.darderion.mundaneassignmentpolice.utils.URLUtil
 import java.util.*
 
+
 private val enLetters = "abcdefghijklmnopqrstuvwxyz"
 private val enCapitalLetters = enLetters.uppercase(Locale.getDefault())
 private val EN = enLetters + enCapitalLetters
@@ -421,11 +422,13 @@ val RULE_LOW_QUALITY_CONFERENCES = URLRuleBuilder()
 		}.map { it to it.lines }
 	}.getRule()
 
+val fieldsCoordinateX = 560
 val RULE_OUTSIDE_FIELDS = LineRuleBuilder()
-	.called("Слово вышло за поля")
-	.inArea(PDFRegion.EVERYWHERE.except(PDFArea.BIBLIOGRAPHY,PDFArea.FOOTNOTE,PDFArea.TITLE_PAGE))
+	.called("Слово вышло  поля")
+	.inArea(PDFRegion.EVERYWHERE.except(PDFArea.BIBLIOGRAPHY, PDFArea.FOOTNOTE, PDFArea.TITLE_PAGE))
 	.disallow { it ->
 		it.filter {
-			it.positionLast.x + it.text.last().text.length*7>570
-		}}
+			it.lastPosition.x > fieldsCoordinateX
+		}
+	}
 	.getRule()
