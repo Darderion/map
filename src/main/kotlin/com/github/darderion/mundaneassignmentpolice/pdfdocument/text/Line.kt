@@ -3,12 +3,10 @@ package com.github.darderion.mundaneassignmentpolice.pdfdocument.text
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFArea
 
 data class Line(val index: Int, val page: Int, val documentIndex: Int,
-				val text: List<Word>, var area: PDFArea? = null
+				val text: List<Word>, var area: PDFArea? = null,var lastPosition: Coordinate
 ) {
 	val content: String
 	get() = text.joinToString("") { it.text }
-	val positionLast: Coordinate
-		get() = if (text.isNotEmpty()) text.last().position else Coordinate(0, 0)
 	val position: Coordinate
 	get() = if (text.isNotEmpty()) text.first().position else Coordinate(0, 0)
 
@@ -20,5 +18,5 @@ data class Line(val index: Int, val page: Int, val documentIndex: Int,
 
 	override fun toString() = "[$documentIndex -- $index, p.$page, $area, ${position.x}] --> '$content'"
 
-	fun drop(numberOfItems: Int) = Line(index, page, documentIndex, text.drop(numberOfItems), area)
+	fun drop(numberOfItems: Int) = Line(index, page, documentIndex, text.drop(numberOfItems), area,Coordinate(0,0))
 }
