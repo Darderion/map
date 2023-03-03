@@ -15,7 +15,7 @@ import org.apache.pdfbox.text.PDFTextStripper
 import org.jetbrains.kotlinx.dataframe.AnyFrame
 import org.jetbrains.kotlinx.dataframe.DataFrame
 import org.jetbrains.kotlinx.dataframe.api.filter
-import org.jetbrains.kotlinx.dataframe.api.first
+import org.jetbrains.kotlinx.dataframe.api.last
 import org.jetbrains.kotlinx.dataframe.api.select
 import org.jetbrains.kotlinx.dataframe.io.read
 import java.awt.Color
@@ -175,14 +175,7 @@ class PDFBox {
 				if (font == null && word.isEmpty()) font = Font(0.0f)
 					words.add(Word(word, font!!, coordinates))
 					tables.forEach { table ->
-						words = words.filter {
-							if (isWordInTable(pageIndex, it, table)) {
-								table.tableText.add(it)
-								if (!(table.lineIndexes.contains(lineIndex)))
-									table.lineIndexes.add(lineIndex)
-							}
-							!isWordInTable(pageIndex, it, table)
-						}.toMutableList()
+						words = words.filter { !isWordInTable(pageIndex, it, table) }.toMutableList()
 					}
 					Line(line, pageIndex, lineIndex, words.toList())
 			})
@@ -235,12 +228,16 @@ class PDFBox {
 	}
 
 	private fun getTables(path: String): List<Table>{
-		ProcessBuilder("python3", "TableExtractionScript.py", "extraction", path).start()
+
+		ProcessBuilder("python3", "../../../../../../../main/scripts/tables/TableExtractionScript.py", "extraction", path).start()
 
 		val fileName = path.replace("uploads/","")
 		val tables = mutableListOf<Table>()
 
-		File("uploads/tables/$fileName/").walkBottomUp().filter { it.isFile }.forEach {
+		val pat = System.getProperty("user.dir")
+		println("Working Directory = $pat")
+
+		File("../../../../../../../../uploads/tables/$fileName/").walkBottomUp().filter { it.isFile }.forEach {
 			val df = DataFrame.read(it)
 			tables.add(extractTable(df))
 		}
@@ -258,7 +255,7 @@ class PDFBox {
 	private val colTableIndex = 11
 
 	private fun extractTable(df: AnyFrame): Table{
-		val indexTableInf = df.select{ cols(0) }.first { it[0] == "table information"}.index()
+		val indexTableInf = df.select{ cols(0) }.last { it[0] == "table information"}.index()
 		val tableInf = df.select{cols(0)}.filter { it.index() >= indexTableInf }
 
 		val page = tableInf[pageTableIndex][0].toString().toInt()
@@ -270,6 +267,10 @@ class PDFBox {
 		val colCount = tableInf[colTableIndex][0].toString().toInt()
 		val tableData  = df.filter { it.index()<indexTableInf }
 
-		return Table(page, x1,y1,x2,y2,rowCount,colCount,tableData, mutableListOf(), mutableListOf())
+		return Table(page,
+			x1,y1,x2,y2,
+			rowCount,colCount,
+			tableData,
+			mutableListOf())
 	}
 }

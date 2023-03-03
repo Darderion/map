@@ -1,15 +1,18 @@
-# coding: utf8
-import os
 import PyPDF2
 import camelot
 import pandas
 import sys
+import os
 
 
 def extraction(path):
+    print(os.getcwd())
+    #os.chdir('../../../../')
+    #print(os.getcwd())
     file_name = path.replace('uploads/', '')
+
     try:
-        PyPDF2.PdfFileReader(open(path, "rb"))
+        PyPDF2.PdfFileReader(open(path, 'rb'))
     except PyPDF2._utils.PdfStreamError:
         print("invalid PDF file")
     else:
@@ -29,12 +32,17 @@ def extraction(path):
                     left_y = min(left_y, tables[k].cells[i][j].y1)
                     right_x = max(right_x, tables[k].cells[i][j].x2)
                     right_y = max(right_y, tables[k].cells[i][j].y2)
+                    tables[k].df.at[i, j] = f'x1 = {tables[k].cells[i][j].x1} ' \
+                                            f'y1 = {tables[k].cells[i][j].y1} ' \
+                                            f'x2 = {tables[k].cells[i][j].x2} ' \
+                                            f'y2 = {tables[k].cells[i][j].y2}\n' \
+                                            + tables[k].df.at[i, j]
             tables[k].df = pandas.concat([tables[k].df,
                                           pandas.DataFrame(['table information',
                                                             'page', tables[k].page,
                                                             'table area', left_x, left_y, right_x, right_y,
                                                             'rows', len(tables[k].rows),
-                                                            'columns', len(tables[k].cols)]
+                                                            'columns', len(tables[k].cols)],
                                                            )],
                                          ignore_index=True)
         tables.export(f'uploads/tables/{file_name}/{file_name}.csv',

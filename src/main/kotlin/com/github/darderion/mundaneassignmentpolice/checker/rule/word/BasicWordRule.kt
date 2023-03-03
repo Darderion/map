@@ -39,6 +39,7 @@ class BasicWordRule(
 			when (direction) {
 				Direction.LEFT -> sideWords.removeAt(1)
 				Direction.RIGHT -> sideWords.removeAt(0)
+				else -> {}
 			}
 
 			val filteredSideWords = sideWords

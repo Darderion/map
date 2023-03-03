@@ -1,6 +1,7 @@
 package com.github.darderion.mundaneassignmentpolice.pdfdocument
 
 import com.github.darderion.mundaneassignmentpolice.controller.pdfFolder
+import com.github.darderion.mundaneassignmentpolice.pdfdocument.tables.Cell
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Coordinate
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Line
 import com.github.darderion.mundaneassignmentpolice.wrapper.PDFBox
@@ -9,7 +10,7 @@ import java.nio.file.Paths
 
 class Annotations {
 	companion object {
-		fun underline(pdf: PDFDocument, lines: List<Line>): String {
+		fun underline(pdf: PDFDocument, lines: List<Line> = listOf(), cells: List<Cell> = listOf()): String {
 			var document = PDFBox().getDocument(pdf.name)
 			lines.forEach { line ->
 				document = PDFBox().addLine(document, line.page,
@@ -17,6 +18,14 @@ class Annotations {
 					(pdf.width - (line.position.x + 50)).toInt()
 				)
 			}
+
+			cells.forEach { cell ->
+				document = PDFBox().addLine(document, cell.page,
+					Coordinate(cell.leftCorner.x, cell.leftCorner.y),
+					(cell.rightCorner.x - cell.leftCorner.x).toInt()
+				)
+			}
+
 			Files.createDirectories(Paths.get("${pdfFolder}ruleviolations/"))
 			val fileName = "${pdfFolder}ruleviolations/${
 				pdf.name.split('/')[pdf.name.split('/').count() - 1].replace(".pdf", "")
@@ -24,5 +33,6 @@ class Annotations {
 			document.save(fileName)
 			return fileName
 		}
+
 	}
 }

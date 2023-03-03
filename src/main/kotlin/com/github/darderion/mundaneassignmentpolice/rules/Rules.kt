@@ -7,6 +7,7 @@ import com.github.darderion.mundaneassignmentpolice.checker.rule.regex.RegexRule
 import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.SymbolRuleBuilder
 import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.and
 import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.or
+import com.github.darderion.mundaneassignmentpolice.checker.rule.table.TableRuleBuilder
 import com.github.darderion.mundaneassignmentpolice.checker.rule.tableofcontent.TableOfContentRuleBuilder
 import com.github.darderion.mundaneassignmentpolice.checker.rule.url.URLRuleBuilder
 import com.github.darderion.mundaneassignmentpolice.checker.rule.url.then
@@ -416,3 +417,8 @@ val RULE_LOW_QUALITY_CONFERENCES = URLRuleBuilder()
 				.any { conference -> url.text.contains(conference) }
 		}.map { it to it.lines }
 	}.getRule()
+
+val TABLE_RULE = TableRuleBuilder()
+	.called("Первая клетка")
+	.disallow { listOf( it.cells[0])}
+	.getRule()

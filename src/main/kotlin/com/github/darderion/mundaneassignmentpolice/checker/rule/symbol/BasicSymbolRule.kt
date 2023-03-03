@@ -39,6 +39,7 @@ class BasicSymbolRule(
 			when (direction) {
 				LEFT -> sideTexts.removeAt(1)
 				RIGHT -> sideTexts.removeAt(0)
+				else -> {}
 			}
 
 			val neighbors = (if (notIgnoredNeighbors.isNotEmpty()) sideTexts
