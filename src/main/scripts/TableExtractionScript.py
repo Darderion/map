@@ -6,9 +6,8 @@ import os
 
 
 def extraction(path):
-    print(os.getcwd())
-    #os.chdir('../../../../')
-    #print(os.getcwd())
+
+    os.chdir(os.path.expanduser("~/map/"))
     file_name = path.replace('uploads/', '')
 
     try:

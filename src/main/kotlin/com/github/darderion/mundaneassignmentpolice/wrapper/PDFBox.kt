@@ -228,31 +228,24 @@ class PDFBox {
 	}
 
 	private fun getTables(path: String): List<Table>{
-
-		ProcessBuilder("python3", "../../../../../../../main/scripts/tables/TableExtractionScript.py", "extraction", path).start()
-
+		val workingDirPath = System.getProperty("user.home") + "/map"
 		val fileName = path.replace("uploads/","")
 		val tables = mutableListOf<Table>()
 
-		val pat = System.getProperty("user.dir")
-		println("Working Directory = $pat")
+		ProcessBuilder("src/main/scripts/venv/bin/python3",
+			"src/main/scripts/TableExtractionScript.py",
+			"extraction", path)
+			.directory(File(workingDirPath))
+			.redirectOutput(ProcessBuilder.Redirect.INHERIT)
+			.start()
+			.waitFor()
 
-		File("../../../../../../../../uploads/tables/$fileName/").walkBottomUp().filter { it.isFile }.forEach {
+		File("$workingDirPath/uploads/tables/$fileName/").walkBottomUp().filter { it.isFile }.forEach {
 			val df = DataFrame.read(it)
 			tables.add(extractTable(df))
 		}
 		return tables
 	}
-
-	private val defaultPageHeight = 842.0
-
-	private val pageTableIndex = 2
-	private val x1TableIndex = 4
-	private val y1TableIndex = 5
-	private val x2TableIndex = 6
-	private val y2TableIndex = 7
-	private val rowTableIndex = 9
-	private val colTableIndex = 11
 
 	private fun extractTable(df: AnyFrame): Table{
 		val indexTableInf = df.select{ cols(0) }.last { it[0] == "table information"}.index()
@@ -272,5 +265,17 @@ class PDFBox {
 			rowCount,colCount,
 			tableData,
 			mutableListOf())
+	}
+
+	companion object {
+		private const val defaultPageHeight = 842.0
+
+		private const val pageTableIndex = 2
+		private const val x1TableIndex = 4
+		private const val y1TableIndex = 5
+		private const val x2TableIndex = 6
+		private const val y2TableIndex = 7
+		private const val rowTableIndex = 9
+		private const val colTableIndex = 11
 	}
 }

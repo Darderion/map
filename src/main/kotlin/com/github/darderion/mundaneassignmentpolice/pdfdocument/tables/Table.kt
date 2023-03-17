@@ -19,11 +19,6 @@ data class Table(val page : Int,
         df.forEachColumn { it.forEach { getCell(it.toString()) } }
     }
 
-    private val defaultPageHeight = 842.0
-    private val x1CellIndex = 3
-    private val y1CellIndex = 6
-    private val x2CellIndex = 9
-    private val y2CellIndex = 12
     private fun getCell(text: String){
 
         val coordinates = text.lines().first().split(" ")
@@ -36,5 +31,13 @@ data class Table(val page : Int,
         val cellText = text.lines().filterIndexed { index, _ -> index != 0 }
 
         cells.add(Cell(page, cellText, Coordinate(x1,y1), Coordinate(x2,y2)))
+    }
+
+    companion object {
+        private const val defaultPageHeight = 842.0
+        private const val x1CellIndex = 2
+        private const val y1CellIndex = 5
+        private const val x2CellIndex = 8
+        private const val y2CellIndex = 11
     }
 }
