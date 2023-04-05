@@ -25,7 +25,6 @@ const val url = developmentURL
 class APIController {
 	val pdfBox = PDFBox()
 	val ruleSet = RULE_SET_RU
-	val tableRuleSet = TABLE_RULE_SET_RU
 
 	@GetMapping("/api/viewPDFText")
 	fun getPDFText(@RequestParam pdfName: String) =
@@ -83,8 +82,7 @@ class APIController {
 			} else
 				pdf.text.filter { it.page == page && it.index >= lines.first() &&
 						it.index <= lines.last() }
-					.sortedBy { line -> line.index },
-			Checker().getRuleTableViolations(fileName, tableRuleSet).map { it.cells }.flatten()
+					.sortedBy { line -> line.index }
 		)
 		logger.info("File created: $pdf2")
 

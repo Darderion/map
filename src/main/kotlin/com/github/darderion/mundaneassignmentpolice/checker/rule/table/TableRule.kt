@@ -1,33 +1,32 @@
 package com.github.darderion.mundaneassignmentpolice.checker.rule.table
 
-import com.github.darderion.mundaneassignmentpolice.checker.RuleTableViolation
 import com.github.darderion.mundaneassignmentpolice.checker.RuleViolation
 import com.github.darderion.mundaneassignmentpolice.checker.RuleViolationType
 import com.github.darderion.mundaneassignmentpolice.checker.rule.Rule
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFDocument
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFRegion
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.tables.Table
-import com.github.darderion.mundaneassignmentpolice.pdfdocument.tables.Cell
+import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Line
 
 class TableRule (
-    val predicates: MutableList<(Table) -> List<Cell>>,
-    val type: RuleViolationType,
-    val area: PDFRegion,
-    val name: String
-    ){
-       fun process(document: PDFDocument): List<RuleTableViolation> {
-            val rulesTablesViolations: MutableSet<RuleTableViolation> = mutableSetOf()
+    val predicates: MutableList<(Table) -> List<Line>>,
+     type: RuleViolationType,
+     area: PDFRegion,
+     name: String
+    ): Rule(area, name, type){
+       override fun process(document: PDFDocument): List<RuleViolation> {
+            val rulesViolations: MutableSet<RuleViolation> = mutableSetOf()
 
             predicates.forEach { predicate ->
-                rulesTablesViolations.addAll(
+                rulesViolations.addAll(
                     document.tables.map {
                         predicate(it)
                     }.filter { it.isNotEmpty() }.map {
-                        RuleTableViolation(it, name, type)
+                        RuleViolation(it, name, type)
                     }
                 )
             }
 
-            return rulesTablesViolations.toList()
+            return rulesViolations.toList()
         }
     }

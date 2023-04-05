@@ -16,6 +16,7 @@ import com.github.darderion.mundaneassignmentpolice.checker.rule.word.WordRuleBu
 import com.github.darderion.mundaneassignmentpolice.checker.rule.word.or
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFArea
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFRegion
+import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Line
 import com.github.darderion.mundaneassignmentpolice.utils.InvalidOperationException
 import com.github.darderion.mundaneassignmentpolice.utils.LowQualityConferencesUtil
 import com.github.darderion.mundaneassignmentpolice.utils.ResourcesUtil
@@ -419,6 +420,10 @@ val RULE_LOW_QUALITY_CONFERENCES = URLRuleBuilder()
 	}.getRule()
 
 val TABLE_RULE = TableRuleBuilder()
-	.called("Первая клетка")
-	.disallow { listOf( it.cells[0])}
+	.called("Все клетки")
+	.disallow { table ->
+		val lines = mutableListOf<Line>()
+		table.cells.forEach { cell ->  lines.addAll(cell.cellLines)  }
+		lines
+	}
 	.getRule()

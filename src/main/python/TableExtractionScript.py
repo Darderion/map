@@ -34,9 +34,9 @@ def extraction(path):
                     tables[k].df.at[i, j] = f'x1 = {tables[k].cells[i][j].x1} ' \
                                             f'y1 = {tables[k].cells[i][j].y1} ' \
                                             f'x2 = {tables[k].cells[i][j].x2} ' \
-                                            f'y2 = {tables[k].cells[i][j].y2}\n' \
+                                            f'y2 = {tables[k].cells[i][j].y2} \n ' \
                                             + tables[k].df.at[i, j]
-            tables[k].df = pandas.concat([tables[k].df,
+            tables[k].df = pandas.concat([pandas.DataFrame(['table data']), tables[k].df,
                                           pandas.DataFrame(['table information',
                                                             'page', tables[k].page,
                                                             'table area', left_x, left_y, right_x, right_y,

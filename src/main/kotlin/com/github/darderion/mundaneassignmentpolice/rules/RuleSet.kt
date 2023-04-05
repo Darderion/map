@@ -1,10 +1,11 @@
 package com.github.darderion.mundaneassignmentpolice.rules
 
 import com.github.darderion.mundaneassignmentpolice.checker.rule.Rule
-import com.github.darderion.mundaneassignmentpolice.checker.rule.table.TableRule
 
 val RULE_SET_RU = RuleSet(
 	mutableListOf(
+		TABLE_RULE,
+
 		/*RULE_LITLINK,
 		RULE_SHORT_DASH,
 		RULE_MEDIUM_DASH,
@@ -31,10 +32,4 @@ val RULE_SET_RU = RuleSet(
 
 			 */
 )
-
-val TABLE_RULE_SET_RU = TableRuleSet(
-	listOf( TABLE_RULE,
-	)
-)
-class TableRuleSet(val rules: List<TableRule>)
 class RuleSet(val rules: List<Rule>) {}

@@ -1,9 +1,11 @@
 package com.github.darderion.mundaneassignmentpolice.pdfdocument.tables
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Coordinate
+import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Line
 
-class Cell(
+data class Cell(
     val page: Int,
-    val cellText: List<String>,
+    val cellText: MutableList<String>,
+    var cellLines: MutableList<Line>,
     val leftCorner: Coordinate,
     val rightCorner: Coordinate
 )

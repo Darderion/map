@@ -14,7 +14,7 @@ import kotlin.math.min
 class StatisticsBuilder
 {
     private val MIN_TOTAL_SHARE_WORDS = 0.75
-    private val fileStopWordsName="src/main/python/src/main/resources/StopWords.txt"
+    private val fileStopWordsName="src/main/resources/StopWords.txt"
 
     fun getWordsStatistic(pdf : PDFDocument) : WordsStatistic
     {
