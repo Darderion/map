@@ -23,7 +23,7 @@ def extraction(path):
         if not os.path.isdir(f'uploads/tables/{file_name}'):
             os.mkdir(f'uploads/tables/{file_name}')
 
-        tables = camelot.read_pdf(path, latice=True, pages='all')
+        tables = camelot.read_pdf(path, latice=True, pages='all', line_scale=30)
 
         for k in range(len(tables)):
             left_x, left_y, right_x, right_y = 596, 896, 0, 0

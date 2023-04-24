@@ -27,6 +27,8 @@ from ..image_processing import (
     find_lines,
     find_contours,
     find_joints,
+    correct_lines,
+    adaptive_threshold_with_img,
 )
 from ..backends.image_conversion import BACKENDS
 
@@ -282,6 +284,33 @@ class Lattice(BaseParser):
             )
             horizontal_mask, horizontal_segments = find_lines(
                 self.threshold,
+                regions=regions,
+                direction="horizontal",
+                line_scale=self.line_scale,
+                iterations=self.iterations,
+            )
+
+            self.image  = correct_lines(
+                self.image,
+                vertical_segments,
+                horizontal_segments
+            )
+            self.image, threshold = adaptive_threshold_with_img(
+                self.image,
+                process_background=self.process_background,
+                blocksize=self.threshold_blocksize,
+                c=self.threshold_constant
+            )
+
+            vertical_mask, vertical_segments = find_lines(
+                threshold,
+                regions=regions,
+                direction="vertical",
+                line_scale=self.line_scale,
+                iterations=self.iterations,
+            )
+            horizontal_mask, horizontal_segments = find_lines(
+                threshold,
                 regions=regions,
                 direction="horizontal",
                 line_scale=self.line_scale,

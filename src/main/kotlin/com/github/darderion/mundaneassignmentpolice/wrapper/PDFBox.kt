@@ -262,14 +262,12 @@ class PDFBox {
 	}
 
 	private fun getTables(path: String): List<Table>{
-		val d: Long = Date().time
 
 		val workingDirPath = System.getProperty("user.home") + "/map"
 		val fileName = path.replace("uploads/","")
 		val tables = mutableListOf<Table>()
 
 		if (!Files.exists(Path("$workingDirPath/uploads/tables/$fileName"), LinkOption.NOFOLLOW_LINKS)) {
-
 
 			ProcessBuilder(
 				"src/main/python/venv/bin/python3",
@@ -287,9 +285,6 @@ class PDFBox {
 			tables.add(Table(df))
 		}
 
-		val e: Long = Date().time
-		println(e - d)
-		println(tables.size)
 		return tables
 	}
 

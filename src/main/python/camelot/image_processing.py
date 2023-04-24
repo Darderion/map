@@ -3,6 +3,23 @@
 import cv2
 import numpy as np
 
+def adaptive_threshold_with_img(img, process_background=False, blocksize=15, c=-2):
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+    if process_background:
+        threshold = cv2.adaptiveThreshold(
+            gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, blocksize, c
+        )
+    else:
+        threshold = cv2.adaptiveThreshold(
+            np.invert(gray),
+            255,
+            cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
+            cv2.THRESH_BINARY,
+            blocksize,
+            c,
+        )
+    return img, threshold
 
 def adaptive_threshold(imagename, process_background=False, blocksize=15, c=-2):
     """Thresholds an image using OpenCV's adaptiveThreshold.
@@ -33,21 +50,7 @@ def adaptive_threshold(imagename, process_background=False, blocksize=15, c=-2):
 
     """
     img = cv2.imread(imagename)
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-
-    if process_background:
-        threshold = cv2.adaptiveThreshold(
-            gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, blocksize, c
-        )
-    else:
-        threshold = cv2.adaptiveThreshold(
-            np.invert(gray),
-            255,
-            cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
-            cv2.THRESH_BINARY,
-            blocksize,
-            c,
-        )
+    img, threshold = adaptive_threshold_with_img(img, process_background, blocksize, c)
     return img, threshold
 
 
@@ -220,3 +223,177 @@ def find_joints(contours, vertical, horizontal):
         tables[(x, y + h, x + w, y)] = joint_coords
 
     return tables
+
+
+def intersectes(r1, r2):
+    """ Checking the intersection of two ribs.
+
+    :param r1: tuple
+        (x11, y11, x21, y21) where (x11, y11) -> start coordinates of r1
+        and (x21, y21) -> end coordinates of rib1.
+    :param r2: tuple
+        (x12, y12, x22, y22) where (x12, y12) -> start coordinates of r2
+        and (x22, y22) -> end coordinates of rib2.
+    :return: boolean
+        if ribs intersect True else False.
+    """
+    c_m = 10
+    x11, y11, x21, y21 = r1[0], r1[1], r1[2], r1[3]
+    x12, y12, x22, y22 = r2[0], r2[1], r2[2], r2[3]
+
+    if (x11 == x21 and x12 == x22) or (y11 == y21 and y12 == y22):
+        return False
+    elif x11 == x21 and y12 == y22:
+        return x11 + c_m >= x12 and x11 <= x22 + c_m \
+            and y12 <= y11 + c_m and y12 >= y21 - c_m
+    else:
+        return x12 + c_m >= x11 and x12 <= x21 + c_m \
+            and y11 <= y12 + c_m and y11 >= y22 - c_m
+
+
+def draw_v(image, h_lines):
+    """
+    Draws the vertical lines between given horisontal lines, corrects the image.
+
+    :param image: img : object
+        numpy.ndarray representing the image.
+    :param h_lines: list
+        List of tuples representing horizontal lines with coordinates.
+    :return: img : object
+        numpy.ndarray representing the new image.
+    """
+
+    if len(h_lines) > 0:
+
+        h_lines = sorted(h_lines, key=lambda x: (x[0], x[1]))
+
+        l_x, r_x = h_lines[0][0], h_lines[0][2]
+        u_y, d_y = h_lines[0][1], h_lines[0][1]
+
+        for i in range(len(h_lines)):
+
+            if l_x == h_lines[i][0] and i != len(h_lines) - 1:
+                r_x = max(r_x, h_lines[i][2])
+
+            elif l_x == h_lines[i][0]:
+                d_y = h_lines[i][3]
+                cv2.rectangle(image, pt1=(l_x, u_y), pt2=(r_x, d_y), color=(0, 0, 0), thickness=3)
+
+            else:
+                d_y = h_lines[i - 1][3]
+                cv2.rectangle(image, pt1=(l_x, u_y), pt2=(r_x, d_y), color=(0, 0, 0), thickness=3)
+                l_x, r_x = h_lines[i][0], h_lines[i][2]
+                u_y, d_y = h_lines[i][1], h_lines[i][3]
+
+
+    return image
+
+
+def draw_h(image, v_lines):
+    '''
+        Draws the horisontal lines between given vertical lines, corrects the image.
+
+        :param image: img : object
+            numpy.ndarray representing the image.
+        :param v_lines: list
+            List of tuples representing vertical lines with
+            coordinates.
+        :return: image : object
+            numpy.ndarray representing the new image.
+    '''
+    if (len(v_lines) > 0):
+        v_lines = sorted(v_lines, key=lambda x: (x[3], x[0]))
+
+        u_y, d_y = v_lines[0][3], v_lines[0][1]
+
+        for i in range(len(v_lines)):
+
+            if u_y == v_lines[i][3] and i != len(v_lines) - 1:
+                d_y = max(d_y, v_lines[i][1])
+
+            elif u_y == v_lines[i][3]:
+                d_y = max(d_y, v_lines[i][1])
+                cv2.rectangle(image, pt1=(50, u_y), pt2=(image.shape[1] - 50, d_y), color=(0, 0, 0), thickness=3)
+
+            else:
+                cv2.rectangle(image, pt1=(50, u_y), pt2=(image.shape[1] - 50, d_y), color=(0, 0, 0), thickness=3)
+                u_y, d_y = v_lines[i][3], v_lines[i][1]
+
+    return image
+
+def correct_lines(image, v_segments, h_segments):
+    '''
+
+    :param image: object
+            numpy.ndarray representing the image.
+    :param v_segments: list
+            List of tuples representing vertical lines with
+            coordinates.
+    :param h_segments: list
+        List of tuples representing horizontal lines with
+        coordinates.
+    :return: image : object
+            numpy.ndarray representing the new image.
+    '''
+
+    h_size, v_size = len(h_segments), len(v_segments)
+
+    if h_size > 1 and v_size == 0:
+        image = draw_v(image, h_segments)
+
+    elif h_size == 0 and v_size > 1:
+        image = draw_h(image, v_segments)
+
+    elif v_size >= 1 and h_size >= 1:
+
+        ribs = v_segments[:] + h_segments[:]
+        segments = [[ribs[i]][:] for i in range(len(ribs))]
+
+        for i in range(0, len(ribs) - 1):
+            for j in range(i+1, len(ribs)):
+                if intersectes(ribs[i],ribs[j]):
+                    for sg1 in segments:
+                        cur_sg = []
+                        if ribs[i] in sg1:
+                            cur_sg = sg1
+                            break
+
+                    for sg2 in segments:
+                        del_sg = []
+                        if ribs[j] in sg2 and cur_sg != sg2:
+                            cur_sg += sg2[:]
+                            del_sg = sg2
+                            break
+                    if del_sg in segments:
+                        segments.remove(del_sg)
+
+
+        s_lines = []
+
+        for i in range(len(segments)):
+
+            min_x, min_y = segments[i][0][0], segments[i][0][3]
+            max_x, max_y = segments[i][0][2], segments[i][0][1]
+
+            if len(segments[i]) > 1:
+                for line in segments[i]:
+                    min_x, min_y = min(min_x, line[0]),min(min_y, line[3])
+                    max_x, max_y = max(max_x, line[2]), max(max_y,line[1])
+                    cv2.rectangle(image, pt1=(min_x, min_y), pt2=(max_x, max_y), color=(0, 0, 0), thickness=3)
+            else:
+                s_lines += segments[i]
+
+        h_s_lines, v_s_lines = [], []
+
+        for line in s_lines:
+            v_s_lines.append(line) if line[0] == line[2] else h_s_lines.append(line)
+
+        image = draw_h(image, v_s_lines)
+        image = draw_v(image, h_s_lines)
+
+    '''cv2.imshow("Image", image)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+    '''
+    return image
+
