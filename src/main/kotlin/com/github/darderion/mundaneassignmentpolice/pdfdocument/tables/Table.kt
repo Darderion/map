@@ -45,6 +45,12 @@ class Table(val df: DataFrame<Any?>){
         cells.add(Cell(page, cellText, mutableListOf(), Coordinate(x1,y1), Coordinate(x2,y2)))
     }
 
+    fun getLines(): List<Line>{
+        val lines = mutableListOf<Line>()
+        cells.forEach{ lines.addAll(it.cellLines) }
+        return lines
+    }
+
     companion object {
         private const val defaultPageHeight = 842.0
         private const val x1CellIndex = 2

@@ -1,7 +1,6 @@
 package com.github.darderion.mundaneassignmentpolice.wrapper
 
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFDocument
-import com.github.darderion.mundaneassignmentpolice.pdfdocument.tables.Cell
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.tables.Table
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.*
 import com.github.darderion.mundaneassignmentpolice.utils.imgToBase64String
@@ -18,6 +17,14 @@ import org.jetbrains.kotlinx.dataframe.io.read
 import java.awt.Color
 import java.awt.image.RenderedImage
 import java.io.*
+import java.nio.file.Files
+import java.nio.file.LinkOption
+import java.util.*
+import java.util.concurrent.TimeUnit
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
+import kotlin.collections.LinkedHashSet
+import kotlin.io.path.Path
 
 
 class PDFBox {
@@ -200,6 +207,7 @@ class PDFBox {
 							val tableLine = Line(line, pageIndex, lineIndex, words.toList(),
 								endPosition = Coordinate(cell.rightCorner.x, cell.rightCorner.y))
 							cell.cellLines = cellLines
+							pdfText.add(tableLine)
 							tableLine
 						}
 
@@ -254,24 +262,34 @@ class PDFBox {
 	}
 
 	private fun getTables(path: String): List<Table>{
+		val d: Long = Date().time
+
 		val workingDirPath = System.getProperty("user.home") + "/map"
 		val fileName = path.replace("uploads/","")
 		val tables = mutableListOf<Table>()
 
-		ProcessBuilder(
-			"src/main/python/venv/bin/python3",
-			"src/main/python/TableExtractionScript.py",
-			"extraction", path
-		)
-			.directory(File(workingDirPath))
-			.redirectOutput(ProcessBuilder.Redirect.INHERIT)
-			.start()
-			.waitFor()
+		if (!Files.exists(Path("$workingDirPath/uploads/tables/$fileName"), LinkOption.NOFOLLOW_LINKS)) {
+
+
+			ProcessBuilder(
+				"src/main/python/venv/bin/python3",
+				"src/main/python/TableExtractionScript.py",
+				"extraction", path
+			)
+				.directory(File(workingDirPath))
+				.redirectOutput(ProcessBuilder.Redirect.INHERIT)
+				.start()
+				.waitFor()
+		}
 
 		File("$workingDirPath/uploads/tables/$fileName/").walkBottomUp().filter { it.isFile }.forEach {
 			val df = DataFrame.read(it)
 			tables.add(Table(df))
 		}
+
+		val e: Long = Date().time
+		println(e - d)
+		println(tables.size)
 		return tables
 	}
 
