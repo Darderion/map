@@ -261,7 +261,12 @@ class PDFBox {
 		return images
 	}
 
-	private fun getTables(path: String): List<Table>{
+	/**
+	 * Returns tables from PDF
+	 * @param path pdf's path
+	 * @return list of Table
+	 */
+	fun getTables(path: String): List<Table>{
 
 		val workingDirPath = System.getProperty("user.home") + "/map"
 		val fileName = path.replace("uploads/","")

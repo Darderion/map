@@ -245,10 +245,10 @@ def intersectes(r1, r2):
         return False
     elif x11 == x21 and y12 == y22:
         return x11 + c_m >= x12 and x11 <= x22 + c_m \
-            and y12 <= y11 + c_m and y12 >= y21 - c_m
+            and y11 + c_m >= y12 >= y21 - c_m
     else:
         return x12 + c_m >= x11 and x12 <= x21 + c_m \
-            and y11 <= y12 + c_m and y11 >= y22 - c_m
+            and y12 + c_m >= y11 >= y22 - c_m
 
 
 def draw_v(image, h_lines):

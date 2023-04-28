@@ -1,29 +1,27 @@
 import PyPDF2
-import sys
-sys.path.insert(0, '../src')
-import camelot
+from PyPDF2.errors import PdfReadError
+import src.main.python.camelot
 import pandas
-import sys
 import os
+import sys
+from pathlib import Path
+sys.path.insert(0, '../src')
 
 
-def extraction(path):
+def extraction(pdf_path):
 
     os.chdir(os.path.expanduser("~/map/"))
-    file_name = path.replace('uploads/', '')
+    file_name = Path(pdf_path).stem
 
     try:
-        PyPDF2.PdfFileReader(open(path, 'rb'))
-    except PyPDF2._utils.PdfStreamError:
+        PyPDF2.PdfFileReader(open(pdf_path, 'rb'))
+    except PyPDF2.errors.PdfReadError:
         print("invalid PDF file")
     else:
-        if not path.endswith('.pdf'):
-            os.rename(path, path+'.pdf')
-            path += '.pdf'
         if not os.path.isdir(f'uploads/tables/{file_name}'):
             os.mkdir(f'uploads/tables/{file_name}')
 
-        tables = camelot.read_pdf(path, latice=True, pages='all', line_scale=30)
+        tables = src.main.python.camelot.read_pdf(pdf_path, latice=True, pages='all', line_scale=30)
 
         for k in range(len(tables)):
             left_x, left_y, right_x, right_y = 596, 896, 0, 0
@@ -49,8 +47,6 @@ def extraction(path):
         tables.export(f'uploads/tables/{file_name}/{file_name}.csv',
                       f='csv',
                       compress=False)
-        if path.endswith('.pdf'):
-            os.rename(path, path.replace('.pdf',''))
 
 
 if __name__ == '__main__':
