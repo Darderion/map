@@ -13,3 +13,4 @@ data class RuleViolation(
 ) {
 	// override fun toString() = if (lines.count() == 1) "[${lines.first().line}, p.${lines.first().page}] --> '$message'" else ""
 }
+

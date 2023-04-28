@@ -7,6 +7,7 @@ import com.github.darderion.mundaneassignmentpolice.checker.rule.regex.RegexRule
 import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.SymbolRuleBuilder
 import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.and
 import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.or
+import com.github.darderion.mundaneassignmentpolice.checker.rule.table.TableRuleBuilder
 import com.github.darderion.mundaneassignmentpolice.checker.rule.tableofcontent.TableOfContentRuleBuilder
 import com.github.darderion.mundaneassignmentpolice.checker.rule.url.URLRuleBuilder
 import com.github.darderion.mundaneassignmentpolice.checker.rule.url.then
@@ -15,6 +16,7 @@ import com.github.darderion.mundaneassignmentpolice.checker.rule.word.WordRuleBu
 import com.github.darderion.mundaneassignmentpolice.checker.rule.word.or
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFArea
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFRegion
+import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Line
 import com.github.darderion.mundaneassignmentpolice.utils.InvalidOperationException
 import com.github.darderion.mundaneassignmentpolice.utils.LowQualityConferencesUtil
 import com.github.darderion.mundaneassignmentpolice.utils.ResourcesUtil
@@ -416,3 +418,12 @@ val RULE_LOW_QUALITY_CONFERENCES = URLRuleBuilder()
 				.any { conference -> url.text.contains(conference) }
 		}.map { it to it.lines }
 	}.getRule()
+
+val TABLE_RULE = TableRuleBuilder()
+	.called("Все клетки")
+	.disallow { table ->
+		val lines = mutableListOf<Line>()
+		table.cells.forEach { cell ->  lines.addAll(cell.cellLines)  }
+		lines
+	}
+	.getRule()

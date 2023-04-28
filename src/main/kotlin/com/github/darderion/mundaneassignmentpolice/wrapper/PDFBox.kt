@@ -1,6 +1,7 @@
 package com.github.darderion.mundaneassignmentpolice.wrapper
 
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFDocument
+import com.github.darderion.mundaneassignmentpolice.pdfdocument.tables.Table
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.*
 import com.github.darderion.mundaneassignmentpolice.utils.imgToBase64String
 import org.apache.pdfbox.pdmodel.PDDocument
@@ -11,9 +12,19 @@ import org.apache.pdfbox.pdmodel.font.PDType1Font
 import org.apache.pdfbox.pdmodel.graphics.form.PDFormXObject
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject
 import org.apache.pdfbox.text.PDFTextStripper
+import org.jetbrains.kotlinx.dataframe.DataFrame
+import org.jetbrains.kotlinx.dataframe.io.read
 import java.awt.Color
 import java.awt.image.RenderedImage
 import java.io.*
+import java.nio.file.Files
+import java.nio.file.LinkOption
+import java.util.*
+import java.util.concurrent.TimeUnit
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
+import kotlin.collections.LinkedHashSet
+import kotlin.io.path.Path
 
 
 class PDFBox {
@@ -90,6 +101,8 @@ class PDFBox {
 	 * @return PDFDocument
 	 */
 	fun getPDF(fileName: String): PDFDocument {
+		val tables = getTables(fileName)
+
 		val pdfText: MutableList<Line> = mutableListOf()
 
 		val document = getDocument(fileName)
@@ -117,7 +130,7 @@ class PDFBox {
 			var font: Font?
 			var word: String
 			var symb: Symbol
-			val words: MutableList<Word> = mutableListOf()
+			var words: MutableList<Word> = mutableListOf()
 			var contentIndex: Int
 			var contentItem: String
 			var coordinates = Coordinate(0, 0)
@@ -166,13 +179,51 @@ class PDFBox {
 				if (font == null && word.isEmpty()) font = Font(0.0f)
 				words.add(Word(word, font!!, coordinates))
 
-				Line(line, pageIndex, lineIndex, words.toList())
-			})
-		}
+				tables.filter { table -> table.page == pageIndex  }.forEach { table ->
+					words = words.filter { word -> !isWordInTable(pageIndex, word, table) }
+						.filter { it.text.isNotEmpty() }.toMutableList()
+				}
 
+				if (document.pages[pageIndex].resources.xObjectNames.count() != 0){
+					Line(line, pageIndex, lineIndex, words.toList(),null,Coordinate(0,0))
+				}
+				else{
+					Line(line, pageIndex, lineIndex, words.toList(),null,stripper.symbols[stripperIndex-1].position)}
+			}
+			)
+
+			var line = text.lines().size
+			tables.forEach { table ->
+				if (table.page == pageIndex)
+					table.cells.forEach { cell ->
+						val cellLines = mutableListOf<Line>()
+						cellLines.addAll(cell.cellText.filter { it.isNotEmpty() }.map { content ->
+							words.clear()
+							content.split(" ").forEach {
+								words.add(Word(it, Font(12f), cell.leftCorner))
+							}
+							lineIndex += 1
+							line += 1
+							val tableLine = Line(line, pageIndex, lineIndex, words.toList(),
+								endPosition = Coordinate(cell.rightCorner.x, cell.rightCorner.y))
+							cell.cellLines = cellLines
+							pdfText.add(tableLine)
+							tableLine
+						}
+
+						)
+					}
+			}
+		}
 		document.close()
 
-		return PDFDocument(fileName, pdfText, size.width.toDouble(), size.height.toDouble())
+		return PDFDocument(fileName, pdfText, tables, size.width.toDouble(), size.height.toDouble())
+	}
+
+	private fun isWordInTable(page: Int, word: Word, table: Table): Boolean {
+		return page == table.page &&
+				word.position.x >= table.x1 && word.position.y <= table.y1 &&
+				word.position.x <= table.x2 && word.position.y >= table.y2
 	}
 
 	fun getPDFSize(fileName: String): Int {
@@ -209,4 +260,37 @@ class PDFBox {
 		}
 		return images
 	}
+
+	/**
+	 * Returns tables from PDF
+	 * @param path pdf's path
+	 * @return list of Table
+	 */
+	fun getTables(path: String): List<Table>{
+
+		val workingDirPath = System.getProperty("user.home") + "/map"
+		val fileName = path.replace("uploads/","")
+		val tables = mutableListOf<Table>()
+
+		if (!Files.exists(Path("$workingDirPath/uploads/tables/$fileName"), LinkOption.NOFOLLOW_LINKS)) {
+
+			ProcessBuilder(
+				"src/main/python/venv/bin/python3",
+				"src/main/python/TableExtractionScript.py",
+				"extraction", path
+			)
+				.directory(File(workingDirPath))
+				.redirectOutput(ProcessBuilder.Redirect.INHERIT)
+				.start()
+				.waitFor()
+		}
+
+		File("$workingDirPath/uploads/tables/$fileName/").walkBottomUp().filter { it.isFile }.forEach {
+			val df = DataFrame.read(it)
+			tables.add(Table(df))
+		}
+
+		return tables
+	}
+
 }

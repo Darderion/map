@@ -1,10 +1,12 @@
 package com.github.darderion.mundaneassignmentpolice.pdfdocument
 
+import com.github.darderion.mundaneassignmentpolice.pdfdocument.tables.Table
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Line
 import mu.KotlinLogging
 
 class PDFDocument(val name: String = "PDF",
 				  val text: List<Line>,
+				  val tables: List<Table>,
 				  val width: Double = defaultPageWidth,
 				  val height: Double = defaultPageHeight
 				  ) {

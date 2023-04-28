@@ -54,7 +54,7 @@ data class PDFList<T>(val value: MutableList<T> = mutableListOf(), val nodes: Mu
 		 */
 		fun getLists(lines: List<Line>): List<PDFList<Line>> {
 			// Adding a line to process a text that has no lines after a list
-			val lines = lines + Line(-1, -1, -1, listOf(Word("NOT A LIST ITEM", Font(0.0f), Coordinate(1000, -1))))
+			val lines = lines + Line(-1, -1, -1, listOf(Word("NOT A LIST ITEM", Font(0.0f), Coordinate(1000, -1))), null, Coordinate(0,0))
 
 			val lists: MutableList<PDFList<Line>> = mutableListOf()
 			val stack: Stack<PDFList<Line>> = Stack()
@@ -69,11 +69,11 @@ data class PDFList<T>(val value: MutableList<T> = mutableListOf(), val nodes: Mu
 						stack.push(stack.peek().nodes.first())
 					}
 				} else {
-					previousPosition = stack.peek().value.first().position
-					if (previousPosition hasSameXAs line.position) {					//	1.	lorem	OR	lorem
+					previousPosition = stack.peek().value.first().startPosition
+					if (previousPosition hasSameXAs line.startPosition) {					//	1.	lorem	OR	lorem
 						stack.peek().value.add(line)									//		lorem		lorem
 					} else {
-						if (previousPosition.x < line.position.x) {
+						if (previousPosition.x < line.startPosition.x) {
 							if (isListItem(line)) {
 								stack.peek().nodes.add(PDFList(line.drop(2)))	// lorem
 								stack.push(stack.peek().nodes.last())						//		1. lorem
@@ -83,17 +83,17 @@ data class PDFList<T>(val value: MutableList<T> = mutableListOf(), val nodes: Mu
 							}
 						} else {							//		lorem	OR		lorem	OR		...	lorem	OR		... lorem
 							while (!(	stack.isEmpty() ||	//	lorem			2. lorem		lorem				2. lorem
-										(isListItem(line) && previousPosition hasSameXAs line.drop(2).position) ||
-										previousPosition hasSameXAs line.position)) {
+										(isListItem(line) && previousPosition hasSameXAs line.drop(2).startPosition) ||
+										previousPosition hasSameXAs line.startPosition)) {
 								previousList = stack.pop()
 								if (stack.isNotEmpty()) {
-									previousPosition = stack.peek().value.first().position
+									previousPosition = stack.peek().value.first().startPosition
 								}
 							}
 							if (stack.isEmpty()) {
 								lists.add(previousList!!)
 							} else {
-								if (previousPosition hasSameXAs line.position) {		//		lorem
+								if (previousPosition hasSameXAs line.startPosition) {		//		lorem
 									stack.peek().value.add(line)						//	lorem
 								} else {
 									stack.pop()
