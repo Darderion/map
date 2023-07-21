@@ -9,23 +9,31 @@ import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFDocument
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFRegion
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.list.PDFList
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Line
+import com.github.darderion.mundaneassignmentpolice.rules.conclusionWord
+
+/**
+ * returns the pages of the section containing the given word
+ * @param document pdf document
+ * @param word word from section title in string format
+ * @return pair<int, int> section page numbers
+ */
 fun getPages(document: PDFDocument, word : String): Pair<Int,Int>
 {
 	var pages = -1 to -1
 	var linesIndexes = -1 to -1
 	var lines = document.text.filter {
 		document.areas!!.sections.forEachIndexed { index , section ->
-			if (section.title.contains(word) && word!="Заключение")
+			if (section.title.contains(word) && word != conclusionWord)
 				linesIndexes = section.contentIndex to document.areas.sections[index+1].contentIndex
 			else if (section.title.contains(word))
 				linesIndexes = section.contentIndex to -1
 		}
-		if (word!="Заключение")
+		if (word != conclusionWord)
 			linesIndexes.first <= it.documentIndex && it.documentIndex < linesIndexes.second
 		else linesIndexes.first <= it.documentIndex
 	}.toMutableList()
 
-	if (lines.isNotEmpty() && word!="Заключение")
+	if (lines.isNotEmpty() && word != conclusionWord)
 		pages = lines[0].page to lines.last().page
 	else if (lines.isNotEmpty())
 		pages = lines[0].page to -1
@@ -33,9 +41,8 @@ fun getPages(document: PDFDocument, word : String): Pair<Int,Int>
 }
 class ListRule(
 	val singleListPredicates: MutableList<(list: PDFList<Line>) -> List<Line>> = mutableListOf(),
-	val multipleListsPredicates : MutableList<(lists: List<PDFList<Line>>)->List<Line>> = mutableListOf(),
-	val multipleListsPredicatesWithDocument : MutableList<(lists: List<PDFList<Line>>, document: PDFDocument) -> List<Line>> = mutableListOf(),
-	val listsFilter : MutableList<(lists: List<PDFList<Line>>,document: PDFDocument) -> MutableList<PDFList<Line>>> ,
+	val multipleListsPredicates : MutableList<(lists: List<PDFList<Line>>, document: PDFDocument) -> List<Line>> = mutableListOf(),
+	val listsFilter : MutableList<(lists: List<PDFList<Line>>,document: PDFDocument) -> MutableList<PDFList<Line>>>,
 	type: RuleViolationType,
 	area: PDFRegion,
 	name: String
@@ -69,13 +76,13 @@ class ListRule(
 				}
 			)
 		}
+
 		multipleListsPredicates.forEach { predicate ->
-			if (predicate(pdfLists).isNotEmpty()) rulesViolations.add(RuleViolation(predicate(pdfLists),name,type))
+			val lines = predicate(pdfLists, document)
+			if (lines.isNotEmpty())
+				rulesViolations.add(RuleViolation(lines, name, type))
 		}
-		multipleListsPredicatesWithDocument.forEach { predicate ->
-			if (predicate(pdfLists,document).isNotEmpty())
-				rulesViolations.add(RuleViolation(predicate(pdfLists,document),name,type))
-		}
+
 		return rulesViolations.toList()
 	}
 }

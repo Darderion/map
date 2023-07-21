@@ -102,6 +102,19 @@ class RulesTests : StringSpec({
 
 		unmockkObject(LowQualityConferencesUtil)
   }
+
+	"ListRule should detect no results" {
+		RULE_TASKS_MAPPING.process(PDFBox().getPDF(filePathNoResults)).count() shouldBeExactly 1
+	}
+	"ListRule should detect no tasks"{
+		RULE_TASKS_MAPPING.process(PDFBox().getPDF(filePathNoTasks)).count() shouldBeExactly 1
+	}
+	"ListRule should detect no tasks and results" {
+		RULE_TASKS_MAPPING.process(PDFBox().getPDF(filePathNoTasksAndResults)).count() shouldBeExactly 2
+	}
+	"ListRule should detect wrong number of tasks and results"{
+		RULE_TASKS_MAPPING.process(PDFBox().getPDF(filePathWrongNumberTasksAndResults)).count() shouldBeExactly 3
+	}
 }) {
 	companion object {
 		const val filePathQuestionMarkAndDashes =
@@ -124,7 +137,17 @@ class RulesTests : StringSpec({
 			"${TestsConfiguration.resourceFolder}checker/RegexRuleTestsVariousAbbreviations.pdf"
 		const val filePathOrderOfSections =
 			"${TestsConfiguration.resourceFolder}checker/TableOfContentRuleTestsSectionsOrder.pdf"
-    const val filePathLowQualityConferences =
+    	const val filePathLowQualityConferences =
 			"${TestsConfiguration.resourceFolder}checker/URLRuleTestsLowQualityConferences.pdf"
+		const val filePathNoTasksAndResults =
+			"${TestsConfiguration.resourceFolder}checker/NoTasksAndResults.pdf"
+		const val filePathNoTasks =
+			"${TestsConfiguration.resourceFolder}checker/NoTasks.pdf"
+		const val filePathNoResults =
+			"${TestsConfiguration.resourceFolder}checker/NoResults.pdf"
+		const val filePathWrongNumberTasksAndResults =
+			"${TestsConfiguration.resourceFolder}checker/WrongNumberTasksAndResults.pdf"
+
+
 	}
 }

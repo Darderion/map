@@ -33,6 +33,8 @@ private val RU = rusLetters + rusCapitalLetters
 
 private val numbers = "0123456789"
 
+const val conclusionWord = "Заключение"
+
 val RULE_LITLINK = SymbolRuleBuilder()
     .symbol('?')
     .ignoringAdjusting(*" ,$numbers".toCharArray())
@@ -182,7 +184,7 @@ val RULE_TASKS_MAPPING = ListRuleBuilder()
         val tasks = mutableListOf<PDFList<Line>>()
         val results = mutableListOf<PDFList<Line>>()
         val taskPages = getPages(document, "адач") // Задачи, задачи, задач, задача
-        val conclusionPages = getPages(document, "Заключение")
+        val conclusionPages = getPages(document, conclusionWord)
         if (taskPages != -1 to -1 && conclusionPages != -1 to -1) {
             document.areas!!.lists.forEach {
                 if (it.getText()[0].page >= taskPages.first && it.getText()[0].page < taskPages.second)
@@ -195,9 +197,9 @@ val RULE_TASKS_MAPPING = ListRuleBuilder()
         newLists.addAll(results)
         newLists
     }
-    .disallowInMultipleListsWithDocument { lists, document ->
+    .disallowInMultipleLists { lists, document ->
         val taskPages = getPages(document,"адач")
-        val conclusionPages = getPages(document, "Заключение")
+        val conclusionPages = getPages(document, conclusionWord)
         var tasks = mutableListOf<PDFList<Line>>()
         var results = mutableListOf<PDFList<Line>>()
 
@@ -210,7 +212,7 @@ val RULE_TASKS_MAPPING = ListRuleBuilder()
         if (taskPages == -1 to -1 || conclusionPages == -1 to -1) listOf()
         else {
             val tasksAndResultsSections = document.areas!!.sections
-                .filter { it.title.contains("адач") || it.title.contains("Заключение") }
+                .filter { it.title.contains("адач") || it.title.contains(conclusionWord) }
             if (tasks.isEmpty() && results.isEmpty()) {
                 listOf( // underline "задачи" "Заключение"
                     document.text[tasksAndResultsSections.first().titleIndex],
