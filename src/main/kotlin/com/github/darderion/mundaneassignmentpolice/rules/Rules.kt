@@ -472,14 +472,14 @@ val RULE_CONFIGURATION_IN_EXPERIMENTS =  LineRuleBuilder()
             val hardConfigurationWords: MutableList<String> = mutableListOf()
             File(fileConfigurationWordsName).forEachLine { hardConfigurationWords.add(it) }
 
-            lines.forEach { line -> line.text.forEach {
+            lines.map { line -> line.text.map {
                     val word = it.text
-                    hardConfigurationWords.forEach { if (word.contains(it)) wordCount += 1 }
+                    hardConfigurationWords.map { if (word.contains(it)) wordCount += 1 }
                 }
             }
 
             if (wordCount < precisionWordCount)
-                listOf(lines.first())
+                return@disallowInMultipleLines listOf(lines.first())
             else listOf()
         }
         .called("Нет hard/soft конфигурации в экспериментах")

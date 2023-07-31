@@ -24,7 +24,7 @@ fun getPages(document: PDFDocument, word : String): Pair<Int,Int>
         if (word!="Заключение")
             linesIndexes.first <= it.documentIndex && it.documentIndex < linesIndexes.second
         else linesIndexes.first <= it.documentIndex
-    }.toMutableList()
+    }
 
     if (lines.isNotEmpty() && word!="Заключение")
         pages = lines[0].page to lines.last().page

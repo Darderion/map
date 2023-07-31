@@ -20,10 +20,10 @@ class LineRule (
             val rulesViolations: MutableSet<RuleViolation> = mutableSetOf()
 
             var lines = document.text
-            linesFilters.forEach { lines = it(lines, document) }
+            linesFilters.map { lines = it(lines, document) }
 
             if (lines.isNotEmpty()) {
-                singleLinePredicates.forEach { predicate ->
+                singleLinePredicates.map { predicate ->
                     rulesViolations.addAll(
                             lines.map { predicate(it) }
                                     .filter { it.isNotEmpty() }.map {
@@ -31,7 +31,7 @@ class LineRule (
                             }
                     )
                 }
-                multipleLinesPredicates.forEach { predicate ->
+                multipleLinesPredicates.map { predicate ->
                     if (predicate(lines, document).isNotEmpty())
                         rulesViolations.add(RuleViolation(predicate(lines, document), name, type))
                 }
