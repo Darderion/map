@@ -4,6 +4,8 @@ import com.github.darderion.mundaneassignmentpolice.checker.RuleViolationType
 import com.github.darderion.mundaneassignmentpolice.checker.Section
 import com.github.darderion.mundaneassignmentpolice.checker.rule.list.ListRuleBuilder
 import com.github.darderion.mundaneassignmentpolice.checker.rule.regex.RegexRuleBuilder
+import com.github.darderion.mundaneassignmentpolice.checker.rule.sentence.SentenceRuleBuilder
+import com.github.darderion.mundaneassignmentpolice.checker.rule.sentence.splitIntoSentences
 import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.SymbolRuleBuilder
 import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.and
 import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.or
@@ -16,12 +18,15 @@ import com.github.darderion.mundaneassignmentpolice.checker.rule.word.or
 import com.github.darderion.mundaneassignmentpolice.checker.rule.word.splitToWordsAndPunctuations
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFArea
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFRegion
+import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Line
 import com.github.darderion.mundaneassignmentpolice.utils.InvalidOperationException
 import com.github.darderion.mundaneassignmentpolice.utils.LowQualityConferencesUtil
 import com.github.darderion.mundaneassignmentpolice.utils.ResourcesUtil
 import com.github.darderion.mundaneassignmentpolice.utils.URLUtil
 import java.util.*
 
+import com.github.kittinunf.fuel.Fuel
+import com.github.kittinunf.fuel.core.extensions.jsonBody
 
 private val enLetters = "abcdefghijklmnopqrstuvwxyz"
 private val enCapitalLetters = enLetters.uppercase(Locale.getDefault())
@@ -262,6 +267,30 @@ val RULE_SECTIONS_ORDER = LineRuleBuilder()
 	}
 	.called("Неверный порядок секций")
 	.getRule()
+
+val RULE_UNSCIENTIFIC_SENTENCE = SentenceRuleBuilder()
+		.called("Ненаучный стиль")
+		.disallow { lines ->
+			val results = mutableListOf<Line>()
+			splitIntoSentences(lines).forEach { sentence ->
+				val body = "{ \"data\" : \"${sentence.joinToString(separator = " ")}\" }"
+				val microservice_url = "http://127.0.0.1:8084/predict"
+
+				val (_, _, result) = Fuel.post(microservice_url)
+						.jsonBody(body)
+						.responseString()
+				result.fold(success = {
+					if ("unscientific" in it.toString()) {
+						results.addAll(lines)
+					}
+
+				}, failure = {
+					println(String(it.errorData))
+				})
+
+			}
+			results.toList()
+		}.getRule()
 
 val smallNumbersRuleName = "Неправильное написание целых чисел от 1 до 9"
 val smallNumbersRuleArea =
