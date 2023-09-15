@@ -1,0 +1,6 @@
+Flask
+onnxruntime
+gunicorn
+torch
+transformers
+numpy
