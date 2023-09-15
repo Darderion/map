@@ -1,23 +1,26 @@
-package com.github.darderion.mundaneassignmentpolice.checker.rule.tableofcontent
+package com.github.darderion.mundaneassignmentpolice.checker.rule.LineRule
 
 import com.github.darderion.mundaneassignmentpolice.checker.RuleViolation
 import com.github.darderion.mundaneassignmentpolice.checker.RuleViolationType
 import com.github.darderion.mundaneassignmentpolice.checker.rule.Rule
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFArea
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFDocument
+import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFRegion
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFRegion.Companion.NOWHERE
+import com.github.darderion.mundaneassignmentpolice.pdfdocument.inside
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Line
 
-class TableOfContentRule(
-	val predicates: List<(tableOfContent: List<Line>) -> List<Line>>,
+class LineRule(
+	val predicates: List<(lines: List<Line>) -> List<Line>>,
+	area: PDFRegion,
 	type: RuleViolationType,
 	name: String
-): Rule(NOWHERE.except(PDFArea.TABLE_OF_CONTENT), name, type) {
+): Rule(area, name, type) {
 	override fun process(document: PDFDocument): List<RuleViolation> {
 		val ruleViolations: MutableSet<RuleViolation> = mutableSetOf()
-		val tableOfContent = document.text.filter { it.area == PDFArea.TABLE_OF_CONTENT }
+		val lines = document.text.filter { it.area!! inside(area) }
 		predicates.forEach { predicate ->
-			ruleViolations.addAll(predicate(tableOfContent).map {
+			ruleViolations.addAll(predicate(lines).map {
 				RuleViolation(listOf(it), name, type)
 			})
 		}

@@ -87,6 +87,9 @@ class RulesTests : StringSpec({
 	"Table of content rule should detect incorrect order of sections" {
 		RULE_SECTIONS_ORDER.process(PDFBox().getPDF(filePathOrderOfSections)).count() shouldBeExactly 5
 	}
+	"Table of content rule should detect sections numbered from 0" {
+		RULE_SECTION_NUMBERING_FROM_0.process(PDFBox().getPDF(filePathSectionNumberingFrom0)).count() shouldBeExactly 2
+	}
 	"URLRule should detect links to low quality conferences" {
 		mockkObject(LowQualityConferencesUtil)
 
@@ -113,6 +116,13 @@ class RulesTests : StringSpec({
 		RULE_OPENING_QUOTATION.process(PDFBox().getPDF(filePathMultilineCitation)).count() +
 				RULE_CLOSING_QUOTATION.process(PDFBox().getPDF(filePathMultilineCitation)).count() shouldBeExactly 0
 	}
+	"""RULE_DISALLOWED_WORDS should detect words:\"Theorem,Definition,Lemma\""""{
+		RULE_DISALLOWED_WORDS.process(PDFBox().getPDF(filePathDisallowedWords)).count() shouldBeExactly 4
+	}
+	"""RULE_INCORRECT_ABBREVIATION should detect incorrect abbreviation \"вуз\""""{
+		RULE_INCORRECT_ABBREVIATION.process(PDFBox().getPDF(filePathIncorrectAbbreviation)).count() shouldBeExactly 9
+	}
+
 }) {
 	companion object {
 		const val filePathQuestionMarkAndDashes =
@@ -135,6 +145,8 @@ class RulesTests : StringSpec({
 			"${TestsConfiguration.resourceFolder}checker/RegexRuleTestsVariousAbbreviations.pdf"
 		const val filePathOrderOfSections =
 			"${TestsConfiguration.resourceFolder}checker/TableOfContentRuleTestsSectionsOrder.pdf"
+		const val filePathSectionNumberingFrom0 =
+				"${TestsConfiguration.resourceFolder}checker/TableOfContentRuleTestsSectionNumberingFrom0.pdf"
 		const val filePathLowQualityConferences =
 			"${TestsConfiguration.resourceFolder}checker/URLRuleTestsLowQualityConferences.pdf"
 		const val filePathDashTitlePage =
@@ -143,5 +155,9 @@ class RulesTests : StringSpec({
 			"${TestsConfiguration.resourceFolder}checker/BracketLetters.pdf"
 		const val filePathMultilineCitation =
 			"${TestsConfiguration.resourceFolder}checker/MultilineCitation.pdf"
+		const val filePathDisallowedWords =
+				"${TestsConfiguration.resourceFolder}checker/WordRuleDisallowedWords.pdf"
+		const val filePathIncorrectAbbreviation =
+				"${TestsConfiguration.resourceFolder}checker/WordRuleTestsIncorrectAbbreviation.pdf"
 	}
 }
