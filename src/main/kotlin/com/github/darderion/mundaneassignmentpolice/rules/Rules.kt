@@ -37,6 +37,7 @@ private val rusCapitalLetters = rusLetters.uppercase(Locale.getDefault())
 private val RU = rusLetters + rusCapitalLetters
 
 private val numbers = "0123456789"
+val microservice_url = "http://127.0.0.1:8084/predict"
 
 val RULE_LITLINK = SymbolRuleBuilder()
 	.symbol('?')
@@ -274,7 +275,6 @@ val RULE_UNSCIENTIFIC_SENTENCE = SentenceRuleBuilder()
 			val results = mutableListOf<Line>()
 			splitIntoSentences(lines).forEach { sentence ->
 				val body = "{ \"data\" : \"${sentence.joinToString(separator = " ")}\" }"
-				val microservice_url = "http://127.0.0.1:8084/predict"
 
 				val (_, _, result) = Fuel.post(microservice_url)
 						.jsonBody(body)

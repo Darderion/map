@@ -27,7 +27,7 @@ with open(os.path.join('ml_microservice', 'labels.json'), 'r') as f:
 def infer(text, max_length=128):
     t = tokenizer(text, padding="max_length", truncation=True,
                   max_length=max_length, return_tensors='pt')
-    t = {k: v.cpu().reshape(1, 128).numpy() for k, v in t.items()}
+    t = {k: v.cpu().numpy() for k, v in t.items() if k != "token_type_ids"}
     ort_outputs = session.run(None, t)
     label = ort_outputs[0].argmax()
     return {'label': label}
