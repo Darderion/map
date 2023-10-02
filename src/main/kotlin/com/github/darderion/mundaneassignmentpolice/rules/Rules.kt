@@ -176,7 +176,8 @@ val RULE_CITATION = SymbolRuleBuilder()
 	.inArea(PDFArea.SECTION)
 	.getRule()
 
-val RULE_SECTION_NUMBERING_FROM_0 = TableOfContentRuleBuilder()
+val RULE_SECTION_NUMBERING_FROM_0 = LineRuleBuilder()
+	.inArea(PDFRegion.NOWHERE.except(PDFArea.TABLE_OF_CONTENT))
 		.disallow { listOfLines ->
 			listOfLines.filter { line ->
 				val text = line.text
