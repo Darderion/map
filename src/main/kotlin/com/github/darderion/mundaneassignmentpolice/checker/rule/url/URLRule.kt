@@ -10,27 +10,29 @@ import com.github.darderion.mundaneassignmentpolice.pdfdocument.inside
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Line
 import com.github.darderion.mundaneassignmentpolice.utils.nearby
 
-class URLRule(
-    val predicates: List<(urls: List<Pair<String, List<Line>>>) -> List<List<Line>>>,
+open class URLRule(
+    protected val predicates: List<(urls: List<Url>) -> List<Pair<Url, List<Line>>>>,
+    protected val predicatesOfIgnoring: List<(url: Url) -> Boolean>,
     type: RuleViolationType,
     area: PDFRegion,
     name: String
-): Rule(area, name, type) {
-    override fun process(document: PDFDocument): List<RuleViolation> {
-        val ruleViolations: MutableList<RuleViolation> = mutableListOf()
+) : Rule(area, name, type) {
+    open fun getRuleViolations(urls: List<Url>): List<Pair<Url, RuleViolation>> {
+        val ruleViolations = mutableSetOf<Pair<Url, RuleViolation>>()
 
-        val urls = getAllUrls(document)
+        val filteredUrls = urls.filterNot { url -> predicatesOfIgnoring.any { predicate -> predicate(url) } }
         predicates.forEach { predicate ->
-            predicate(urls).map { RuleViolation(it, name, type) }.forEach {
-                ruleViolations.add(it)
-            }
+            predicate(filteredUrls).mapTo(ruleViolations) { it.first to RuleViolation(it.second, name, type) }
         }
-        return ruleViolations
+
+        return ruleViolations.toList()
     }
 
-    private fun getAllUrls(document: PDFDocument): List<Pair<String, List<Line>>> {
+    override fun process(document: PDFDocument) = getRuleViolations(getAllUrls(document)).map { it.second }
+
+    private fun getAllUrls(document: PDFDocument): List<Url> {
         val urls: MutableList<Pair<String, List<Line>>> = mutableListOf()
-        val urlRegex = Regex("""^((https?:)|(www\.))[^\s]*""")
+        val urlRegex = Regex("""^((https?:)|(www\.))\S*""")
 
         val linesInsideArea = document.text.filter { it.area!! inside area }
         var lineIndex = 0
@@ -57,7 +59,7 @@ class URLRule(
                     if (currentArea == PDFArea.FOOTNOTE && !nextLine.text.first().font.size.nearby(currentFontSize))
                         break
                                                                 // numbering of bibliography item
-                    if (currentArea == PDFArea.BIBLIOGRAPHY && Regex("""\[[0-9]+]""").matches(nextWord))
+                    if (currentArea == PDFArea.BIBLIOGRAPHY && Regex("""\[\d+]""").matches(nextWord))
                         break
 
                     currentWord = nextWord
@@ -75,6 +77,9 @@ class URLRule(
             }
             lineIndex++
         }
-        return urls.map { pair -> pair.first.dropLastWhile { it == '.' || it == ',' } to pair.second }
+
+        return urls.map { pair ->
+            pair.first.dropLastWhile { it == '.' || it == ',' } to pair.second
+        }.map { Url(it.first, it.second) }
     }
 }

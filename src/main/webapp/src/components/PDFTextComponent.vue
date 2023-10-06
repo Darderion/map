@@ -37,14 +37,14 @@ export default class PDFTextComponent extends Vue {
 
 	viewMode = (this.viewModeName == 'Text') ? ViewMode.Text : (this.viewModeName == 'Errors') ? ViewMode.Rules : ViewMode.Areas
 
-	updatePDFView() {
+	updatePDFView(): void {
 		if (this.receivedLines &&
 			this.receivedRuleViolations &&
 			!!document.getElementById(`pdfLine${this.pdfLines[this.pdfLines.length - 1].index}-${this.pdfLines[this.pdfLines.length - 1].page}`)) {
 			this.pdfLines.forEach(it => {
 				if (!document.getElementById(`pdfLine${it.index}-${it.page}`)) {
 				}
-				document.getElementById(`pdfLine${it.index}-${it.page}`)!.style.backgroundColor = '#abc'
+				document.getElementById(`pdfLine${it.index}-${it.page}`)!.style.backgroundColor = '#f7f7f7'
 				document.getElementById(`pdfLine${it.index}-${it.page}`)!.style.color = 'black'
 			})
 			if (this.viewMode == ViewMode.Rules) {
@@ -70,46 +70,46 @@ export default class PDFTextComponent extends Vue {
 		}
 	}
 
-	updated() {
+	updated(): void {
 		this.updatePDFView()
 	}
 
-	setPDFText(text: string) {
+	setPDFText(text: string): void {
 		this.pdfText = text
 	}
 
-	setPDFImages(text: string) {
+	setPDFImages(text: string): void {
 		this.pdfImages = text.slice(1, -1).split(',').map(it => it.slice(1, -1))
 	}
 
-	setPDFLines(text: string) {
+	setPDFLines(text: string): void {
 		this.pdfLines = JSON.parse(text)
 		this.receivedLines = true
 		this.updatePDFView()
 	}
 
-	setPDFRuleViolations(text: string) {
+	setPDFRuleViolations(text: string): void {
 		this.pdfRuleViolations = JSON.parse(text)
 		this.receivedRuleViolations = true
 		this.updatePDFView()
 	}
 
-	mounted() {
+	mounted(): void {
 		/*
 		fetch(`api/viewPDF?pdfName=${this.pdfName}`)
 			.then((response) => response.text().then(this.setPDFText));
 			*/
 
-		fetch(`api/viewPDFLines?pdfName=${this.$store.getters.getPdfName}`)
+		fetch(`${this.$store.getters.getAPI}viewPDFLines?pdfName=${this.$route.query.pdfName}`)
 			.then((response) => response.text().then(this.setPDFLines));
 
-		fetch(`api/viewRuleViolations?pdfName=${this.$store.getters.getPdfName}`)
+		fetch(`${this.$store.getters.getAPI}viewRuleViolations?pdfName=${this.$route.query.pdfName}`)
 			.then((response) => response.text().then(this.setPDFRuleViolations));
 			
-		fetch(`api/viewPDFImages?pdfName=${this.$store.getters.getPdfName}`)
+		fetch(`${this.$store.getters.getAPI}viewPDFImages?pdfName=${this.$route.query.pdfName}`)
 			.then((response) => response.text().then(this.setPDFImages));
 
-		fetch(`api/viewPDFSections?pdfName=${this.$store.getters.getPdfName}`)
+		fetch(`${this.$store.getters.getAPI}viewPDFSections?pdfName=${this.$route.query.pdfName}`)
 			.then((response) => response.text().then(text => {
 				this.pdfSections = JSON.parse(text)
 			}));

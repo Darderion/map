@@ -1,12 +1,13 @@
 package com.github.darderion.mundaneassignmentpolice.pdfdocument
 
+import com.github.darderion.mundaneassignmentpolice.TestsConfiguration.Companion.resourceFolder
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFArea.*
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.list.PDFList
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Section
 import com.github.darderion.mundaneassignmentpolice.wrapper.PDFBox
 import io.kotest.core.spec.style.StringSpec
+import io.kotest.inspectors.forAll
 import io.kotest.matchers.shouldBe
-import com.github.darderion.mundaneassignmentpolice.TestsConfiguration.Companion.resourceFolder
 
 class PDFDocumentTests: StringSpec({
 	"PDFDocument should contain TITLE_PAGE's lines" {
@@ -80,10 +81,49 @@ class PDFDocumentTests: StringSpec({
 
 		document.areas!!.tableOfContents shouldBe pdfList
 	}
+	"PDFStructure should be correct if pdf contains a section after bibliography" {
+		val pdf = PDFBox().getPDF(filePathSectionAfterBibliography)
+
+		val expectedSections = listOf(
+			Section("Introduction", 36),
+			Section("Заключение", 47),
+			Section("Приложение", 64)
+		)
+
+		val actualSections = pdf.areas!!.sections
+		actualSections shouldBe expectedSections
+
+		val sectionLines = pdf.text
+			.takeLastWhile { it.index >= expectedSections.last().titleIndex }
+			.filterNot { it.area == PAGE_INDEX }
+
+		sectionLines.forAll { it.area shouldBe SECTION }
+	}
+	"PDFStructure should be correct if the pdf contains multiline section titles" {
+		val pdf = PDFBox().getPDF(filePathMultilineLineSectionTitle)
+
+		val expectedSections = listOf(
+			Section("Introduction", 40),
+			Section("1. Section title that takes two lines in text " +
+					"Lorem in fermentum posuere urna", 51, 53),
+			Section("2. Very long section title that takes three " +
+					"lines in text Lorem in fermentum posuere " +
+					"urna nec tincidunt praesent semper feugiat", 57, 60),
+			Section("Заключение", 64),
+		)
+
+		val actualSections = pdf.areas!!.sections
+		actualSections shouldBe expectedSections
+	}
 }) {
 	private companion object {
 		const val filePathCW = "${resourceFolder}pdfdocument/PDFDocumentTestsCW.pdf"
 		const val filePathPDF = "${resourceFolder}pdfdocument/PDFDocumentTestsPDF.pdf"
+
+		const val filePathSectionAfterBibliography =
+			"${resourceFolder}pdfdocument/PDFDocumentTestsSectionAfterBibliography.pdf"
+		const val filePathMultilineLineSectionTitle =
+			"${resourceFolder}pdfdocument/PDFDocumentTestsMultilineLineSectionTitle.pdf"
 
 		private val lines = PDFBox().getLines(filePathCW)
 

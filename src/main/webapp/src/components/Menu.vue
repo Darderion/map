@@ -1,6 +1,11 @@
 <template>
-	<ul class="menu cf">
-		<li><router-link :to="`/?pdfName=${this.$store.getters.getPdfName}`">{{ $t("page.home.title") }}</router-link></li>
+	<div>
+	<ul class="menu cf" v-if="this.menuMode == 0">
+		<li><router-link :to="`/`">{{ $t("page.home.title") }}</router-link></li>
+		<li><router-link :to="`/about`">{{ $t("page.about.title") }}</router-link></li>
+	</ul>
+	<ul class="menu cf" v-else>
+		<li><router-link :to="`/`" @click.native="clearFileName">{{ $t("page.home.title") }}</router-link></li>
 		<li><router-link :to="`/viewPDF?pdfName=${this.$store.getters.getPdfName}&numPages=${this.$store.getters.getNumPages}`">{{ $t("page.viewPDF.title") }}</router-link></li>
 		<li>
 			<router-link :to="`/viewPDFText?pdfName=${this.$store.getters.getPdfName}`">{{ $t("page.viewText.title") }}</router-link>
@@ -11,14 +16,14 @@
 			</ul>
 		</li>
 		<li><router-link :to="`/viewRulesViolations?pdfName=${this.$store.getters.getPdfName}`">{{ $t("page.rulesViolations.title") }}</router-link></li>
-		<li><router-link :to="`/uploadMultipleFiles`">{{ $t("page.uploadMultipleFiles.title") }}</router-link></li>
-		<li><router-link :to="`/about?pdfName=${this.$store.getters.getPdfName}`">{{ $t("page.about.title") }}</router-link></li>
+
 	</ul>
+	</div>
 </template>
 
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Component, Vue } from 'vue-property-decorator';
 
 @Component({
 	components: {
@@ -26,6 +31,39 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 })
 
 export default class MenuComponent extends Vue {
+	menuMode = 0
+
+	clearFileName(): void {
+		this.$store.commit('setPdfName', {
+			name: ""
+		})
+	}
+
+	mounted(): void {
+		this.$store.commit('setPdfName', {
+			name: this.$route.query.pdfName
+		})
+
+		let step = 0
+		let pdfName = ""
+		const checkQuery = () => {
+			if (!pdfName) {
+				this.$store.commit('setPdfName', {
+					name: this.$route.query.pdfName
+				})
+				pdfName = this.$route.query.pdfName as string;
+				this.menuMode = this.$route.query.pdfName ? 1: 0
+			}
+			if (step < 10) {
+				step++;
+				setTimeout(checkQuery, Math.pow(2, step) * 100)
+			}
+		}
+
+		checkQuery()
+
+		console.log(this.menuMode)
+	}
 }
 </script>
 
@@ -80,7 +118,7 @@ export default class MenuComponent extends Vue {
   text-transform: uppercase;
   text-decoration: none;
   font-family: Arial, Helvetica;
-  font-size: 14px;
+  font-size: 17px;
 }
 
 .menu li:hover {

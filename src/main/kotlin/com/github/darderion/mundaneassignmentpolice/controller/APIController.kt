@@ -13,9 +13,15 @@ import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.servlet.view.RedirectView
 import java.io.File
 
-const val pdfFolder = "build/"
+const val pdfFolder = "uploads/"
+
+const val developmentURL = "http://localhost:8080"
+const val deploymentURL = "http://91.109.207.113"
+
+const val url = developmentURL
 
 @RestController
+@CrossOrigin(origins = [url])
 class APIController {
 	val pdfBox = PDFBox()
 	val ruleSet = RULE_SET_RU

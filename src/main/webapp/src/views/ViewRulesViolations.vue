@@ -1,45 +1,40 @@
 
 <template>
 	<div>
-		<div v-if="this.$store.getters.pdfName">
-			<div v-show="!this.$store.getters.getContainsErrors" class="messageDiv">
-				{{ $t('page.rulesViolations.noErrors')}}
+		<div v-show="!this.$store.getters.getContainsErrors" class="messageDiv">
+			{{ $t('page.rulesViolations.noErrors')}}
+		</div>
+		<div v-show="this.$store.getters.getContainsErrors">
+			<div v-show="this.$store.getters.getContainsAreaErrors" class="messageDivText">
+				<div style="color: #A22; font-size: 32px;">{{ $t('page.rulesViolations.errors')}}</div>
+				<br>
+				<br>{{ $t('page.rulesViolations.suggestions')}}
+				<br><div style="width: 50%; margin: auto;"><ul>
+					<li>{{ $t('page.rulesViolations.suggestion_1_1')}} <b><i>{{ $t('page.viewText.title')}}</i></b>. {{ $t('page.rulesViolations.suggestion_1_2')}} "Ñîäåðæàíèå Ïîñòàíîâêà öåëè è çàäà÷" {{ $t('page.rulesViolations.suggestion_1_3')}}<br><br></li>
+					<li>{{ $t('page.rulesViolations.suggestion_2_1')}} <b><i>{{ $t('page.viewText.title')}}</i></b> -> <b><i>{{ $t('page.viewText.highlightSections')}}</i></b>. {{ $t('page.rulesViolations.suggestion_2_2')}}</li>
+					</ul>
+					</div>
+				<br>
 			</div>
-			<div v-show="this.$store.getters.getContainsErrors">
-				<div v-show="this.$store.getters.getContainsAreaErrors" class="messageDivText">
-					<div style="color: #A22; font-size: 32px;">{{ $t('page.rulesViolations.errors')}}</div>
-					<br>
-					<br>{{ $t('page.rulesViolations.suggestions')}}
-					<br><div style="width: 50%; margin: auto;"><ul>
-						<li>{{ $t('page.rulesViolations.suggestion_1_1')}} <b><i>{{ $t('page.viewText.title')}}</i></b>. {{ $t('page.rulesViolations.suggestion_1_2')}} "Ñîäåðæàíèå Ïîñòàíîâêà öåëè è çàäà÷" {{ $t('page.rulesViolations.suggestion_1_3')}}<br><br></li>
-						<li>{{ $t('page.rulesViolations.suggestion_2_1')}} <b><i>{{ $t('page.viewText.title')}}</i></b> -> <b><i>{{ $t('page.viewText.highlightSections')}}</i></b>. {{ $t('page.rulesViolations.suggestion_2_2')}}</li>
-						</ul>
-						</div>
-					<br>
-				</div>
-				<div v-show="!this.$store.getters.getContainsAreaErrors">
-					<div class="messageDiv">{{ $t('page.rulesViolations.selectRuleViolation')}}</div>
-					<ul id="rulesViolations">
-						<li v-for="ruleViolation in this.$store.getters.getRuleViolations"
-						:key="'rulesViolations'+ruleViolation.toString()">{{ruleViolation.message}} >
+			<div v-show="!this.$store.getters.getContainsAreaErrors">
+				<div class="messageDiv">{{ $t('page.rulesViolations.selectRuleViolation')}}</div>
+				<ul id="rulesViolations">
+					<li v-for="ruleViolation in this.$store.getters.getRuleViolations"
+					:key="'rulesViolations'+ruleViolation.toString()">{{ruleViolation.message}} >
               {{(ruleViolation.lines.length > 1) ? $t('page.rulesViolations.lines') : $t('page.rulesViolations.line')}}
               {{(ruleViolation.lines.length > 1) ?
                 ruleViolation.lines.map((line) => line.index)[0] + "-" + ruleViolation.lines.map((line) => line.index)[ruleViolation.lines.length - 1] :
                 ruleViolation.lines[0].index}},
               {{ $t('page.rulesViolations.page')}} {{ruleViolation.lines[0].page}}</li>
-					</ul>
-					<div id="ruleViolation" v-show="curPage != -1">
-						<pdf
-							:src="`api/viewPDFRuleViolations.pdf?pdfName=${this.$store.getters.getPdfName}&page=${curPage}&lines=${curLines}`"
-							:page="curPage + 1"
-							style="display: inline-block; width: 100%"
-						></pdf>
-					</div>
+				</ul>
+				<div id="ruleViolation" v-show="curPage != -1">
+					<pdf
+						:src="`${this.$store.getters.getAPI}viewPDFRuleViolations.pdf?pdfName=${this.$store.getters.getPdfName}&page=${curPage}&lines=${curLines}`"
+						:page="curPage + 1"
+						style="display: inline-block; width: 100%"
+					></pdf>
 				</div>
 			</div>
-		</div>
-		<div v-else>
-			<NoPDFComponent/>
 		</div>
 	</div>
 </template>
@@ -48,13 +43,11 @@
 
 import { Component, Prop, Vue } from 'vue-property-decorator';
 
-import NoPDFComponent from '../components/NoPDFComponent.vue'
 import pdf from 'vue-pdf'
 
 @Component({
 	components: {
 		Keypress: () => import('vue-keypress'),
-		NoPDFComponent,
 		pdf
 	},
 })
@@ -64,7 +57,11 @@ export default class ViewRulesViolations extends Vue {
 		document.getElementById('rulesViolations') as HTMLUListElement: undefined
 
 	curPage = -1
-	curLines = [Number(0)]
+	curLines = [] as number[]
+
+	pdfName() {
+		return this.$store.getters.pdfName
+	}
 
 	mounted() {
 		const locale = this.$route.query.locale as string
@@ -117,18 +114,6 @@ export default class ViewRulesViolations extends Vue {
 		this.curPage = page
 		this.curLines = lines
 	}
-
-/*
-	updated() {
-		this.noErrorsFound = this.$store.getters.getRuleViolations().count() == 0
-		this.noAreaErrorsFound =
-			this.$store.getters.getRuleViolations().count() == 0 ||
-			this.$store.getters.getRuleViolations().filter((ruleViolation: RuleViolation) => ruleViolation.message == 'PDFArea').count() == 0
-		console.log(this.$store.getters.getRuleViolations())
-		console.log(this.$store.getters.getRuleViolations().count() == 0)
-		console.log(this.$store.getters.getRuleViolations().filter((ruleViolation: RuleViolation) => ruleViolation.message == 'PDFArea').count() == 0)
-	}
-*/
 }
 </script>
 
@@ -157,5 +142,9 @@ export default class ViewRulesViolations extends Vue {
 
 .messageDivText {
 	font-size: 24px;
+}
+
+li {
+	text-align: left;
 }
 </style>

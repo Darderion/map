@@ -5,6 +5,7 @@ import mu.KotlinLogging
 
 class PDFDocument(val name: String = "PDF",
 				  val text: List<Line>,
+				  val numberOfPages: Int = 1,
 				  val width: Double = defaultPageWidth,
 				  val height: Double = defaultPageHeight
 				  ) {
@@ -27,6 +28,8 @@ class PDFDocument(val name: String = "PDF",
 		.filterIndexed { index, pdfText ->
 		index in fromIndex..toIndex
 	}.joinToString("\n ") { it.content }
+
+	fun getLines(fromIndex: Int, toIndex: Int) = text.slice(fromIndex..toIndex)
 
 	fun print() {
 		text.map { "${it.area} | ${it.text.joinToString("--") { "${it.font.size}-${it.text}"}}" }.forEach(::println)

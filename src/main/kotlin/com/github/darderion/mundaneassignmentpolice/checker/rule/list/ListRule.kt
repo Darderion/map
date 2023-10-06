@@ -8,6 +8,7 @@ import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFArea.TABLE_OF
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFDocument
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFRegion
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.list.PDFList
+import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Coordinate
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Line
 import com.github.darderion.mundaneassignmentpolice.rules.conclusionWord
 
@@ -57,7 +58,7 @@ class ListRule(
 				document.areas!!.tableOfContents.map {
 					document.text.filter { it.area == TABLE_OF_CONTENT }.firstOrNull { line ->
 						line.content.contains(it)
-					}?: Line(0, 0, 0, listOf(), TABLE_OF_CONTENT)
+					}?: Line(0, 0, 0, listOf(), TABLE_OF_CONTENT, Coordinate(0,0))
 				}
 			)
 

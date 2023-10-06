@@ -13,7 +13,14 @@ export default new Vuex.Store({
 		ruleViolations: [],
 		noErrorsFound: false,
 		noAreaErrorsFound: false,
-		languages: ['ru', 'en']
+		languages: ['ru', 'en'],
+		fileNames: [],
+    // DEPLOYMENT_URL:
+		/*
+    apiURL: 'http://91.109.207.113:8081/api/'
+		 */
+    // DEVELOPMENT_URL:
+    apiURL: 'http://localhost:8081/api/'
 	},
 	mutations: {
 		setPdfName(state, payload) {
@@ -21,6 +28,9 @@ export default new Vuex.Store({
 		},
 		setNumPages(state, payload) {
 			state.pages = payload.pages
+		},
+		setFileNames(state, payload) {
+			state.fileNames = payload.fileNames;
 		},
 		setRuleViolations(state, payload) {
 			state.ruleViolations = payload.ruleViolations
@@ -34,8 +44,14 @@ export default new Vuex.Store({
 	},
 	actions: {},
 	getters: {
+		getAPI(state): string {
+			return state.apiURL;
+		},
 		getLanguages(state): string[] {
 			return state.languages;
+		},
+		getFileNames(state): string[] {
+			return state.fileNames;
 		},
 		pdfName(state): boolean {
 			return state.pdfName != undefined && state.pdfName.trim() != "" && state.pdfName != "undefined"

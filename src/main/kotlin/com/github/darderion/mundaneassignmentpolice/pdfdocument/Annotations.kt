@@ -1,5 +1,6 @@
 package com.github.darderion.mundaneassignmentpolice.pdfdocument
 
+import com.github.darderion.mundaneassignmentpolice.controller.pdfFolder
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Coordinate
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Line
 import com.github.darderion.mundaneassignmentpolice.wrapper.PDFBox
@@ -16,8 +17,8 @@ class Annotations {
 					(pdf.width - (line.position.x + 50)).toInt()
 				)
 			}
-			Files.createDirectories(Paths.get("build/ruleviolations/"))
-			val fileName = "build/ruleviolations/${
+			Files.createDirectories(Paths.get("${pdfFolder}ruleviolations/"))
+			val fileName = "${pdfFolder}ruleviolations/${
 				pdf.name.split('/')[pdf.name.split('/').count() - 1].replace(".pdf", "")
 			}${lines.first().index}-${lines.last().index}(${lines[0].page}).pdf"
 			document.save(fileName)
