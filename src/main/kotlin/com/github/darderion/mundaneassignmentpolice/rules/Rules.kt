@@ -1,6 +1,5 @@
 package com.github.darderion.mundaneassignmentpolice.rules
 
-import com.github.darderion.mundaneassignmentpolice.checker.Direction
 import com.github.darderion.mundaneassignmentpolice.checker.RuleViolationType
 import com.github.darderion.mundaneassignmentpolice.checker.SectionName
 import com.github.darderion.mundaneassignmentpolice.checker.rule.list.ListRuleBuilder
@@ -11,7 +10,7 @@ import com.github.darderion.mundaneassignmentpolice.checker.rule.sentence.splitI
 import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.SymbolRuleBuilder
 import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.and
 import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.or
-import com.github.darderion.mundaneassignmentpolice.checker.rule.LineRule.LineRuleBuilder
+import com.github.darderion.mundaneassignmentpolice.checker.rule.line.LineRuleBuilder
 import com.github.darderion.mundaneassignmentpolice.checker.rule.url.URLRuleBuilder
 import com.github.darderion.mundaneassignmentpolice.checker.rule.word.*
 import com.github.darderion.mundaneassignmentpolice.checker.rule.url.then
@@ -22,6 +21,7 @@ import com.github.darderion.mundaneassignmentpolice.checker.rule.word.splitToWor
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFArea
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFDocument
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFRegion
+import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Line
 import com.github.darderion.mundaneassignmentpolice.utils.InvalidOperationException
 import com.github.darderion.mundaneassignmentpolice.utils.LowQualityConferencesUtil
 import com.github.darderion.mundaneassignmentpolice.utils.ResourcesUtil
@@ -249,10 +249,9 @@ val RULE_TWO_IDENTICAL_WORDS = PredicateWordRuleBuilder()
 			.filter { it.isNotEmpty() }
 			.map { it.slice(IntRange(0, 0)) }
 			.flatten()
-		if (neighbors[0] == neighbors[1] && neighbors[0].first().isLetter()) {
-			return@setRuleBody true
-		}
-		return@setRuleBody false
+			.map { it.lowercase(Locale.getDefault()) }
+
+		return@setRuleBody neighbors[0] == neighbors[1] && neighbors[0].first().isLetter()
 	}
 	.getRule()
 
@@ -401,7 +400,7 @@ val RULES_SECTION_SIZE = listOf(
 	sectionsSizeRule
 )
 
-val RULE_SHORTENED_URLS = URLRuleBuilder()
+val ruleShortenedURLBuilder = URLRuleBuilder()
 	.called("Сокращённая ссылка")
 	.inArea(PDFRegion.NOWHERE.except(PDFArea.FOOTNOTE, PDFArea.BIBLIOGRAPHY))
 

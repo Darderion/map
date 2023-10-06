@@ -17,8 +17,7 @@ import java.io.*
 
 
 class PDFBox {
-	val recentDocuments: HashMap<String, PDDocument> = hashMapOf()
-	val recentDocumentsSizes: HashMap<String, Int> = hashMapOf()
+	private val recentDocumentsSizes: HashMap<String, Int> = hashMapOf()
 
 	fun getDocument(fileName: String): PDDocument {
 		/*
@@ -163,18 +162,23 @@ class PDFBox {
 						stripperIndex++
 					}
 				}
+
 				if (font == null && word.isEmpty()) font = Font(0.0f)
 				words.add(Word(word, font!!, coordinates))
 
-				if (document.pages[pageIndex].resources.xObjectNames.count()!=0){
-					Line(line, pageIndex, lineIndex, words.toList(),null,Coordinate(0,0))
+				val coordinate = if (stripper.symbols.isEmpty() || document.pages[pageIndex].resources.xObjectNames.count() != 0) {
+					Coordinate(0,0)
 				}
-				else{
-				if (words.isEmpty()){
-					Line(line, pageIndex, lineIndex, words.toList(),null,stripper.symbols[stripperIndex].position)
+				else {
+					if (words.isEmpty()) {
+						stripper.symbols[stripperIndex].position
+					}
+					else{
+						stripper.symbols[stripperIndex-1].position
+					}
 				}
-				else{
-				Line(line, pageIndex, lineIndex, words.toList(),null,stripper.symbols[stripperIndex-1].position)}}
+
+				Line(line, pageIndex, lineIndex, words.toList(),null, coordinate)
 			})
 		}
 

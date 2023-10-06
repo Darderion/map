@@ -1,4 +1,4 @@
-package com.github.darderion.mundaneassignmentpolice.checker.rule.LineRule
+package com.github.darderion.mundaneassignmentpolice.checker.rule.line
 
 import com.github.darderion.mundaneassignmentpolice.checker.RuleViolationType
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFRegion

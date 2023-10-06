@@ -88,7 +88,7 @@ class RulesTests : StringSpec({
 		RULE_URLS_UNIFORMITY.process(PDFBox().getPDF(filePathUniformityUrls)).count() shouldBeExactly 2
 	}
 	"Regex rule should detect incorrect order of literature references"{
-		RULE_ORDER_OF_REFERENCES.process(PDFBox().getPDF(filePathOrderOfReferences)).count() shouldBeExactly 3
+		RULE_ORDER_OF_REFERENCES.process(PDFBox().getPDF(filePathOrderOfReferences)).count() shouldBeExactly 4
 	}
 	"Regex rule should detect incorrect order of literature references" {
 		RULE_ORDER_OF_REFERENCES.process(PDFBox().getPDF(filePathOrderOfReferences)).count() shouldBeExactly 4
@@ -154,7 +154,6 @@ class RulesTests : StringSpec({
 	}
 }) {
 	companion object {
-		const val filePathQuestionMarkAndDashes = "${TestsConfiguration.resourceFolder}checker/SymbolRuleTestsQuestionMarkAndDashes.pdf"
 		const val filePathTwoIdenticalWords = "${TestsConfiguration.resourceFolder}checker/WordRuleTestsTwoIdenticalWords.pdf"
 		const val filePathQuestionMarkAndDashes =
 			"${TestsConfiguration.resourceFolder}checker/SymbolRuleTestsQuestionMarkAndDashes.pdf"
@@ -166,7 +165,6 @@ class RulesTests : StringSpec({
 		const val filePathSpaceAroundBrackets =
 			"${TestsConfiguration.resourceFolder}checker/SymbolRuleTestsSpaceAroundBrackets.pdf"
 		const val filePathCitation = "${TestsConfiguration.resourceFolder}checker/SymbolRuleTestsCitation.pdf"
-		const val filePathShortenedUrls = "${TestsConfiguration.resourceFolder}checker/URLRuleShortenedUrls.pdf"
 		const val filePathShortenedUrls = "${TestsConfiguration.resourceFolder}checker/URLRuleTestsShortenedURLs.pdf"
 		const val filePathUniformityUrls = "${TestsConfiguration.resourceFolder}checker/URLRuleUniformityURL.pdf"
 		const val filePathSymbolsInSectionNames =

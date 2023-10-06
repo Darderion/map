@@ -1,12 +1,10 @@
-package com.github.darderion.mundaneassignmentpolice.checker.rule.LineRule
+package com.github.darderion.mundaneassignmentpolice.checker.rule.line
 
 import com.github.darderion.mundaneassignmentpolice.checker.RuleViolation
 import com.github.darderion.mundaneassignmentpolice.checker.RuleViolationType
 import com.github.darderion.mundaneassignmentpolice.checker.rule.Rule
-import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFArea
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFDocument
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFRegion
-import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFRegion.Companion.NOWHERE
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.inside
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Line
 
