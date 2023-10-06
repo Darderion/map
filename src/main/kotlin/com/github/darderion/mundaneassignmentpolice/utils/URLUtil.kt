@@ -1,16 +1,11 @@
 package com.github.darderion.mundaneassignmentpolice.utils
 
-import java.io.File
 import java.net.HttpURLConnection
 import java.net.MalformedURLException
 import java.net.URL
 
 class URLUtil {
     companion object {
-        private const val urlShortenersFilePath = "src/main/resources/URLShorteners.txt"
-
-        fun getUrlShorteners() = File(urlShortenersFilePath).readLines()
-
         fun getUrl(url: String) =
             try {
                 if (url.startsWith("http")) URL(url) else URL("http://$url")
@@ -18,7 +13,11 @@ class URLUtil {
                 throw IllegalArgumentException("""Incorrect URL: "$url"""", e)
             }
 
+        fun removeProtocol(url: String) = url.removePrefix("http://").removePrefix("https://")
+
         fun getDomainName(url: String) = getUrl(url).host.removePrefix("www.")
+
+        fun partAfterDomain(url: String) = removeProtocol(url).dropWhile { it != '/' }
 
         fun equalDomainName(urlA: String, urlB: String) = getDomainName(urlA).equals(getDomainName(urlB), true)
 
