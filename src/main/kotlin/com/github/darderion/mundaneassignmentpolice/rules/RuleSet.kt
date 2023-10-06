@@ -3,7 +3,7 @@ package com.github.darderion.mundaneassignmentpolice.rules
 import com.github.darderion.mundaneassignmentpolice.checker.rule.Rule
 
 val RULE_SET_RU = RuleSet(
-	mutableListOf(
+	listOf(
 		RULE_OUTSIDE_FIELDS,
 		RULE_LITLINK,
 		RULE_SHORT_DASH,
@@ -26,9 +26,10 @@ val RULE_SET_RU = RuleSet(
 		RULE_ORDER_OF_REFERENCES,
 		RULE_VARIOUS_ABBREVIATIONS,
 		RULE_SECTIONS_ORDER,
-   		RULE_LOW_QUALITY_CONFERENCES,
+		RULE_LOW_QUALITY_CONFERENCES,
 	)
-			+ RULES_SPACE_AROUND_BRACKETS
-			+ RULES_SMALL_NUMBERS
+		+ RULES_SPACE_AROUND_BRACKETS
+		+ RULES_SMALL_NUMBERS
+		+ RULES_SECTION_SIZE
 )
 class RuleSet(val rules: List<Rule>) {}

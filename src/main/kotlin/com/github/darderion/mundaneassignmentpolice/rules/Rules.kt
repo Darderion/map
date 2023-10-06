@@ -1,9 +1,10 @@
 package com.github.darderion.mundaneassignmentpolice.rules
 
 import com.github.darderion.mundaneassignmentpolice.checker.RuleViolationType
-import com.github.darderion.mundaneassignmentpolice.checker.Section
+import com.github.darderion.mundaneassignmentpolice.checker.SectionName
 import com.github.darderion.mundaneassignmentpolice.checker.rule.list.ListRuleBuilder
 import com.github.darderion.mundaneassignmentpolice.checker.rule.regex.RegexRuleBuilder
+import com.github.darderion.mundaneassignmentpolice.checker.rule.section.SectionSizeRuleBuilder
 import com.github.darderion.mundaneassignmentpolice.checker.rule.sentence.SentenceRuleBuilder
 import com.github.darderion.mundaneassignmentpolice.checker.rule.sentence.splitIntoSentences
 import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.SymbolRuleBuilder
@@ -18,7 +19,6 @@ import com.github.darderion.mundaneassignmentpolice.checker.rule.word.or
 import com.github.darderion.mundaneassignmentpolice.checker.rule.word.splitToWordsAndPunctuations
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFArea
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFRegion
-import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Line
 import com.github.darderion.mundaneassignmentpolice.utils.InvalidOperationException
 import com.github.darderion.mundaneassignmentpolice.utils.LowQualityConferencesUtil
 import com.github.darderion.mundaneassignmentpolice.utils.ResourcesUtil
@@ -92,7 +92,7 @@ val RULE_LONG_DASH = SymbolRuleBuilder()
 	.symbol(longDash)
 	.shouldHaveNeighbor(' ')
 	.inArea(PDFRegion.EVERYWHERE.except(PDFArea.BIBLIOGRAPHY, PDFArea.FOOTNOTE))
-	.getRule()
+    .getRule()
 
 val closingQuote = '”'
 val openingQuote = '“'
@@ -207,9 +207,9 @@ val RULE_TABLE_OF_CONTENT_NUMBERS = LineRuleBuilder()
 		it.filter {
 			// println("${it.text.count()} -> ${it.content}")
 			val text = it.text.filter { it.text.trim().isNotEmpty() }
-			((text.count() == 3 && (text[1].text == Section.INTRODUCTION.title ||
-					text[1].text == Section.CONCLUSION.title)) ||
-					(text.count() == 4 && (text[1].text + " " + text[2].text) == Section.BIBLIOGRAPHY.title))
+			((text.count() == 3 && (text[1].text == SectionName.INTRODUCTION.title ||
+					text[1].text == SectionName.CONCLUSION.title)) ||
+					(text.count() == 4 && (text[1].text + " " + text[2].text) == SectionName.BIBLIOGRAPHY.title))
 		}
 	}.called("Введение, заключение и список литературы не нумеруются")
 	.getRule()
@@ -227,12 +227,12 @@ val RULE_SYMBOLS_IN_SECTION_NAMES = LineRuleBuilder()
 	.getRule()
 
 val sectionsThatMayPrecedeThis = mapOf<String, HashSet<String>>(
-	Section.INTRODUCTION.title to hashSetOf(""),
-	Section.PROBLEM_STATEMENT.title to hashSetOf(Section.INTRODUCTION.title),
-	Section.REVIEW.title to hashSetOf(Section.PROBLEM_STATEMENT.title),
-	Section.CONTENT.title to hashSetOf(Section.REVIEW.title, Section.CONTENT.title),
-	Section.CONCLUSION.title to hashSetOf(Section.CONTENT.title),
-	Section.BIBLIOGRAPHY.title to hashSetOf(Section.CONCLUSION.title)
+	SectionName.INTRODUCTION.title to hashSetOf(""),
+	SectionName.PROBLEM_STATEMENT.title to hashSetOf(SectionName.INTRODUCTION.title),
+	SectionName.REVIEW.title to hashSetOf(SectionName.PROBLEM_STATEMENT.title),
+	SectionName.CONTENT.title to hashSetOf(SectionName.REVIEW.title, SectionName.CONTENT.title),
+	SectionName.CONCLUSION.title to hashSetOf(SectionName.CONTENT.title),
+	SectionName.BIBLIOGRAPHY.title to hashSetOf(SectionName.CONCLUSION.title)
 )
 
 val RULE_SECTIONS_ORDER = LineRuleBuilder()
@@ -244,7 +244,7 @@ val RULE_SECTIONS_ORDER = LineRuleBuilder()
 				val words = line.text
 					.filter { it.text.trim().isNotEmpty() }
 					.filterNot { it.text.contains("[0-9]+\\.".toRegex()) }		// remove numbering
-				words.isEmpty() || words[0].text == Section.TABLE_OF_CONTENT.title
+				words.isEmpty() || words[0].text == SectionName.TABLE_OF_CONTENT.title
 			}
 			.filter { line ->
 				val words = line.text
@@ -252,14 +252,14 @@ val RULE_SECTIONS_ORDER = LineRuleBuilder()
 					.filterNot { it.text.contains("[0-9]+\\.".toRegex()) }		// remove numbering
 
 				val sectionName =
-					if ((words[0].text + " " + words[1].text) == Section.BIBLIOGRAPHY.title ||
-						(words[0].text + " " + words[1].text) == Section.PROBLEM_STATEMENT.title
+					if ((words[0].text + " " + words[1].text) == SectionName.BIBLIOGRAPHY.title ||
+						(words[0].text + " " + words[1].text) == SectionName.PROBLEM_STATEMENT.title
 					)
 						words[0].text + " " + words[1].text
 					else if (sectionsThatMayPrecedeThis.contains(words[0].text))
 						words[0].text
 					else
-						Section.CONTENT.title
+						SectionName.CONTENT.title
 
 				val isRuleViolation =
 					!sectionsThatMayPrecedeThis[sectionName]!!.contains(nameOfPreviousSection)
@@ -339,6 +339,41 @@ val RULES_SMALL_NUMBERS = List<WordRule>(9) { index ->
 	smallNumbersRuleBuilder2.fromRight().getRule() or
 	smallNumbersRuleBuilder3.word((index + 1).toString()).getRule()
 }
+
+private const val sectionSizeRuleName = "Слишком длинная секция"
+
+val introductionAndConclusionSizeRuleError = SectionSizeRuleBuilder()
+	.called(sectionSizeRuleName)
+	.sections(SectionName.INTRODUCTION, SectionName.CONCLUSION)
+	.shouldBeLessThan()
+	.limitByPages(4)
+	.type(RuleViolationType.Error)
+	.getRule()
+
+val introductionAndConclusionSizeRuleWarning = SectionSizeRuleBuilder()
+	.called(sectionSizeRuleName)
+	.sections(SectionName.INTRODUCTION, SectionName.CONCLUSION)
+	.shouldNotBeEqual()
+	.limitByPages(3)
+	.type(RuleViolationType.Warning)
+	.getRule()
+
+val sectionsSizeRule = SectionSizeRuleBuilder()
+	.called(sectionSizeRuleName)
+	.sections(SectionName.PROBLEM_STATEMENT, SectionName.REVIEW, SectionName.CONTENT, SectionName.BIBLIOGRAPHY)
+	.shouldNotBeGreaterThan()
+	.limitByPercentage(50)
+	.getRule()
+
+val RULES_SECTION_SIZE = listOf(
+	introductionAndConclusionSizeRuleError,
+	introductionAndConclusionSizeRuleWarning,
+	sectionsSizeRule
+)
+
+val RULE_SHORTENED_URLS = URLRuleBuilder()
+	.called("Сокращённая ссылка")
+	.inArea(PDFRegion.NOWHERE.except(PDFArea.FOOTNOTE, PDFArea.BIBLIOGRAPHY))
 
 val RULE_DISALLOWED_WORDS = WordRuleBuilder()
 		.called("слова \"theorem, definition, lemma\" не должны использоваться")

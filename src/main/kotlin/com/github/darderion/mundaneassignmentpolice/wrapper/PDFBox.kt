@@ -96,12 +96,13 @@ class PDFBox {
 		val stripper = PDFStripper()			// Stripper with additional information
 		val textStripper = PDFTextStripper()	// Text stripper
 
+		val numberOfPages = document.pages.count
 		val size = document.pages.first().mediaBox
 
 		val strippers = listOf(stripper, textStripper)
 
 		var lineIndex = -1
-		for (pageIndex in (0 until document.pages.count)) {
+		for (pageIndex in (0 until numberOfPages)) {
 			// For each page
 			strippers.forEach {
 				it.startPage = pageIndex + 1
@@ -179,7 +180,7 @@ class PDFBox {
 
 		document.close()
 
-		return PDFDocument(fileName, pdfText, size.width.toDouble(), size.height.toDouble())
+		return PDFDocument(fileName, pdfText, numberOfPages, size.width.toDouble(), size.height.toDouble())
 	}
 
 	fun getPDFSize(fileName: String): Int {
