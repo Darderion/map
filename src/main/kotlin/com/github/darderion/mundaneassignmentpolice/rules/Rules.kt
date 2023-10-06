@@ -311,7 +311,8 @@ val RULE_TASKS_MAPPING = ListRuleBuilder()
     }
     .getRule()
 
-val RULE_NO_TASKS = TableOfContentRuleBuilder()
+val RULE_NO_TASKS = LineRuleBuilder()
+	.inArea(PDFRegion.NOWHERE.except(PDFArea.TABLE_OF_CONTENT))
     .called("Задачи не выделены в содержании")
     .disallow {
         val tasks = it.filter { it.text.toString().contains("адач") }

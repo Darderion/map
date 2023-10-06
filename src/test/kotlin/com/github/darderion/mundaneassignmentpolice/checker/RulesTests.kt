@@ -195,8 +195,6 @@ class RulesTests : StringSpec({
 			"${TestsConfiguration.resourceFolder}checker/RegexRuleTestsVariousAbbreviations.pdf"
 		const val filePathOrderOfSections =
 			"${TestsConfiguration.resourceFolder}checker/TableOfContentRuleTestsSectionsOrder.pdf"
-    	const val filePathLowQualityConferences =
-			"${TestsConfiguration.resourceFolder}checker/URLRuleTestsLowQualityConferences.pdf"
 		const val filePathNoTasksAndResults =
 			"${TestsConfiguration.resourceFolder}checker/NoTasksAndResults.pdf"
 		const val filePathNoTasks =
