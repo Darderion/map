@@ -1,19 +1,32 @@
 package com.github.darderion.mundaneassignmentpolice.rules
 
 import com.github.darderion.mundaneassignmentpolice.checker.RuleViolationType
+import com.github.darderion.mundaneassignmentpolice.checker.Section
 import com.github.darderion.mundaneassignmentpolice.checker.rule.list.ListRuleBuilder
+import com.github.darderion.mundaneassignmentpolice.checker.rule.regex.RegexRuleBuilder
+import com.github.darderion.mundaneassignmentpolice.checker.rule.sentence.SentenceRuleBuilder
+import com.github.darderion.mundaneassignmentpolice.checker.rule.sentence.splitIntoSentences
 import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.SymbolRuleBuilder
 import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.and
 import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.or
-import com.github.darderion.mundaneassignmentpolice.checker.rule.tableofcontent.TableOfContentRuleBuilder
+import com.github.darderion.mundaneassignmentpolice.checker.rule.LineRule.LineRuleBuilder
 import com.github.darderion.mundaneassignmentpolice.checker.rule.url.URLRuleBuilder
+import com.github.darderion.mundaneassignmentpolice.checker.rule.url.then
 import com.github.darderion.mundaneassignmentpolice.checker.rule.word.WordRule
 import com.github.darderion.mundaneassignmentpolice.checker.rule.word.WordRuleBuilder
 import com.github.darderion.mundaneassignmentpolice.checker.rule.word.or
+import com.github.darderion.mundaneassignmentpolice.checker.rule.word.splitToWordsAndPunctuations
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFArea
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFRegion
+import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Line
+import com.github.darderion.mundaneassignmentpolice.utils.InvalidOperationException
+import com.github.darderion.mundaneassignmentpolice.utils.LowQualityConferencesUtil
+import com.github.darderion.mundaneassignmentpolice.utils.ResourcesUtil
 import com.github.darderion.mundaneassignmentpolice.utils.URLUtil
 import java.util.*
+
+import com.github.kittinunf.fuel.Fuel
+import com.github.kittinunf.fuel.core.extensions.jsonBody
 
 private val enLetters = "abcdefghijklmnopqrstuvwxyz"
 private val enCapitalLetters = enLetters.uppercase(Locale.getDefault())
@@ -24,6 +37,7 @@ private val rusCapitalLetters = rusLetters.uppercase(Locale.getDefault())
 private val RU = rusLetters + rusCapitalLetters
 
 private val numbers = "0123456789"
+val microservice_url = "http://127.0.0.1:8084/predict"
 
 val RULE_LITLINK = SymbolRuleBuilder()
 	.symbol('?')
@@ -45,7 +59,7 @@ val shortDashRules = SymbolRuleBuilder()
 	.shouldHaveNeighbor(*numbers.toCharArray())
 	//.called("Incorrect usage of '-' symbol")
 	.called("Неправильное использование дефиса")
-	.inArea(PDFRegion.EVERYWHERE.except(PDFArea.BIBLIOGRAPHY, PDFArea.FOOTNOTE))
+	.inArea(PDFRegion.EVERYWHERE.except(PDFArea.BIBLIOGRAPHY, PDFArea.FOOTNOTE, PDFArea.TITLE_PAGE))
 
 val RULE_SHORT_DASH = shortDashRules.getRule() and (
 		shortDashRules.fromLeft().shouldHaveNeighbor('.')
@@ -122,13 +136,23 @@ val RULE_MULTIPLE_LITLINKS = SymbolRuleBuilder()
 
 const val bracket = '('
 
-val RULE_BRACKETS_LETTERS = SymbolRuleBuilder()
-	.symbol(bracket)
-	.ignoringAdjusting(' ')
-	.fromRight().shouldNotHaveNeighbor(*rusCapitalLetters.toCharArray())
-	.called("Большая русская буква после скобки")
-	.type(RuleViolationType.Warning)
-	.getRule()
+val RULE_BRACKETS_LETTERS = List(2) {
+	SymbolRuleBuilder()
+		.symbol(bracket)
+		.ignoringAdjusting(' ')
+		.called("Большая русская буква после скобки")
+		.type(RuleViolationType.Warning)
+}.apply {
+	first()
+		.fromLeft()
+		.shouldNotHaveNeighbor('.')
+	last()
+		.fromRight()
+		.shouldNotHaveNeighbor(*rusCapitalLetters.toCharArray())
+}.map { it.getRule() }
+	.reduce { acc, symbolRule ->
+		acc and symbolRule
+	}
 
 private const val openingBrackets = "([{<"
 private const val closingBrackets = ")]}>"
@@ -169,6 +193,17 @@ val RULE_CITATION = SymbolRuleBuilder()
 	.inArea(PDFArea.SECTION)
 	.getRule()
 
+val RULE_SECTION_NUMBERING_FROM_0 = LineRuleBuilder()
+	.inArea(PDFRegion.NOWHERE.except(PDFArea.TABLE_OF_CONTENT))
+		.disallow { listOfLines ->
+			listOfLines.filter { line ->
+				val text = line.text
+						.filter { it.text.contains("([0-9])*+\\.".toRegex()) }.joinToString("")
+				text.contains("\\.0\\.".toRegex() ) || text.isNotEmpty() && text.first()=='0' // detect .0. or 0. (not 10.0)
+			}
+		}.called("Нумерация секций не должна начинаться с нуля")
+		.getRule()
+
 val RULE_SINGLE_SUBSECTION = ListRuleBuilder()
 	.inArea(PDFRegion.NOWHERE.except(PDFArea.TABLE_OF_CONTENT))
 	//.called("Only 1 subsection in a section")
@@ -177,18 +212,21 @@ val RULE_SINGLE_SUBSECTION = ListRuleBuilder()
 		if (it.nodes.count() == 1) it.nodes.first().getText() else listOf()
 	}.getRule()
 
-val RULE_TABLE_OF_CONTENT_NUMBERS = TableOfContentRuleBuilder()
+val RULE_TABLE_OF_CONTENT_NUMBERS = LineRuleBuilder()
+	.inArea(PDFRegion.NOWHERE.except(PDFArea.TABLE_OF_CONTENT))
 	.disallow {
 		it.filter {
 			// println("${it.text.count()} -> ${it.content}")
 			val text = it.text.filter { it.text.trim().isNotEmpty() }
-			((text.count() == 3 && (text[1].text == "Введение" || text[1].text == "Заключение")) ||
-					(text.count() == 4 && text[1].text == "Список" && text[2].text == "литературы"))
+			((text.count() == 3 && (text[1].text == Section.INTRODUCTION.title ||
+					text[1].text == Section.CONCLUSION.title)) ||
+					(text.count() == 4 && (text[1].text + " " + text[2].text) == Section.BIBLIOGRAPHY.title))
 		}
 	}.called("Введение, заключение и список литературы не нумеруются")
 	.getRule()
 
-val RULE_SYMBOLS_IN_SECTION_NAMES = TableOfContentRuleBuilder()
+val RULE_SYMBOLS_IN_SECTION_NAMES = LineRuleBuilder()
+	.inArea(PDFRegion.NOWHERE.except(PDFArea.TABLE_OF_CONTENT))
 	.disallow { listOfLines ->
 		listOfLines.filter { line ->
 			val text = line.text.filterNot { it.text == "." }           // remove leaders
@@ -198,6 +236,73 @@ val RULE_SYMBOLS_IN_SECTION_NAMES = TableOfContentRuleBuilder()
 		}
 	}.called("""Символы ":", ".", "," в названии секции""")
 	.getRule()
+
+val sectionsThatMayPrecedeThis = mapOf<String, HashSet<String>>(
+	Section.INTRODUCTION.title to hashSetOf(""),
+	Section.PROBLEM_STATEMENT.title to hashSetOf(Section.INTRODUCTION.title),
+	Section.REVIEW.title to hashSetOf(Section.PROBLEM_STATEMENT.title),
+	Section.CONTENT.title to hashSetOf(Section.REVIEW.title, Section.CONTENT.title),
+	Section.CONCLUSION.title to hashSetOf(Section.CONTENT.title),
+	Section.BIBLIOGRAPHY.title to hashSetOf(Section.CONCLUSION.title)
+)
+
+val RULE_SECTIONS_ORDER = LineRuleBuilder()
+	.inArea(PDFRegion.NOWHERE.except(PDFArea.TABLE_OF_CONTENT))
+	.disallow { listOfLines ->
+		var nameOfPreviousSection = ""
+		listOfLines
+			.filterNot { line ->
+				val words = line.text
+					.filter { it.text.trim().isNotEmpty() }
+					.filterNot { it.text.contains("[0-9]+\\.".toRegex()) }		// remove numbering
+				words.isEmpty() || words[0].text == Section.TABLE_OF_CONTENT.title
+			}
+			.filter { line ->
+				val words = line.text
+					.filter { it.text.trim().isNotEmpty() }
+					.filterNot { it.text.contains("[0-9]+\\.".toRegex()) }		// remove numbering
+
+				val sectionName =
+					if ((words[0].text + " " + words[1].text) == Section.BIBLIOGRAPHY.title ||
+						(words[0].text + " " + words[1].text) == Section.PROBLEM_STATEMENT.title
+					)
+						words[0].text + " " + words[1].text
+					else if (sectionsThatMayPrecedeThis.contains(words[0].text))
+						words[0].text
+					else
+						Section.CONTENT.title
+
+				val isRuleViolation =
+					!sectionsThatMayPrecedeThis[sectionName]!!.contains(nameOfPreviousSection)
+				nameOfPreviousSection = sectionName
+				isRuleViolation
+			}
+	}
+	.called("Неверный порядок секций")
+	.getRule()
+
+val RULE_UNSCIENTIFIC_SENTENCE = SentenceRuleBuilder()
+		.called("Ненаучный стиль")
+		.disallow { lines ->
+			val results = mutableListOf<Line>()
+			splitIntoSentences(lines).forEach { sentence ->
+				val body = "{ \"data\" : \"${sentence.joinToString(separator = " ")}\" }"
+
+				val (_, _, result) = Fuel.post(microservice_url)
+						.jsonBody(body)
+						.responseString()
+				result.fold(success = {
+					if ("unscientific" in it.toString()) {
+						results.addAll(lines)
+					}
+
+				}, failure = {
+					println(String(it.errorData))
+				})
+
+			}
+			results.toList()
+		}.getRule()
 
 val smallNumbersRuleName = "Неправильное написание целых чисел от 1 до 9"
 val smallNumbersRuleArea =
@@ -282,16 +387,155 @@ val RULES_SMALL_NUMBERS = List<WordRule>(9) { index ->
 	smallNumbersRuleBuilder3.word((index + 1).toString()).getRule()
 }
 
-val RULE_SHORTENED_URLS = URLRuleBuilder()
-	.called("Сокращённая ссылка")
+val RULE_DISALLOWED_WORDS = WordRuleBuilder()
+		.called("слова \"theorem, definition, lemma\" не должны использоваться")
+		.inArea(PDFRegion.EVERYWHERE.except(PDFArea.BIBLIOGRAPHY,PDFArea.TITLE_PAGE))
+		.fromLeft()
+		.ignoringPunctuation(true)
+		.shouldNotHaveNeighbor(
+				Regex("""[Tt]heorem"""),
+				Regex("""[Dd]efinition"""),
+				Regex("""[Ll]emma"""))
+		.getRule()
+
+val RULE_INCORRECT_ABBREVIATION = WordRuleBuilder()
+		.called("Неправильное написание аббревиатуры \"вуз\"")
+		.inArea(PDFRegion.EVERYWHERE)
+		.ignoringPunctuation(true)
+		.shouldNotHaveNeighbor(
+				Regex("""ВУЗ(\p{Pd})?(.*)""") // detect "ВУЗ-", "ВУЗ", not "вуз","Вуз"
+		)
+		.getRule()
+
+const val shortenedUrlRuleName = "Сокращённая ссылка"
+val shortenedUrlRuleArea = PDFRegion.NOWHERE.except(PDFArea.FOOTNOTE, PDFArea.BIBLIOGRAPHY)
+
+val urlShortenersListRule = URLRuleBuilder()
+	.called(shortenedUrlRuleName)
+	.inArea(shortenedUrlRuleArea)
+	.type(RuleViolationType.Error)
 	.disallow { urls ->
-		urls.filter { pair ->
+		val urlShorteners = ResourcesUtil.getResourceLines("URLShorteners.txt")
+		urls.filter { url ->
+			urlShorteners.any { shortener -> URLUtil.equalDomainName(shortener, url.text) }
+		}.map { it to it.lines }
+	}.getRule()
+
+val urlWithRedirectRule = URLRuleBuilder()
+	.called(shortenedUrlRuleName)
+	.inArea(shortenedUrlRuleArea)
+	.type(RuleViolationType.Warning)
+	.ignoreIf { url ->
+		val allowedUrls = ResourcesUtil.getResourceLines("AllowedDomainsWithRedirect.txt")
+		allowedUrls.any { allowedUrl -> URLUtil.equalDomainName(allowedUrl, url.text) }
+	}
+	.ignoreIf { url ->
+		// Remain only URLs (potential shortened URLs) that have a domain name no longer 5 characters and
+		// only one part after a domain (token in shortened URL) that is less than 10 characters.
+		val partsAfterDomain = URLUtil.partAfterDomain(url.text).split('/').filter { it.isNotEmpty() }
+		URLUtil.getDomainName(url.text).length > 5 ||
+			partsAfterDomain.isEmpty() ||
+			partsAfterDomain.size > 1 ||
+			partsAfterDomain.first().length >= 10
+	}
+	.disallow { urls ->
+		urls.filter { url ->
 			try {
-				var url = pair.first
-				if (!url.startsWith("http")) url = "https://$url"
-				URLUtil.isShortened(url)
-			} catch (_: Exception) {
+				URLUtil.isRedirect(url.text)
+			} catch (_: InvalidOperationException) {
 				false
 			}
+		}.map { it to it.lines }
+	}.getRule()
+
+val RULE_SHORTENED_URLS = urlShortenersListRule then urlWithRedirectRule
+
+val RULE_URLS_UNIFORMITY = URLRuleBuilder()
+	.called("Ссылки разных видов")
+	.inArea(PDFRegion.NOWHERE.except(PDFArea.FOOTNOTE, PDFArea.BIBLIOGRAPHY))
+	.disallow { urls ->
+		var filteredUrls = urls.filter { url ->
+			!url.text.startsWith("https://www")
+		}
+		if (urls.size == filteredUrls.size) {
+			filteredUrls = filteredUrls.filter { url ->
+				!url.text.startsWith("www")
+			}
+			if (urls.size == filteredUrls.size) {
+				filteredUrls = filteredUrls.filter { url ->
+					!url.text.startsWith("htt")
+				}
+			}
+		}
+		filteredUrls.map { it to it.lines }
+	}.getRule()
+
+val RULE_ORDER_OF_REFERENCES = RegexRuleBuilder()
+	.called("Неверный порядок ссылок на литературу")
+	.regex(Regex("""\[[0-9,\-\s]+\]"""))
+	.searchIn(1)
+	.disallow { matches ->
+		matches.filter { pair ->
+			val references = pair.first
+			val referencesInIntList = references
+				.slice(IntRange(1, references.length - 2))
+				.split(Regex("""[,\-]"""))
+				.map { it.trim() }
+				.filter { it.isNotEmpty() }
+				.map { it.toInt() }
+			referencesInIntList != referencesInIntList.sorted()
 		}.map { it.second }
 	}.getRule()
+
+val RULE_VARIOUS_ABBREVIATIONS = RegexRuleBuilder()
+	.called("Использованы различные версии сокращения")
+	.regex(Regex("""[a-zA-Zа-яА-Я]+"""))
+	.inArea(PDFRegion.EVERYWHERE.except(PDFArea.BIBLIOGRAPHY))
+	.disallow { matches ->
+		val abbreviations = hashSetOf<String>()
+		val allWords = hashMapOf<String, HashSet<String>>()
+		matches.forEach { pair ->
+			val word = pair.first
+			if (word.slice(IntRange(1, word.length - 1))
+					.count { it.isUpperCase() } > 0)
+				abbreviations.add(word.uppercase())
+			if (!allWords.containsKey(word.lowercase()))
+				allWords.put(word.lowercase(), hashSetOf())
+			allWords[word.lowercase()]?.add(word)
+		}
+		matches.filter { pair ->
+			val word = pair.first
+			if (abbreviations.contains(word.uppercase()))
+				allWords[word.lowercase()]?.size!! > 1
+			else
+				false
+		}.map { it.second }
+	}.getRule()
+
+val RULE_LOW_QUALITY_CONFERENCES = URLRuleBuilder()
+	.called("Ссылка на низкокачественную конференцию")
+	.inArea(PDFArea.BIBLIOGRAPHY)
+	.disallow { urls ->
+		val lowQualityConferencesList = LowQualityConferencesUtil.getList()
+			.map {
+				it.removePrefix("http://")
+					.removePrefix("https://")
+					.removePrefix("www.")
+					.removeSuffix("/")
+			}
+		urls.filter { url ->
+			lowQualityConferencesList
+				.any { conference -> url.text.contains(conference) }
+		}.map { it to it.lines }
+	}.getRule()
+
+val fieldsCoordinateX = 560
+val RULE_OUTSIDE_FIELDS = LineRuleBuilder()
+	.called("Слово вышло  поля")
+	.inArea(PDFRegion.EVERYWHERE.except(PDFArea.BIBLIOGRAPHY, PDFArea.FOOTNOTE, PDFArea.TITLE_PAGE))
+	.disallow { it ->
+		it.filter {
+			it.lastPosition.x > fieldsCoordinateX
+		}
+	}
+	.getRule()

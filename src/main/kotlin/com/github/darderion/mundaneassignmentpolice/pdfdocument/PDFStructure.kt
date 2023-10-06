@@ -1,8 +1,8 @@
 package com.github.darderion.mundaneassignmentpolice.pdfdocument
 
-import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Line
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFArea.*
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.list.PDFList
+import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Line
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Section
 import com.github.darderion.mundaneassignmentpolice.utils.floatEquals
 import java.util.*
@@ -18,6 +18,8 @@ class PDFStructure(text: List<Line>) {
 		// Areas
 		var area = TITLE_PAGE
 		var sectionTitle: String? = null
+		var isAfterBibliography = false
+		var sectionAfterBibliographyTitle: String? = null
 		text.forEach {
 			// For each line
 			area = when(area) {
@@ -34,7 +36,17 @@ class PDFStructure(text: List<Line>) {
 					} else {
 						if (sectionTitle != null && it.index == 0 && it.content == sectionTitle) {
 							SECTION
-						} else area
+						} else {
+							if (isAfterBibliography && sectionAfterBibliographyTitle == null) {
+								sectionAfterBibliographyTitle = it.text.filter { it.text.trim().isNotEmpty() }
+									.dropLast(1).joinToString(" ").ifBlank { null }
+								isAfterBibliography = false
+							}
+							else if (removeNumberingAndPage(it.content) == BIBLIOGRAPHY_TITLE) {
+								isAfterBibliography = true
+							}
+							area
+						}
 					}
 				}
 				SECTION -> {
@@ -53,6 +65,14 @@ class PDFStructure(text: List<Line>) {
 						} else {
 							SECTION
 						}
+					} else area
+				}
+				BIBLIOGRAPHY -> {
+					if (sectionAfterBibliographyTitle != null &&
+						it.index == 0 &&
+						it.content == sectionAfterBibliographyTitle
+					) {
+						SECTION
 					} else area
 				}
 				else -> area
@@ -81,7 +101,9 @@ class PDFStructure(text: List<Line>) {
 			.drop(1)												// Remove line with TABLE_OF_CONTENT_TITLE
 			.map { it.content }										// filter STRING values
 			.filter { it.isNotEmpty() }								//	remove empty lines
-			.dropLast(1)											//	remove line with BIBLIOGRAPHY_TITLE
+			.filterNot {										//	remove line with BIBLIOGRAPHY_TITLE
+				removeNumberingAndPage(it) == BIBLIOGRAPHY_TITLE
+			}
 			.forEach {
 				if (it[it.length - 1].isDigit() || it[it.length - 2].isDigit()) {
 					sectionsTitlesLines.add(curSectionTitle + it)
@@ -92,9 +114,9 @@ class PDFStructure(text: List<Line>) {
 			}
 
 		val sectionsTitles = sectionsTitlesLines.map { it
-				.dropLast(2)										//	remove ' ' + NUMBER or NUMBER + NUMBER
-				.dropLastWhile { it == ' ' || it == '.' }			// THIS FILTER ASSUMES THAT DOCUMENT CONTAINS
-		}															//	LESS THAN 100 PAGES
+				.dropLastWhile { it.isDigit() }
+				.dropLastWhile { it == ' ' || it == '.' }
+		}
 
 		val sectionsTitlesWithIndexes = sectionsTitles.map { if (it.contains('.')) it else ". $it" }
 
@@ -103,38 +125,36 @@ class PDFStructure(text: List<Line>) {
 			.map { it.documentIndex to it.content.clearSymbols()
 			}.dropLast(1)
 
-		val sectionText = listOf(
-			sectionTextLines,
-			sectionTextLines.dropLast(1).mapIndexed { index, pair ->
-				pair.first to pair.second + sectionTextLines[index + 1].second
-			}
-		).flatten()
+		val sectionsIndexed = mutableListOf<Section>()
 
-		val sectionsIndexed = sectionsTitles.map { section ->
-			val sectionItem = sectionText
-				.filter {
-					section.clearSymbols() == it.second
+		val titlesIterator = sectionsTitles.iterator()
+
+		var lineIndex = 0
+		while (titlesIterator.hasNext()) {
+			val title = titlesIterator.next()
+			var numberOfLines = 1
+			var titleLines = sectionTextLines[lineIndex].second
+
+			while (title.clearSymbols() != titleLines) {
+				if (titleLines.isNotEmpty() && title.clearSymbols().startsWith(titleLines)) {
+					titleLines += sectionTextLines[lineIndex + numberOfLines].second
+					numberOfLines++
+				} else {
+					numberOfLines = 1
+					lineIndex++
+					titleLines = sectionTextLines[lineIndex].second
 				}
-			if (sectionItem.isEmpty()) {
-				println("ERR: $section")
-				sectionText
-					.forEach {
-						println("${
-							section.clearSymbols()} -> '${it.second}'"
-						)
-					}
 			}
-			section to sectionItem.first().first
-		}
-		// Sections: List<Pair<String, Int>>
-		//	Section.second --> SectionIndex
-		//	Section.first --> SectionTitle
 
-		sections = sectionsIndexed.map { section -> Section(section.first, section.second,	// Sections: List<Section>
-			sectionText.filter { it.first > section.second }[
-					if (section.first.clearSymbols() == sectionText.first { it.first == section.second }.second) 0 else 1
-				].first
-		) }
+			val titleIndex = sectionTextLines[lineIndex].first
+			val contentIndex = if (text[titleIndex + numberOfLines].area == SECTION) titleIndex + numberOfLines else -1
+			sectionsIndexed.add(
+				Section(title, titleIndex, contentIndex)
+			)
+			lineIndex += numberOfLines
+		}
+
+		sections = sectionsIndexed
 
 		tableOfContents = PDFList("TABLE_OF_CONTENTS")
 
@@ -192,5 +212,10 @@ class PDFStructure(text: List<Line>) {
 				line.index == (text.filter { textLine ->
 			textLine.page == line.page && textLine.content.isNotEmpty()
 		}.maxOfOrNull { it.index } ?: -1)
+
+		private fun removeNumberingAndPage(tableOfContentLine: String) = tableOfContentLine
+			.dropWhile { it.isDigit() || it == '.' }
+			.dropLastWhile { it.isDigit() }
+			.trim()
 	}
 }

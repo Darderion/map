@@ -33,5 +33,6 @@ build/
 .vscode/
 
 src/main/webapp/dist/
+src/main/webapp/Dist_local/
 src/main/webapp/node_modules/
 src/main/resources/static

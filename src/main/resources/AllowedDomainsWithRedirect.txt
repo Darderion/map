@@ -1,0 +1,3 @@
+doi.org
+dx.doi.org
+aclweb.org

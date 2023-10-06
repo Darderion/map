@@ -5,8 +5,6 @@ import com.github.darderion.mundaneassignmentpolice.checker.Direction.*
 import com.github.darderion.mundaneassignmentpolice.checker.RuleViolationType
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFDocument
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFRegion
-import kotlin.reflect.jvm.internal.impl.utils.DFS.Neighbors
-
 
 /**
  * Rule that looks for closest symbol that is not IGNORED
