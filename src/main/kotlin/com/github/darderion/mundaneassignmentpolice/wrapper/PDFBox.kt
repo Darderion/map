@@ -122,7 +122,6 @@ class PDFBox {
 			var contentIndex: Int
 			var contentItem: String
 			var coordinates = Coordinate(0, 0)
-
 			var stripperIndex = 0
 
 			pdfText.addAll(text.lines().mapIndexed { line, content ->
@@ -167,7 +166,15 @@ class PDFBox {
 				if (font == null && word.isEmpty()) font = Font(0.0f)
 				words.add(Word(word, font!!, coordinates))
 
-				Line(line, pageIndex, lineIndex, words.toList())
+				if (document.pages[pageIndex].resources.xObjectNames.count()!=0){
+					Line(line, pageIndex, lineIndex, words.toList(),null,Coordinate(0,0))
+				}
+				else{
+				if (words.isEmpty()){
+					Line(line, pageIndex, lineIndex, words.toList(),null,stripper.symbols[stripperIndex].position)
+				}
+				else{
+				Line(line, pageIndex, lineIndex, words.toList(),null,stripper.symbols[stripperIndex-1].position)}}
 			})
 		}
 

@@ -11,6 +11,8 @@ import java.io.IOException
 
 @Controller
 class RouterController {
+	/*
 	@GetMapping("/")
 	fun home() = "forward:/app/index.html"
+	 */
 }

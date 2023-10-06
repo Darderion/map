@@ -63,7 +63,7 @@ const routes: Array<RouteConfig> = [
 ];
 
 const router = new VueRouter({
-	base: "/app/",
+	base: "/",
 	routes,
 });
 

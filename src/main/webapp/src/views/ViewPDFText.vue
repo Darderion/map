@@ -1,12 +1,7 @@
 
 <template>
 	<div class="about">
-		<div v-if="this.$store.getters.pdfName">
-			<PDFTextComponent :viewModeName="`Text`"/>
-		</div>
-		<div v-else>
-			<NoPDFComponent/>
-		</div>
+		<PDFTextComponent :viewModeName="`Text`"/>
 	</div>
 </template>
 
@@ -15,16 +10,19 @@
 import { Component, Prop, Vue } from 'vue-property-decorator';
 
 import PDFTextComponent from '../components/PDFTextComponent.vue'
-import NoPDFComponent from '../components/NoPDFComponent.vue'
 
 @Component({
 	components: {
 		Keypress: () => import('vue-keypress'),
-		PDFTextComponent,
-		NoPDFComponent
+		PDFTextComponent
 	},
 })
 
 export default class ViewPDFText extends Vue {
+	mounted() {
+		if (this.$route.query.locale) {
+			this.$i18n.locale = this.$route.query.locale as string;
+		}
+	}
 }
 </script>
