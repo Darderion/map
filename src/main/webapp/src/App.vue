@@ -6,8 +6,8 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
-import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
+import { Component, Vue } from 'vue-property-decorator';
+import { BootstrapVue } from 'bootstrap-vue'
 
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
@@ -27,9 +27,9 @@ import pdf from 'vue-pdf'
 })
 
 export default class AppComponent extends Vue {
-	updatePdfName() {
+	updatePdfName(): void {
 		// this.$store.dispatch("setPdfName", this.$route.query.pdfName? (this.$route.query.pdfName as string): "")
-		fetch(`api/getPDFSize?pdfName=${this.$store.getters.getPdfName}`)
+		fetch(`${this.$store.getters.getAPI}getPDFSize?pdfName=${this.$route.query.pdfName}`)
 			.then(numPages => {
 				this.$store.commit('setNumPages', {
 					pages: numPages
@@ -37,25 +37,22 @@ export default class AppComponent extends Vue {
 			});
 	}
 
-	updated() {
-		this.$store.commit('setPdfName', {
-			name: this.$route.query.pdfName
-		})
-
+	updated(): void {
 		if (this.$store.getters.getNumPages == 0) {
-			fetch(`api/getPDFSize?pdfName=${this.$store.getters.getPdfName}`)
+			fetch(`${this.$store.getters.getAPI}getPDFSize?pdfName=${this.$route.query.pdfName}`)
 				.then(response => response.json())
 				.then(numPages => {
 					this.$store.commit('setNumPages', {
 						pages: numPages
 					})
 				});
-			fetch(`api/viewRuleViolations?pdfName=${this.$store.getters.getPdfName}`)
+			fetch(`${this.$store.getters.getAPI}viewRuleViolations?pdfName=${this.$route.query.pdfName}`)
 				.then(response => response.json())
 				.then(ruleViolations => {
 					this.$store.commit('setRuleViolations', {
 						ruleViolations
 					})
+					console.log(ruleViolations)
 					this.$store.commit('updateContainsErrors', {
 						ruleViolations
 					})
@@ -67,7 +64,7 @@ export default class AppComponent extends Vue {
 
 <style lang="scss">
 body {
-	background-color: #abc;
+	background-color: #f7f7f7;
 }
 
 #app {

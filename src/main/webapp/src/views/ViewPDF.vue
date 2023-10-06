@@ -1,12 +1,8 @@
 
 <template>
 	<div class="about">
-		<div v-if="this.$store.getters.pdfName">
-			<PDFComponent :pdfURL="`api/viewPDF.pdf?pdfName=${this.$store.getters.getPdfName}`"></PDFComponent>
-		</div>
-		<div v-else>
-			<NoPDFComponent/>
-		</div>
+		<b-spinner style="width: 10rem; height: 10rem;" label="" v-show="!pdfComponent"></b-spinner>
+		<PDFComponent :pdfURL="`${this.$store.getters.getAPI}viewPDF.pdf?pdfName=${this.$route.query.pdfName}`" :pdfView="pdfView"></PDFComponent>
 	</div>
 </template>
 
@@ -15,17 +11,22 @@
 import { Component, Prop, Vue } from 'vue-property-decorator';
 
 import PDFComponent from '../components/PDFComponent.vue'
-import NoPDFComponent from '../components/NoPDFComponent.vue'
 
 @Component({
 	components: {
 		Keypress: () => import('vue-keypress'),
-		PDFComponent,
-		NoPDFComponent
+		PDFComponent
 	},
 })
 
 export default class ViewPDF extends Vue {
+	pdfComponent = false
+
+	pdfView() {
+		this.pdfComponent = true
+		console.log('pdfView')
+	}
+	
 	mounted() {
 		const locale = this.$route.query.locale as string
 		if (locale != undefined && ['en', 'ru'].includes(locale)) {

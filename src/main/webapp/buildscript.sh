@@ -3,6 +3,7 @@
 # /mundane-assignment-police/src/main/webapp
 npm install &&
 npm run build --fix &&
+mkdir -p ../resources/static &&
 rm -r -f ../resources/static/js &&
 cp -a dist/. ../resources/static/ &&
 rm -r -f ../resources/static/app &&

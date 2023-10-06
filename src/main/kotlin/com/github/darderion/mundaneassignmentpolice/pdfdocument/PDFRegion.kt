@@ -26,6 +26,11 @@ class PDFRegion private constructor(areas: Set<PDFArea>) {
 
 	fun contains(area: PDFArea) = areas.contains(area)
 
+	override fun equals(other: Any?) = this === other ||
+			(other is PDFRegion && this.areas == other.areas)
+
+	override fun hashCode() = areas.hashCode()
+
 	companion object {
 		val EVERYWHERE: PDFRegion
 		get() = PDFRegion(PDFArea.values().toSet())

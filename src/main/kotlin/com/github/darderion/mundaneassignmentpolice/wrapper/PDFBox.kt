@@ -96,12 +96,13 @@ class PDFBox {
 		val stripper = PDFStripper()			// Stripper with additional information
 		val textStripper = PDFTextStripper()	// Text stripper
 
+		val numberOfPages = document.pages.count
 		val size = document.pages.first().mediaBox
 
 		val strippers = listOf(stripper, textStripper)
 
-		var lineIndex = 0
-		for(pageIndex in (0..document.pages.count)) {
+		var lineIndex = -1
+		for (pageIndex in (0 until numberOfPages)) {
 			// For each page
 			strippers.forEach {
 				it.startPage = pageIndex + 1
@@ -121,7 +122,6 @@ class PDFBox {
 			var contentIndex: Int
 			var contentItem: String
 			var coordinates = Coordinate(0, 0)
-
 			var stripperIndex = 0
 
 			pdfText.addAll(text.lines().mapIndexed { line, content ->
@@ -166,13 +166,21 @@ class PDFBox {
 				if (font == null && word.isEmpty()) font = Font(0.0f)
 				words.add(Word(word, font!!, coordinates))
 
-				Line(line, pageIndex, lineIndex, words.toList())
+				if (document.pages[pageIndex].resources.xObjectNames.count()!=0){
+					Line(line, pageIndex, lineIndex, words.toList(),null,Coordinate(0,0))
+				}
+				else{
+				if (words.isEmpty()){
+					Line(line, pageIndex, lineIndex, words.toList(),null,stripper.symbols[stripperIndex].position)
+				}
+				else{
+				Line(line, pageIndex, lineIndex, words.toList(),null,stripper.symbols[stripperIndex-1].position)}}
 			})
 		}
 
 		document.close()
 
-		return PDFDocument(fileName, pdfText, size.width.toDouble(), size.height.toDouble())
+		return PDFDocument(fileName, pdfText, numberOfPages, size.width.toDouble(), size.height.toDouble())
 	}
 
 	fun getPDFSize(fileName: String): Int {
