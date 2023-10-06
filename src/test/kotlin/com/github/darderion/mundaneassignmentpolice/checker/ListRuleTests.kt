@@ -12,7 +12,7 @@ class ListRuleTests: StringSpec({
 	"List rule should detect lists of incorrect size in TABLE_OF_CONTENT" {
 		ListRuleBuilder()
 			.inArea(TABLE_OF_CONTENT)
-			.disallow {
+			.disallowInSingleList {
 				if (it.nodes.count() == 1) it.getText() else listOf()
 			}.getRule()
 			.process(PDFBox().getPDF(filePathTableOfContent)).count() shouldBeExactly 2
@@ -20,7 +20,7 @@ class ListRuleTests: StringSpec({
 	"List rule should detect lists of incorrect size in SECTION" {
 		ListRuleBuilder()
 			.inArea(SECTION)
-			.disallow {
+			.disallowInSingleList {
 				if (it.nodes.count() == 1) it.getText() else listOf()
 			}.getRule()
 			.process(PDFBox().getPDF(filePathSection)).count() shouldBeExactly 3
