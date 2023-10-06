@@ -142,10 +142,18 @@ class RulesTests : StringSpec({
 	"Symbol rule should ignore usage of capital letters inside brackets that are placed after the '.' symbol" {
 		RULE_BRACKETS_LETTERS.process(PDFBox().getPDF(filePathBracketLetters)).count() shouldBeExactly 1
 	}
+	"Symbol rule should detect detect no space usage"{
+		RULE_NO_SPACE_AFTER_PUNCTUATION.process(PDFBox().getPDF(filePathNoSpaceAfterPunctuation )).count() shouldBeExactly 1
+	}
+	"Symbol rule should detect incorrect space usage"{
+		RULE_SPACE_BEFORE_PUNCTUATION.forEach { it.process(PDFBox().getPDF(filePathSpaceBeforePunctuation)).count() shouldBeExactly 1 }}
 	"RULE_OPENING_QUOTATION and RULE_CLOSING_QUOTATION should process multiple lines" {
 		RULE_OPENING_QUOTATION.process(PDFBox().getPDF(filePathMultilineCitation)).count() +
 				RULE_CLOSING_QUOTATION.process(PDFBox().getPDF(filePathMultilineCitation)).count() shouldBeExactly 0
 	}
+	"RULE_LONG_SENTENCE should detect long sentences without quotes"{
+			RULE_LONG_SENTENCE.process(PDFBox().getPDF(filePathLongSentence)).count() shouldBeExactly 3
+		}
 	"""RULE_DISALLOWED_WORDS should detect words:\"Theorem,Definition,Lemma\""""{
 		RULE_DISALLOWED_WORDS.process(PDFBox().getPDF(filePathDisallowedWords)).count() shouldBeExactly 4
 	}
@@ -193,6 +201,12 @@ class RulesTests : StringSpec({
 			"${TestsConfiguration.resourceFolder}checker/BracketLetters.pdf"
 		const val filePathMultilineCitation =
 			"${TestsConfiguration.resourceFolder}checker/MultilineCitation.pdf"
+		const val filePathLongSentence =
+				"${TestsConfiguration.resourceFolder}checker/SentenceRuleTestsLongSentence.pdf"
+		const val  filePathSpaceBeforePunctuation =
+				"${TestsConfiguration.resourceFolder}checker/SymbolRuleTestsSpaceBeforePunctuation.pdf"
+		const val  filePathNoSpaceAfterPunctuation =
+				"${TestsConfiguration.resourceFolder}checker/SymbolRuleTestsNoSpaceAfterPunctuation.pdf"
 		const val filePathDisallowedWords =
 				"${TestsConfiguration.resourceFolder}checker/WordRuleDisallowedWords.pdf"
 		const val filePathIncorrectAbbreviation =

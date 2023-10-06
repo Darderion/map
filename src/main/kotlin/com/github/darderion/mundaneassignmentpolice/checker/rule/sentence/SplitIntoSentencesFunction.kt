@@ -12,7 +12,6 @@ fun splitIntoSentences(lines : MutableList<Line>): MutableList<MutableList<Word>
                 .forEach { sentence.add(it)
                     if (sentence.first().text.first().isUpperCase() &&
                             sentence.last().text.last() in punctuationConclusionSymbols) {
-                        println(sentence)
                         sentences.add(sentence)
                         sentence = mutableListOf()
                     }
