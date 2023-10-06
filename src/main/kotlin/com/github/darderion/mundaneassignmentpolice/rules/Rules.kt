@@ -552,7 +552,7 @@ val RULE_ORDER_OF_REFERENCES = RegexRuleBuilder()
 val RULE_VARIOUS_ABBREVIATIONS = RegexRuleBuilder()
 	.called("Использованы различные версии сокращения")
 	.regex(Regex("""[a-zA-Zа-яА-Я]+"""))
-	.inArea(PDFRegion.EVERYWHERE.except(PDFArea.BIBLIOGRAPHY))
+	.inArea(PDFRegion.EVERYWHERE.except(PDFArea.BIBLIOGRAPHY, PDFArea.FOOTNOTE))
 	.disallow { matches ->
 		val abbreviations = hashSetOf<String>()
 		val allWords = hashMapOf<String, HashSet<String>>()
@@ -593,7 +593,7 @@ val RULE_LOW_QUALITY_CONFERENCES = URLRuleBuilder()
 
 val fieldsCoordinateX = 560
 val RULE_OUTSIDE_FIELDS = LineRuleBuilder()
-	.called("Слово вышло  поля")
+	.called("Слово вышло за поля")
 	.inArea(PDFRegion.EVERYWHERE.except(PDFArea.BIBLIOGRAPHY, PDFArea.FOOTNOTE, PDFArea.TITLE_PAGE))
 	.disallow { it ->
 		it.filter {
