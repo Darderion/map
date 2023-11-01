@@ -1,0 +1,7 @@
+.preset {
+    background-color: rgb(250, 250, 250);
+    max-width: 900px;
+    width: calc(25px + 875 * (100vw / 1280));
+    font-size: 18px;
+  }
+  

@@ -1,0 +1,10 @@
+name: file-uploader
+id: 97c0ca58-f9bd-4bc5-9c75-0ef119107ef3
+languages:
+  - TypeScript
+  - TSX
+extensions:
+  - .ts
+  - .cts
+  - .mts
+  - .tsx

@@ -1,0 +1,63 @@
+.main {
+    display: flex;
+    justify-content: center;
+    height: auto;
+}
+
+.page {
+    text-align: end;
+    margin: 0;
+    width: calc(180px + 495 * (100vw / 1280)) 
+}
+.settings {
+    display: none;
+    margin: 0;
+}
+.selected-item {
+    background-color: #7950f2; 
+    cursor: pointer; 
+  }
+.ruleViolations {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    max-width: 1000px;
+}
+
+.sortedRuleViolationsList {
+    display: flex;
+    flex-direction: column;
+    margin-top: 30px;
+    min-width: 400px;
+    margin-left: calc(10px + 20 * (100vw / 1280));
+}
+.sortWithIcon {
+    display: flex;
+}
+
+.saveButton{
+    display: flex;
+    justify-content: end;
+}
+.ruleList{
+    display: initial;
+}
+
+.pageWithSort {
+    display: flex;
+    flex-direction: row;
+}
+@media (max-width: 1400px) {
+    .settings {
+      display: initial;
+    }
+    .pageWithSort {
+        flex-direction: column-reverse;
+    }
+    .main {
+        display: inline-block;
+    }
+    .sortedRuleViolationsList {
+        min-width: 200px;
+    }
+}
