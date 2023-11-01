@@ -30,9 +30,6 @@ data class Feedback(val pdfName: String, val comment: String, val title: String,
 class APIController {
 	val pdfBox = PDFBox()
 	val ruleSet = RULE_SET_RU
-	@GetMapping("/api/viewPDFText")
-	fun getPDFText() :String{
-		return "hello from bek"}
 
 	@GetMapping("/api/viewPDFSections")
 	fun getPDFSections(@RequestParam pdfName: String): List<Section> {
