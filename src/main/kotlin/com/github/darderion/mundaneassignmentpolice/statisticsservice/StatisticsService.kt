@@ -9,7 +9,7 @@ class StatisticsService {
         val document = PDFBox().getPDF(pdfName)
         return if (document.areas!=null) {
             GeneralStatistic(StatisticsBuilder().getWordsStatistic(document),
-                StatisticsBuilder().getPageStatistic(document))
+                StatisticsBuilder().getPageStatistic(pdfName,document))
         } else GeneralStatistic(StatisticsBuilder().getWordsStatistic(document))
     }
 }

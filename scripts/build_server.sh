@@ -1,7 +1,6 @@
 #!/bin/bash
 
-# mvn package -Dmaven.test.skip &&
-mvn package &&
+mvn package -Dmaven.test.skip &&
 mv target/mundane-assignment-police-0.0.1-SNAPSHOT.jar target/app.jar &&
 
 mkdir -p build &&

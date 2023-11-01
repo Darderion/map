@@ -28,9 +28,9 @@ class SymbolRuleBuilder {
 	private var type: RuleViolationType = RuleViolationType.Error
 	private var name: String = "Rule name"
 	private var region: PDFRegion = EVERYWHERE
-
+	private  var description: String = ""
 	infix fun symbol(symbol: Char) = this.also { this.symbol = symbol }
-
+	infix fun setDescription(description: String) = this.also { this.description = description }
 	infix fun called(name: String) = this.also { this.name = name }
 
 	fun ignoringAdjusting(vararg symbols: Char) = this.also { if (notIgnoredNeighbors.isEmpty()) ignoredNeighbors.addAll(symbols.toList())
@@ -74,6 +74,7 @@ class SymbolRuleBuilder {
 		neighborhoodSize,
 		type,
 		region,
-		name
+		name,
+		description
 	) as SymbolRule
 }

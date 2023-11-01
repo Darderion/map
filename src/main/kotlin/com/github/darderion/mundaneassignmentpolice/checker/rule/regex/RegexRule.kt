@@ -15,7 +15,8 @@ open class RegexRule(
 	type: RuleViolationType,
 	area: PDFRegion,
 	name: String,
-) : Rule(area, name, type) {
+	description: String
+) : Rule(area, name, type, description) {
 	override fun process(document: PDFDocument): List<RuleViolation> {
 		val ruleViolations: MutableList<RuleViolation> = mutableListOf()
 

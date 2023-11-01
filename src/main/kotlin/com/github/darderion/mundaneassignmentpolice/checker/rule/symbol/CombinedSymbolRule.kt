@@ -21,7 +21,8 @@ class CombinedSymbolRule(
 	rules.first().symbol,
 	rules.first().type,
 	rules.first().area,
-	rules.first().name
+	rules.first().name,
+	rules.first().description
 ) {
 	override fun isViolated(document: PDFDocument, line: Int, index: Int) = rules.map { it.isViolated(document, line, index) }.reduce {
 			acc, ruleViolation ->
