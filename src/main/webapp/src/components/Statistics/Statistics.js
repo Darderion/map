@@ -13,8 +13,11 @@ const Statistics = () => {
   const colors = ['#FF7F50', '#FFD700', '#40E0D0', '#FF69B4', '#7CFC00', '#FF1493', '#00CED1', '#FF8C00', '#8A2BE2', '#00FF00'];
 
   useEffect(() => {
-    axios.get(`http://localhost:8081/api/viewPDFStatistic?pdfName=${currentFileName}`)
+    axios.get(`http://localhost:8081/api/viewPDFStatistic?pdfName=${currentFileName}`, {
+      responseType: 'arraybuffer',
+    })
       .then(res => {
+        console.log(res)
         const sortedWords = Object.entries(res.data.wordsStatistic.topKWords)
             .sort((a, b) => b[1] - a[1]) 
             .slice(0, 100)

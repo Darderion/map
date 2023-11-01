@@ -53,7 +53,7 @@ class APIController {
 		pdfBox.getImages("$pdfFolder$pdfName").toList().also { logger.info("ViewPDFImages(pdfName = $pdfName)") }
 	@GetMapping("/api/viewPDFStatistic")
 	fun getPDFStatistic(@RequestParam pdfName: String) =
-		StatisticsService().getPDFStatistic(pdfName)
+		StatisticsService().getPDFStatistic("$pdfFolder$pdfName")
 	@GetMapping("/api/viewRULE_SET")
 	@ResponseBody
 	fun viewRuleSet(): RuleSet {
