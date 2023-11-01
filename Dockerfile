@@ -10,5 +10,5 @@ RUN mvn -f /usr/src/app/pom.xml clean package
 
 FROM gcr.io/distroless/java
 COPY --from=build /usr/src/app/target/mundane-assignment-police-0.0.1-SNAPSHOT.jar /usr/app/mundane-assignment-police-0.0.1-SNAPSHOT.jar
-EXPOSE 3000
+EXPOSE 8080
 ENTRYPOINT ["java","-jar","/usr/app/mundane-assignment-police-0.0.1-SNAPSHOT.jar"]

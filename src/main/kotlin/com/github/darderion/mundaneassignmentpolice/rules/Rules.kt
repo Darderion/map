@@ -8,6 +8,8 @@ import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.SymbolRu
 import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.and
 import com.github.darderion.mundaneassignmentpolice.checker.rule.symbol.or
 import com.github.darderion.mundaneassignmentpolice.checker.rule.LineRule.LineRuleBuilder
+import com.github.darderion.mundaneassignmentpolice.checker.rule.sentence.SentenceRuleBuilder
+import com.github.darderion.mundaneassignmentpolice.checker.rule.sentence.splitIntoSentences
 import com.github.darderion.mundaneassignmentpolice.checker.rule.url.URLRuleBuilder
 import com.github.darderion.mundaneassignmentpolice.checker.rule.url.then
 import com.github.darderion.mundaneassignmentpolice.checker.rule.word.WordRule
@@ -15,11 +17,15 @@ import com.github.darderion.mundaneassignmentpolice.checker.rule.word.WordRuleBu
 import com.github.darderion.mundaneassignmentpolice.checker.rule.word.or
 import com.github.darderion.mundaneassignmentpolice.checker.rule.word.splitToWordsAndPunctuations
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFArea
+import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFDocument
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFRegion
+import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Line
 import com.github.darderion.mundaneassignmentpolice.utils.InvalidOperationException
 import com.github.darderion.mundaneassignmentpolice.utils.LowQualityConferencesUtil
 import com.github.darderion.mundaneassignmentpolice.utils.ResourcesUtil
 import com.github.darderion.mundaneassignmentpolice.utils.URLUtil
+import com.github.kittinunf.fuel.Fuel
+import com.github.kittinunf.fuel.core.extensions.jsonBody
 import java.util.*
 
 
@@ -30,9 +36,9 @@ private val EN = enLetters + enCapitalLetters
 private val rusLetters = "абвгдеёжзийклмнопрстуфхцчшщъыьэюя"
 private val rusCapitalLetters = rusLetters.uppercase(Locale.getDefault())
 private val RU = rusLetters + rusCapitalLetters
-
+const val conclusionWord = "Заключение"
 private val numbers = "0123456789"
-
+val microservice_url = "http://127.0.0.1:8084/predict"
 val RULE_LITLINK = SymbolRuleBuilder()
 	.symbol('?')
 	.ignoringAdjusting(*" ,$numbers".toCharArray())
@@ -198,14 +204,14 @@ val RULE_SECTION_NUMBERING_FROM_0 = LineRuleBuilder()
 	.setDescription("Нумерация секций не должна начинаться с нуля")
 		.getRule()
 
-val RULE_SINGLE_SUBSECTION = ListRuleBuilder()
+	val RULE_SINGLE_SUBSECTION = ListRuleBuilder()
 	.inArea(PDFRegion.NOWHERE.except(PDFArea.TABLE_OF_CONTENT))
 	//.called("Only 1 subsection in a section")
 	.called("Одна подсекция в секции")
 	.setDescription("В работе не должно быть одной подсекции в секции, необходимо перенести текст на уровень выше и переделать название")
-	.disallow {
-		if (it.nodes.count() == 1) it.nodes.first().getText() else listOf()
-	}.getRule()
+	.disallowInSingleList {
+			if (it.nodes.count() == 1) it.nodes.first().getText() else listOf()
+		}.getRule()
 
 val RULE_TABLE_OF_CONTENT_NUMBERS = LineRuleBuilder()
 	.inArea(PDFRegion.NOWHERE.except(PDFArea.TABLE_OF_CONTENT))
@@ -243,6 +249,36 @@ val sectionsThatMayPrecedeThis = mapOf<String, HashSet<String>>(
 	Section.BIBLIOGRAPHY.title to hashSetOf(Section.CONCLUSION.title)
 )
 
+val RULE_NO_TASKS = LineRuleBuilder()
+	.inArea(PDFRegion.NOWHERE.except(PDFArea.TABLE_OF_CONTENT))
+	.called("Задачи не выделены в содержании")
+	.disallow {
+		val tasks = it.filter { it.text.toString().contains("адач") }
+		if (tasks.isEmpty()) listOf(it.first()) else listOf()
+	}
+	.getRule()
+val RULE_UNSCIENTIFIC_SENTENCE = SentenceRuleBuilder()
+	.called("Ненаучный стиль")
+	.disallow { lines ->
+		val results = mutableListOf<Line>()
+		splitIntoSentences(lines).forEach { sentence ->
+			val body = "{ \"data\" : \"${sentence.joinToString(separator = " ")}\" }"
+
+			val (_, _, result) = Fuel.post(microservice_url)
+				.jsonBody(body)
+				.responseString()
+			result.fold(success = {
+				if ("unscientific" in it.toString()) {
+					results.addAll(lines)
+				}
+
+			}, failure = {
+				println(String(it.errorData))
+			})
+
+		}
+		results.toList()
+	}.getRule()
 val RULE_SECTIONS_ORDER = LineRuleBuilder()
 	.inArea(PDFRegion.NOWHERE.except(PDFArea.TABLE_OF_CONTENT))
 	.disallow { listOfLines ->
