@@ -27,7 +27,7 @@ class SymbolRuleBuilder {
 	private var neighborhoodSize: Int = 1
 	private var type: RuleViolationType = RuleViolationType.Error
 	private var name: String = "Rule name"
-	private var region: PDFRegion = EVERYWHERE
+	private var region: PDFRegion = EVERYWHERE.except(PDFArea.CODE)
 
 	infix fun symbol(symbol: Char) = this.also { this.symbol = symbol }
 
