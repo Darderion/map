@@ -159,6 +159,9 @@ class RulesTests : StringSpec({
 	}
 	"Symbol rule should detect incorrect space usage"{
 		RULE_SPACE_BEFORE_PUNCTUATION.forEach { it.process(PDFBox().getPDF(filePathSpaceBeforePunctuation)).count() shouldBeExactly 1 }}
+	"Symbol rule should detect double space usage"{
+		RULE_DOUBLE_SPACE.process(PDFBox().getPDF(filePathDoubleSpace)).count() shouldBeExactly 4
+	}
 	"RULE_OPENING_QUOTATION and RULE_CLOSING_QUOTATION should process multiple lines" {
 		RULE_OPENING_QUOTATION.process(PDFBox().getPDF(filePathMultilineCitation)).count() +
 				RULE_CLOSING_QUOTATION.process(PDFBox().getPDF(filePathMultilineCitation)).count() shouldBeExactly 0
@@ -231,5 +234,7 @@ class RulesTests : StringSpec({
 				"${TestsConfiguration.resourceFolder}checker/WordRuleDisallowedWords.pdf"
 		const val filePathIncorrectAbbreviation =
 				"${TestsConfiguration.resourceFolder}checker/WordRuleTestsIncorrectAbbreviation.pdf"
+		const val filePathDoubleSpace = 
+				"${TestsConfiguration.resourceFolder}checker/SymbolRuleTestsDoubleSpace.pdf"
 	}
 }
