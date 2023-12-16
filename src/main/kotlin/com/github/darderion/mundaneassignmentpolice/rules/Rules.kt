@@ -442,49 +442,101 @@ val smallNumbersRuleName = "Неправильное написание целы
 val smallNumbersRuleArea =
     PDFRegion.EVERYWHERE.except(PDFArea.PAGE_INDEX, PDFArea.TABLE_OF_CONTENT, PDFArea.BIBLIOGRAPHY)
 val allowedWordsOnLeft = arrayOf(
-    Regex("""[Рр]ис[a-я]*"""),
-    Regex("""[Тт]абл[a-я]*"""), Regex("""[Сс]х[a-я]*"""),
-    Regex("""[Dd]ef[a-z]*"""), Regex("""[Оо]пр[а-я]*"""),
-    Regex("""[Tt]h[a-z]*"""), Regex("""[Тт]еорема""")
+	Regex("""[Рр]ис[a-я]*"""),
+	Regex("""[Тт]абл[a-я]*"""), Regex("""[Сс]х[a-я]*"""),
+	Regex("""[Dd]ef[a-z]*"""), Regex("""[Оо]пр[а-я]*"""),
+	Regex("""[Tt]h[a-z]*"""), Regex("""[Тт]еорем[а-я]*"""), Regex("""№"""),
+	Regex("""[Дд]иаграм[а-я]*"""), Regex("""[Пп]ункт[а-я]*"""),Regex("""[Сс]тро[а-я]*"""),
+	Regex("""[Ll]ist[a-z]*"""), Regex("""[Лл]истинг[а-я]*"""),
+	Regex("""[Пп]риложе[а-я]*"""), Regex("""[Зз]начени[а-я]*"""),
+	Regex("""[Гг]лав[а-я]*"""),Regex("""[Шш]аг[а-я]*"""),Regex("""[Зз]апро[а-я]*"""),
+	Regex("""[Пп]риме[а-я]*"""),Regex("""[Ии]ллюстрац[а-я]*"""),
+	Regex("""[Рр]азд[а-я]*"""), Regex("""[Нн]омер[а-я]*"""), Regex("""[Лл]емм[а-я]*"""),Regex(""" """)
+	)
+	
+val hyphenSymbols = arrayOf(Regex("""\n"""),Regex("""\s"""),Regex("""-"""))
+
+val hyphenatedWordsOnLeft = arrayOf(
+	arrayOf(Regex("""[Рр]и[а-я]*"""), *hyphenSymbols, Regex("""н[а-я]*""")),
+	arrayOf(Regex("""[Тт]аб[а-я]*"""), *hyphenSymbols,Regex("""ц[а-я]*""")),
+	arrayOf(Regex("""[Сс]хе"""), *hyphenSymbols,Regex("""м[а-я]*""")),
+	arrayOf(Regex("""[Оо]п[а-я]*"""), *hyphenSymbols, Regex("""ни[а-я]*""")),
+	arrayOf(Regex("""[Тт]ео[а-я]*"""), *hyphenSymbols, Regex("""м[а-я]*""")),
+	arrayOf(Regex("""[Дд]и[а-я]*"""), *hyphenSymbols, Regex("""м[а-я]*""")),
+	arrayOf(Regex("""[Пп]унк"""), *hyphenSymbols, Regex("""т[а-я]*""")),
+	arrayOf(Regex("""[Сс]тро"""), *hyphenSymbols, Regex("""к[а-я]*""")),
+	arrayOf(Regex("""[Лл]ис"""), *hyphenSymbols, Regex("""г[а-я]*""")),
+	arrayOf(Regex("""[Пп]ри[а-я]*"""), *hyphenSymbols, Regex("""ни[а-я]*""")),
+	arrayOf(Regex("""[Зз]на[а-я]*"""), *hyphenSymbols, Regex("""ни[а-я]*""")),
+	arrayOf(Regex("""[Гг]ла"""), *hyphenSymbols, Regex("""в[а-я]*""")),
+	arrayOf(Regex("""[Шш]а"""), *hyphenSymbols, Regex("""г[а-я]*""")),
+	arrayOf(Regex("""[Зз]а[а-я]*"""), *hyphenSymbols, Regex("""c[а-я]*""")),
+	arrayOf(Regex("""[Ии]л[а-я]*"""), *hyphenSymbols, Regex("""ц[а-я]*""")),
+	arrayOf(Regex("""[Рр]аз[а-я]*"""), *hyphenSymbols, Regex("""л[а-я]*""")),
+	arrayOf(Regex("""[Нн]о[а-я]*"""), *hyphenSymbols, Regex("""р[а-я]*""")),
+	arrayOf(Regex("""[Лл]ем"""), *hyphenSymbols, Regex("""м[а-я]*"""))
 )
+
 val allowedWordsOnRight = arrayOf(
-    Regex("""[Gg][Bb]"""), Regex("""[Гг][Бб]"""),
-    Regex("""[Mm][Bb]"""), Regex("""[Мм][Бб]"""),
-    Regex("""[Gg][Hh][Zz]"""), Regex("""[Гг][Цц]"""),
-    Regex("""→""")
+	Regex("""[Gg][Bb]"""), Regex("""[Гг][Бб]"""),
+	Regex("""[Mm][Bb]"""), Regex("""[Мм][Бб]"""),
+	Regex("""[Gg][Hh][Zz]"""), Regex("""[Гг][Гг][Цц]"""),
+	Regex("""→"""), Regex("""[Кк]илобайт[а-я]*"""), Regex("""[Кк][Бб]"""),
+	Regex("""[Kk][Bb]"""),Regex("""[Бб]айт[а-я]*"""), Regex("""[Kk]byte[s]"""),
+	Regex("""[Bb]ytes"""), Regex("""[Бб]ит""")
 )
 
-val smallNumbersRuleBuilder1 = WordRuleBuilder()        //for nearest words
-    .called(smallNumbersRuleName)
-    .inArea(smallNumbersRuleArea)
-    .ignoringAdjusting(Regex("""\s"""), Regex("""\."""))
-    .ignoringIfIndex(0)
+val smallNumbersRuleBuilder1Left = WordRuleBuilder()        //for nearest words
+	.called(smallNumbersRuleName)
+	.inArea(smallNumbersRuleArea)
+	.fromLeft()
+	.ignoringAdjusting(Regex("""\."""))
+	.shouldHaveNeighbor(*allowedWordsOnLeft)
+	.shouldHaveNumberOfNeighbors(2)
 
+val smallNumbersRuleBuilder1Right = WordRuleBuilder()       //as previous, but for right
+	.called(smallNumbersRuleName)
+	.inArea(smallNumbersRuleArea)
+	.fromRight()
+	.ignoringAdjusting(Regex("""\s"""), Regex("""\."""))
+	.shouldHaveNeighbor(*allowedWordsOnRight)//, Regex("""\."""), Regex(""","""), Regex("""[0-9]+"""))
+	.ignoringIfIndex(0)
+	
 val smallNumbersRuleBuilder2 = WordRuleBuilder()        //for decimal fractions and version numbers
-    .called(smallNumbersRuleName)
-    .inArea(smallNumbersRuleArea)
-    .shouldHaveNeighbor(
-        Regex("""\."""), Regex(""","""),
-        Regex("""[0-9]+""")
-    )
-    .shouldHaveNumberOfNeighbors(2)
+	.called(smallNumbersRuleName)
+	.inArea(smallNumbersRuleArea)
+	.shouldHaveNeighbor(
+		Regex("""\."""), Regex(""","""),
+		Regex("""[0-9]+""")
+	)
+	.shouldHaveNumberOfNeighbors(2)
 
-val smallNumbersRuleBuilder3 = WordRuleBuilder()        //for links
-    .called(smallNumbersRuleName)
-    .inArea(smallNumbersRuleArea)
-    .fromLeft()
-    .ignoringWords(true)
-    .ignoringAdjusting(Regex(""","""), Regex("""\s"""))
-    .shouldHaveNeighbor(Regex("""\["""))
+val smallNumbersRuleBuilder3 = WordRuleBuilder()        //for links and operators
+	.called(smallNumbersRuleName)
+	.inArea(smallNumbersRuleArea)
+	.ignoringAdjusting(Regex(""","""), Regex("""\s"""))
+	.shouldHaveNeighbor(Regex("""\[|\]"""), Regex("""\/"""), Regex("""<|≤|>|≥|=|\+"""),
+						Regex("""\""""))
 
+val smallNumbersRuleBuilderHyphenated = WordRuleBuilder() //for hyphenated words
+	.called(smallNumbersRuleName)
+	.inArea(smallNumbersRuleArea)
+	.fromLeft()
+	.inNeighborhood(3)
+	.shouldHaveNumberOfNeighbors(5)                                  
+
+val smallNumbersRuleBuilder4 = hyphenatedWordsOnLeft.map { hyphenatedWord ->
+		smallNumbersRuleBuilderHyphenated.shouldHaveNeighbor(*hyphenatedWord)
+	}
+	
 val RULES_SMALL_NUMBERS = List<WordRule>(9) { index ->
-    smallNumbersRuleBuilder1.word((index + 1).toString())
-        .fromLeft().shouldHaveNeighbor(*allowedWordsOnLeft).getRule() or
-            smallNumbersRuleBuilder1.word((index + 1).toString())
-                .fromRight().shouldHaveNeighbor(*allowedWordsOnRight).getRule() or
-            smallNumbersRuleBuilder2.word((index + 1).toString()).fromLeft().getRule() or
-            smallNumbersRuleBuilder2.fromRight().getRule() or
-            smallNumbersRuleBuilder3.word((index + 1).toString()).getRule()
+			smallNumbersRuleBuilder1Left.word((index + 1).toString()).getRule() or
+			smallNumbersRuleBuilder1Right.word((index + 1).toString()).getRule() or
+			smallNumbersRuleBuilder2.word((index + 1).toString()).fromLeft().getRule() or
+			smallNumbersRuleBuilder2.fromRight().getRule() or
+			smallNumbersRuleBuilder3.word((index + 1).toString()).fromLeft().getRule() or
+			smallNumbersRuleBuilder3.fromRight().getRule() or
+			combinedWordRules(smallNumbersRuleBuilder4.map { it.word((index+1).toString()).getRule() })
 }
 
 private const val sectionSizeRuleName = "Слишком длинная секция"
