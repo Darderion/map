@@ -172,6 +172,12 @@ class RulesTests : StringSpec({
 	"""RULE_INCORRECT_ABBREVIATION should detect incorrect abbreviation \"вуз\""""{
 		RULE_INCORRECT_ABBREVIATION.process(PDFBox().getPDF(filePathIncorrectAbbreviation)).count() shouldBeExactly 9
 	}
+	"""RULE_NUMBER_OF_BRACKETS should detect large number of brackets"""{
+		RULE_NUMBER_OF_BRACKETS.process(PDFBox().getPDF(filePathNumberOfBrackets)).count() shouldBeExactly 2
+	}
+	"""RULE_TEXT_IN_BRACKETS should detect large amount of text inside brackets"""{
+		RULE_TEXT_IN_BRACKETS.process(PDFBox().getPDF(filePathAmountOfTextInBrackets)).count() shouldBeExactly 4
+	}
 }) {
 	companion object {
 		const val filePathTwoIdenticalWords = "${TestsConfiguration.resourceFolder}checker/WordRuleTestsTwoIdenticalWords.pdf"
@@ -231,5 +237,9 @@ class RulesTests : StringSpec({
 				"${TestsConfiguration.resourceFolder}checker/WordRuleDisallowedWords.pdf"
 		const val filePathIncorrectAbbreviation =
 				"${TestsConfiguration.resourceFolder}checker/WordRuleTestsIncorrectAbbreviation.pdf"
+		const val filePathNumberOfBrackets = 
+				"${TestsConfiguration.resourceFolder}checker/SentenceRuleTestNumberOfBrackets.pdf"
+		const val filePathAmountOfTextInBrackets = 
+				"${TestsConfiguration.resourceFolder}checker/SentenceRuleTestTextInsideBrackets.pdf"
 	}
 }
