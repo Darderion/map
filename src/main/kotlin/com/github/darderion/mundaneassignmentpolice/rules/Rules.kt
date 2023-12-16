@@ -590,8 +590,9 @@ val RULE_URLS_UNIFORMITY = URLRuleBuilder()
 	.inArea(PDFRegion.NOWHERE.except(PDFArea.FOOTNOTE, PDFArea.BIBLIOGRAPHY))
 	.disallow { urls ->
 		var filteredUrls = urls.filter { url ->
-			!url.text.startsWith("https://www")
-		}
+			!url.text.startsWith("https://www") 
+		}.filter {url -> !url.text.startsWith("http://www") }								
+
 		if (urls.size == filteredUrls.size) {
 			filteredUrls = filteredUrls.filter { url ->
 				!url.text.startsWith("www")
