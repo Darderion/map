@@ -50,6 +50,6 @@ open class RegexRule(
 			})
 		}
 
-		return matches.toSet().toList()
+		return matches.sortedBy{it.first}.toSet().toList()
 	}
 }
