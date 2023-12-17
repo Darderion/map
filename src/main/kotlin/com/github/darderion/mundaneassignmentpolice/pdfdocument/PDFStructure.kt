@@ -4,7 +4,7 @@ import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFArea.*
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.list.PDFList
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Line
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Section
-import com.github.darderion.mundaneassignmentpolice.utils.CodeDetector
+import com.github.darderion.mundaneassignmentpolice.utils.codeDetector.CodeDetector
 import com.github.darderion.mundaneassignmentpolice.utils.floatEquals
 import java.util.*
 
@@ -14,6 +14,7 @@ class PDFStructure(text: List<Line>) {
     val tableOfContents: PDFList<String>
 
     private fun String.clearSymbols() = this.replace("-", "").replace(" ", "").replace(".", "")
+
     init {
         // Areas
         var area = TITLE_PAGE
@@ -57,7 +58,26 @@ class PDFStructure(text: List<Line>) {
                     } else {
                         if (it.content == BIBLIOGRAPHY_TITLE) {
                             BIBLIOGRAPHY
+                        } else if (it.content.isNotBlank() && CodeDetector.isLikelyCode(it.content)) {
+                            CODE
                         } else area
+                    }
+                }
+
+                CODE -> {
+                    if (CodeDetector.isLikelyCode(it.content)) {
+                        area
+                    } else {
+                        if (isFootnote(it)) {
+                            FOOTNOTE
+                        }
+                        else if (isPageIndex(text,it,area)) {
+                            PAGE_INDEX
+                        }
+                        else if (it.content == BIBLIOGRAPHY_TITLE) {
+                            BIBLIOGRAPHY
+                        }
+                        else SECTION
                     }
                 }
 
@@ -76,14 +96,14 @@ class PDFStructure(text: List<Line>) {
                         SECTION
                     } else area
                 }
+
                 else -> area
             }
             it.area = if (isPageIndex(text, it, area)) {
                 PAGE_INDEX
-            } else if (CodeDetector.isLikelyCode(it.content)) CODE
-            else {
-                area
             }
+            else area
+
         }
 
         val sectionsWithoutIndexes = listOf<String>(
@@ -118,8 +138,8 @@ class PDFStructure(text: List<Line>) {
         val sectionsTitlesWithIndexes = sectionsTitles.map { if (it.contains('.')) it else ". $it" }
 
         val sectionTextLines = text.filter { it.area == SECTION }.map {
-                it.documentIndex to it.content.clearSymbols()
-            }.dropLast(1)
+            it.documentIndex to it.content.clearSymbols()
+        }.dropLast(1)
 
         val sectionsIndexed = mutableListOf<Section>()
 

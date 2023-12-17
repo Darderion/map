@@ -31,6 +31,9 @@ class PDFDocumentTests: StringSpec({
 	"PDFDocument should contain BIBLIOGRAPHY's lines" {
 		PDFDocument(text = lines).text.any { it.area == BIBLIOGRAPHY } shouldBe true
 	}
+//	"PDFDocument should contain CODE's lines"{
+//		PDFDocument(text = lines).text.any { it.area == CODE } shouldBe true
+//	}
 	"PDFDocument should contain sections with section's title, section's index and section's content index" {
 		val document = PDFDocument(text = lines)
 

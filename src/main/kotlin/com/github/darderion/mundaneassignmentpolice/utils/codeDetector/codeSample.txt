@@ -1,0 +1,1944 @@
+! In program name, - is not allowed
+!works till 100938872634753805466563377840038871040
+! Commenting out of the reasonable bounds for calculation
+program prime_check
+  character(len=10) :: argument
+  Character(26) :: low = 'abcdefghijklmnopqrstuvwxyz'
+  Character(26) :: cap = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+  integer :: check_capital_letters, check_small_letters, i, decimal_check, even_check, remainder, flag_prime
+  integer(kind = 16):: number
+  ! Anything not equal to single argument, Print Error
+  IF(COMMAND_ARGUMENT_COUNT().NE.1)THEN
+    write(*,'(g0.8)')"Usage: please input a non-negative integer"
+    STOP
+  ENDIF
+
+  CALL GET_COMMAND_ARGUMENT(1,argument)
+  if (argument == "") then
+    write(*,'(g0.8)')"Usage: please input a non-negative integer"
+    STOP
+  endif
+  ! Scan for letters
+  check_capital_letters = scan(argument, cap)
+  check_small_letters = scan(argument, low)
+  decimal_check = scan(argument, '.')
+  ! If capital letters exist, print error
+  if (check_capital_letters > 0) then
+    write(*,'(g0.8)')"Usage: please input a non-negative integer"
+    STOP
+  endif
+  ! If small letters exist, print error
+  if (check_small_letters > 0) then
+    write(*,'(g0.8)')"Usage: please input a non-negative integer"
+    STOP
+  endif
+
+  ! Decimal Check
+  if (decimal_check > 0) then
+    write(*,'(g0.8)')"Usage: please input a non-negative integer"
+    STOP
+  endif
+  ! read the cmd line arg into number
+  read (argument, '(I10)') number
+
+  ! negative number
+  if (number < 0) then
+    write(*,'(g0.8)')"Usage: please input a non-negative integer"
+    STOP
+  endif
+
+  ! ! Maximum Limit
+  ! if (number > 100938872634753805466563377840038871040) then
+  !   write(*,'(g0.8)')"Input is out of the reasonable bounds for calculation"
+  !   STOP
+  ! endif
+
+  ! 2 is Prime
+  if (number == 2) then
+    write(*,'(g0.8)')"Prime"
+    STOP
+  endif
+  ! 0, 1 and even numbers are Even
+  even_check = modulo(number, 2)
+  if ((number == 0) .or. (number == 1) .or. ( even_check == 0 )) then
+    write(*,'(g0.8)')"Composite"
+    STOP
+  endif
+  ! Check Prime
+  max = number / 2
+  flag_prime = 1
+  do i = 3, max
+    remainder = modulo(number, i)
+    if (remainder == 0) then
+      flag_prime = 0
+      exit
+    end if
+  end do
+
+  if(flag_prime == 1) then
+    write(*,'(g0.8)') "Prime"
+  else
+    write(*,'(g0.8)') "Composite"
+  end if
+end program
+
+
+PROC usage = VOID: printf(($gl$, "Usage: please provide a string"));
+
+PROC duplicate character counter = (STRING s) REF []INT:
+(
+    # Initialize character counter #
+    HEAP [0..255]INT char counter;
+    FOR k FROM LWB char counter TO UPB char counter
+    DO
+        char counter[k] := 0
+    OD;
+
+    # Count number of occurances of each character #
+    FOR k TO UPB s
+    DO
+        char counter[ABS s[k]] +:= 1
+    OD;
+
+    char counter
+);
+
+PROC show duplicate character counts = (STRING s, REF []INT char counter) VOID:
+(
+    BOOL has dupes := FALSE;
+    INT code;
+    FOR k TO UPB s
+    DO
+        code := ABS s[k];
+        IF char counter[code] > 1
+        THEN
+            printf(($g": "gl$, s[k], whole(char counter[code], 0)));
+            char counter[code] := 0;
+            has dupes := TRUE
+        FI
+    OD;
+
+    IF NOT has dupes
+    THEN
+        printf(($gl$, "No duplicate characters"))
+    FI
+);
+
+# Get 1st command-line argument. Exit if empty #
+STRING s := argv(4);
+IF UPB s = 0
+THEN
+    usage;
+    stop
+FI;
+
+# Count duplicate characters #
+REF []INT char counter := duplicate character counter(s);
+
+# Show all duplicate character counts in order in which they occurred in string (if any) #
+show duplicate character counts(s, char counter)
+
+
+#!/bin/bash
+
+# based on https://stackoverflow.com/questions/7442417/how-to-sort-an-array-in-bash
+
+# quicksorts positional arguments
+# return is in array qsort_ret
+# Note: iterative, NOT recursive! :)
+# First argument is a function name that takes two arguments and compares them
+qsort_iter() {
+   (($#<=1)) && return 0
+   local compare_fun=$1
+   shift
+   local stack=( 0 $(($#-1)) ) beg end i pivot smaller larger
+   qsort_ret=("$@")
+   while ((${#stack[@]})); do
+      beg=${stack[0]}
+      end=${stack[1]}
+      stack=( "${stack[@]:2}" )
+      smaller=() larger=()
+      pivot=${qsort_ret[beg]}
+      for ((i=beg+1;i<=end;++i)); do
+         if "$compare_fun" "${qsort_ret[i]}" "$pivot"; then
+            smaller+=( "${qsort_ret[i]}" )
+         else
+            larger+=( "${qsort_ret[i]}" )
+         fi
+      done
+      qsort_ret=( "${qsort_ret[@]:0:beg}" "${smaller[@]}" "$pivot" "${larger[@]}" "${qsort_ret[@]:end+1}" )
+      if ((${#smaller[@]}>=2)); then stack+=( "$beg" "$((beg+${#smaller[@]}-1))" ); fi
+      if ((${#larger[@]}>=2)); then stack+=( "$((end-${#larger[@]}+1))" "$end" ); fi
+   done
+}
+
+# compare function
+compare_str() { [[ $1 < $2 ]]; }
+
+ERROR="Usage: please provide a list of at least two integers to sort in the format \"1, 2, 3, 4, 5\""
+
+#Validation to fit criteria
+if [ "$#" != "1" ]; then echo $ERROR; exit 1; fi; #wrong input
+if [[ ! "$1" =~ "," ]]; then echo $ERROR; exit 1; fi; #wrong format
+
+array=($(echo $@ | tr ", " " "))
+
+if [ "${array[0]}" == "" ]; then echo $ERROR; exit 1; fi; #empty input
+if [ "${#array[@]}" == "1" ]; then echo $ERROR; exit 1; fi; #not a list
+
+qsort_iter compare_str "${array[@]}"
+arrayString=${qsort_ret[@]}
+echo "${arrayString// /, }"
+
+exit 0
+
+
+#include <iostream>
+#include <algorithm>
+#include <vector>
+#include <string>
+using namespace std;
+
+vector<string> splitStrings(string str)
+{
+	string word = "";
+	char dl = ',';
+	int num = 0;
+
+	str = str + dl;
+	int l = str.size();
+
+	vector<string> substr_list;
+
+	for (int i = 0; i < l; i++)
+	{
+		if (str[i] != dl)
+			word = word + str[i];
+		else
+		{
+			if ((int)word.size() != 0)
+				substr_list.push_back(word);
+
+			word = "";
+		}
+	}
+	return substr_list;
+}
+
+void longest_common_subsequence(vector<string> arr1, vector<string> arr2)
+{
+	int m = arr1.size();
+	int n = arr2.size();
+	int table[m + 1][n + 1];
+
+	for (int row = 0; row <= m; row++)
+	{
+		for (int col = 0; col <= n; col++)
+		{
+
+			if (row == 0 || col == 0)
+			{
+				table[row][col] = 0;
+			}
+			else if (arr1[row - 1] == arr2[col - 1])
+			{
+				table[row][col] = 1 + table[row - 1][col - 1];
+			}
+			else
+			{
+				table[row][col] = max(table[row][col - 1], table[row - 1][col]);
+			}
+		}
+	}
+
+	vector<string> array_of_lcs;
+
+	int i = m, j = n;
+	while (i > 0 && j > 0)
+	{
+		if (arr1.at(i - 1) == arr2.at(j - 1))
+		{
+			array_of_lcs.insert(array_of_lcs.begin(), arr2[j - 1]);
+			i--;
+			j--;
+		}
+		else
+		{
+			if (table[i - 1][j] > table[i][j - 1])
+			{
+				i--;
+			}
+			else
+			{
+				j--;
+			}
+		}
+	}
+
+	for (int i = 0; i < array_of_lcs.size() - 1; i++)
+	{
+		cout << array_of_lcs[i] << ",";
+	}
+	cout << array_of_lcs[array_of_lcs.size() - 1] << endl;
+}
+
+int main(int argc, char *argv[])
+{
+	if (!(argc > 2 && std::string(argv[1]) != "" && std::string(argv[2]) != ""))
+	{
+		cout << "Usage: please provide two lists in the format \"1, 2, 3, 4, 5\"" << endl;
+		return 1;
+	}
+
+	string input1 = argv[1];
+	vector<string> arr1 = splitStrings(input1);
+
+	string input2 = argv[2];
+	vector<string> arr2 = splitStrings(input2);
+
+	longest_common_subsequence(arr1, arr2);
+	return 0;
+}
+
+
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace SamplePrograms
+{
+    public class LongestCommonSubsequence
+    {
+        private static IEnumerable<string> LCS(IEnumerable<string> list1, IEnumerable<string> list2)
+        {
+            if (list1.Count() == 0 || list2.Count() == 0)
+                return new List<string>();
+
+            if (list1.First().Equals(list2.First()))
+                return LCS(list1.Skip(1), list2.Skip(1)).Concat(new List<string>() { list1.First() });
+
+            return Longest(LCS(list1, list2.Skip(1)), LCS(list1.Skip(1), list2));
+        }
+
+        private static IEnumerable<string> Longest(params IEnumerable<string>[] lists) =>
+            lists.OrderByDescending(l => l.Count()).First();
+
+        public static void Main(string[] args)
+        {
+            try
+            {
+                var list1 = args[0].Split(',').Select(i => i.Trim());
+                var list2 = args[1].Split(',').Select(i => i.Trim());
+                var lcs = LCS(list1, list2).Reverse();
+                Console.WriteLine(string.Join(", ", lcs));
+            }
+            catch
+            {
+                Console.WriteLine("Usage: please provide two lists in the format \"1, 2, 3, 4, 5\"");
+                Environment.Exit(1);
+            }
+        }
+    }
+}
+
+
+
+#include  <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+long long arr[100000],arr1[100000];
+int lc[1000][1000];
+long long ans[100000];
+int indic;
+
+long long get_val(int tmp[],int len){
+    long long value=0,mult=1;
+    for(int i=len-1;i>-1;--i){
+        if(tmp[i]==' '-'0'){
+            printf("Usage: please provide two lists in the format \"1, 2, 3, 4, 5\"");
+            exit(0);
+        }
+        value+=tmp[i]*mult;
+        mult*=10;
+    }
+    return value;
+}
+
+int max(int a,int b){
+    return a>b?a:b;
+}
+
+int lcs(int l,int r){
+    if(l<0||r<0)return 0;
+    if(lc[l][r]!=-1)return lc[l][r];
+    if(arr[l]==arr1[r])lc[l][r]=lcs(l-1,r-1)+1;
+    lc[l][r]=max(lc[l][r],max(lcs(l,r-1),lcs(l-1,r)));
+    return lc[l][r];
+}
+
+void find(int l,int r){
+    if(l<0||r<0)return ;
+    if(arr[l]==arr1[r]){
+        ans[indic++]=arr[l];
+        find(l-1,r-1);
+    }
+    else if(lc[l-1][r]==lc[l][r])find(l-1,r);
+    else find(l,r-1);
+}
+
+int main(int argc,char **argv)
+{
+    if(argv[1]==NULL||strlen(argv[1])==0||argv[2]==NULL||strlen(argv[2])==0){
+        printf("Usage: please provide two lists in the format \"1, 2, 3, 4, 5\"");
+        return 0;
+    }
+
+    int len = strlen(argv[1]);
+    int tmp[20];
+    int ind=0;
+    int pos=0;
+
+    for(int i=0;i<len;++i){
+        if(argv[1][i]==','){
+            long long val = get_val(tmp,ind);
+            ind=0;
+            i++;
+            arr[pos++]=val;
+            continue;
+        }
+        tmp[ind++]=argv[1][i]-'0';
+    }
+    arr[pos++]=get_val(tmp,ind);
+    int len1=pos;
+    ind=0,pos=0;
+    len=strlen(argv[2]);
+    for(int i=0;i<len;++i){
+        if(argv[2][i]==','){
+            long long val = get_val(tmp,ind);
+            ind=0;
+            i++;
+            arr1[pos++]=val;
+            continue;
+        }
+        tmp[ind++]=argv[2][i]-'0';
+    }
+    arr1[pos++]=get_val(tmp,ind);
+    memset(lc,-1,sizeof(lc));
+    lcs(len1-1,pos-1);
+    find(len1-1,pos-1);
+    for(int i=indic-1;i>-1;--i){
+        printf("%lld",ans[i]);
+        if(i!=0)printf(", ");
+    }
+}
+
+
+
+        IDENTIFICATION DIVISION.
+        PROGRAM-ID. PRIME-NUMBER.
+        DATA DIVISION.
+        WORKING-STORAGE SECTION.
+          01 CMDARGS     PIC X(38).
+          01 DECINUM     PIC S9999v99.
+          01 NUM         PIC S9(7).
+          01 SQRT        PIC 9(7).
+          01 CNT         PIC 9(7) VALUE 3.
+          01 PRIME       PIC 9(1) VALUE 0.
+        PROCEDURE DIVISION.
+           ACCEPT CMDARGS FROM COMMAND-LINE.
+
+           IF CMDARGS IS ALPHABETIC THEN
+              PERFORM ERROR-PARA.
+
+      * Convert CMDARGS to it's cumeric value
+           COMPUTE DECINUM = FUNCTION NUMVAL(CMDARGS).
+
+           IF DECINUM < 0 THEN
+              PERFORM ERROR-PARA.
+
+      * Move the Decimal number to Non decimal number
+           MOVE DECINUM TO NUM
+
+      * If both are equal, then it was an integer
+           IF NUM IS EQUAL TO DECINUM THEN
+              IF FUNCTION MOD (NUM, 2) = 0 AND NUM IS NOT EQUAL TO 2
+                 PERFORM DISPLAY-COMPOSITE
+              ELSE IF NUM IS EQUAL TO 1
+                 PERFORM DISPLAY-COMPOSITE
+              ELSE
+                 COMPUTE SQRT = NUM ** 0.5
+                 PERFORM ISPRIME UNTIL CNT > SQRT
+                 DISPLAY "Prime"
+                 STOP RUN
+           ELSE
+              PERFORM ERROR-PARA.
+
+
+          ISPRIME.
+            IF FUNCTION MOD (NUM, CNT) = 0 THEN
+               PERFORM DISPLAY-COMPOSITE
+            ELSE
+               COMPUTE CNT = CNT + 1
+            END-IF.
+
+          DISPLAY-COMPOSITE.
+            DISPLAY "Composite"
+            STOP RUN.
+
+          ERROR-PARA.
+           DISPLAY "Usage: please input a non-negative integer".
+           STOP RUN.
+
+
+module Main where
+
+import System.Environment
+import System.Exit (exitWith, ExitCode(ExitFailure))
+import Data.List (intercalate)
+
+-- Recursively find longest common subsequence
+lcs :: Eq a => [a] -> [a] -> [a]
+lcs [] bs = []
+lcs as [] = []
+lcs (a:as) (b:bs)
+  | a == b    = (lcs as bs) ++ [a]
+  | otherwise = longest (lcs (a:as) bs) (lcs as (b:bs))
+
+
+-- Returns the longer of two lists
+longest :: Foldable t => t a -> t a -> t a
+longest l1 l2
+  | length l1 > length l2 = l1
+  | otherwise             = l2
+
+
+-- Converts string in format "1, 2, 3" to a list of integers
+stringToList :: String -> [Int]
+stringToList str = read $ "[" ++ str ++ "]" :: [Int]
+
+
+listToString :: [Int] -> String
+listToString = intercalate ", " . map show
+
+
+main :: IO ()
+main = do
+  args <- getArgs
+  let l1 = stringToList $ head args :: [Int]
+  let l2 = stringToList $ head $ tail args :: [Int]
+  if length args /= 2 then do
+    putStrLn "Usage: please provide two lists in the format \"1, 2, 3, 4, 5\""
+    exitWith $ ExitFailure 1
+  else
+    putStrLn $ listToString $ reverse $ lcs l1 l2
+
+
+
+import java.util.*;
+
+public class LongestCommonSubsequence {
+
+    static ArrayList<String> split_strings(String str) {
+        String word = "";
+        char dl = ',';
+
+        str = str + dl;
+
+        ArrayList<String> substr_list = new ArrayList<>();
+        for (int i = 0; i < str.length(); i++) {
+
+            if (str.charAt(i) != dl)
+                word = word + str.charAt(i);
+            else {
+                if ((int) word.length() != 0)
+                    substr_list.add(word);
+                word = "";
+            }
+        }
+
+        return substr_list;
+    }
+
+    static void longest_common_subsequence(ArrayList<String> arr1, ArrayList<String> arr2) {
+
+        int[][] array = new int[arr1.size() + 1][arr2.size() + 1];
+
+        for (int i = 0; i < array.length; i++) {
+            for (int j = 0; j < array[0].length; j++) {
+
+                if (i == 0 || j == 0) {
+                    array[i][j] = 0;
+                } else if (arr1.get(i - 1).equals(arr2.get(j - 1))) {
+                    array[i][j] = 1 + array[i - 1][j - 1];
+                } else {
+                    array[i][j] = Math.max(array[i - 1][j], array[i][j - 1]);
+                }
+            }
+        }
+
+        ArrayList<String> lcs = new ArrayList<>();
+        int x = array.length - 1;
+        int y = array[0].length - 1;
+
+        while (x > 0 && y > 0) {
+
+            if (arr1.get(x - 1).equals(arr2.get(y - 1))) {
+                lcs.add(0, arr1.get(x - 1));
+                x--;
+                y--;
+            } else {
+                if (array[x - 1][y] > array[x][y - 1])
+                    x--;
+                else
+                    y--;
+            }
+        }
+
+        for (int element = 0; element < lcs.size() - 1; element++) {
+            System.out.print(lcs.get(element) + ",");
+        }
+        System.out.println(lcs.get(lcs.size() - 1));
+    }
+
+    public static void main(String args[]) {
+
+        if (args.length < 2 || args[0] == "" || args[1] == "") {
+            System.out.println("Usage: please provide two lists in the format \"1, 2, 3, 4, 5\"");
+            return;
+        }
+
+        ArrayList<String> arr1 = split_strings(args[0]);
+        ArrayList<String> arr2 = split_strings(args[1]);
+
+        longest_common_subsequence(arr1, arr2);
+    }
+}
+
+
+
+fun main(args: Array<String>)
+{
+    var arr: IntArray
+    try
+    {
+        arr = args[0].split(", ").map{ it.toInt() }.toIntArray()
+        if (arr.size < 2) {
+            throw Exception()
+        }
+    }
+    catch(e: Exception)
+    {
+        println("Usage: please provide a list of at least two integers to sort in the format \"1, 2, 3, 4, 5\"")
+        return
+    }
+
+    var ans:IntArray = quickSort(arr)
+    for(i in 0 until ans.count())
+    {
+        if (i==ans.count() - 1)
+        {
+            println("${ans[i]}")
+            return
+        }
+        print("${ans[i]}, ")
+    }
+}
+
+fun quickSort(arr: IntArray):IntArray
+{
+    if (arr.count() == 1)
+    {
+        return(arr.sliceArray(0..0))
+    }
+    var pivot:Int = (arr.count() - 1) / 2
+    arr[pivot] = arr[arr.count() - 1].also {arr[arr.count() - 1] =  arr[pivot]}
+    pivot = arr.count()-1
+
+    var ans = intArrayOf()
+    var left = intArrayOf()
+    for(i in 0 until arr.count())
+    {
+        if(arr[i] > arr[pivot] || i == pivot)
+        {
+            for(j in arr.count() - 2 downTo 0)
+            {
+                if(i>j || j == 0)
+                {
+                    arr[pivot] = arr[i].also {arr[i] =  arr[pivot]}
+                    pivot = i
+
+                    if(pivot!=0){
+                        left = arr.sliceArray(0..pivot-1)
+                        ans = quickSort(arr.sliceArray(0..pivot - 1))
+                        ans = ans + arr.sliceArray(pivot..pivot)
+                    }
+                    else
+                    {
+                        ans = arr.sliceArray(pivot..pivot)
+                    }
+                    if(pivot!=arr.count()-1){
+                        ans = ans + quickSort(arr.sliceArray(pivot + 1..arr.count() - 1))
+                    }
+
+                    return (ans)
+                }
+                if(arr[j]<arr[pivot])
+                {
+                    arr[i] = arr[j].also {arr[j] = arr[i]}
+                    break
+                }
+            }
+        }
+    }
+    return (intArrayOf())
+}
+
+
+
+# Requirement https://sample-programs.therenegadecoder.com/projects/prime-number/
+# Issue  #1834
+# Accept a number on command line and print if it is Prime or Composite
+# Prime Numbers will have only 1 Divisor, itself..  Use that to determine Composite.
+# Note: 0 and 1 are Composite numbers, 2 is a Prime Number
+use warnings;
+
+my ($prime) = @ARGV;
+
+$num_args = $#ARGV + 1;
+
+# Empty input
+if ( $num_args < 1 ) {
+    print("Usage: please input a non-negative integer");
+    exit(0);
+}
+
+# Only Integer
+if ( $prime =~ /^-?\d+$/ ) {
+
+    # Negative Number
+    if ( $prime < 0 ) {
+        print("Usage: please input a non-negative integer");
+        exit(0);
+    }
+
+    if ( $prime == 2 ) {
+        print("Prime");
+        exit(0);
+    }
+
+    # If 1 or the Number is Even
+    elsif ( ( $prime == 1 ) || ( $prime == 0 ) || ( $prime % 2 == 0 ) ) {
+        print("Composite");
+        exit(0);
+    }
+
+    else {
+        #   Check how many divisors for the given number
+        $i               = 0;
+        $num_of_divisors = 0;
+
+        #   Number is guaranteed to be Even
+        for ( $i = $prime ; $i > 1 ; $i = $i - 2 ) {
+            if ( $prime % $i == 0 ) {
+                $num_of_divisors += 1;
+            }
+        }
+
+        # If more than 2 divisors
+        if ( $num_of_divisors > 2 ) {
+            print("Composite");
+        }
+        else {
+            print("Prime");
+        }
+    }
+
+}
+
+# If not Integer
+else {
+    print "Usage: please input a non-negative integer";
+    exit(0);
+}
+
+
+<?php
+// Find longest palindromic string using matching array
+// Source: https://www.geeksforgeeks.org/longest-palindromic-substring-using-dynamic-programming/
+function longest_palindromic_substring($str)
+{
+    // Initialize array indicating whether there is a character match
+    // between two characters to indicate that nothing matches
+    $n = strlen($str);
+    $matches = array_fill(0, $n, array_fill(0, $n, FALSE));
+
+    // Indicate all length 1 strings match
+    for ($i = 0; $i < $n; $i++)
+    {
+        $matches[$i][$i] = TRUE;
+    }
+
+    // Convert string to lowercase
+    $temp_str = strtolower($str);
+
+    // Find all length 2 matches
+    $start = 0;
+    $max_len = 1;
+    for ($i = 0; $i < $n - 1; $i++)
+    {
+        if ($temp_str[$i] == $temp_str[$i + 1])
+        {
+            $matches[$i][$i + 1] = TRUE;
+            if ($max_len < 2)
+            {
+                $start = $i;
+                $max_len = 2;
+            }
+        }
+    }
+
+    // Find all length 3 or higher matches
+    for ($len = 3; $len <= $n; $len++)
+    {
+        // Loop through each starting character
+        for ($i = 0; $i < $n - $len + 1; $i++)
+        {
+            // If match for one character in from start and end characters
+            // and start and end characters match, set match for start and
+            // end characters, and update max length
+            $j = $i + $len - 1;
+            if ($matches[$i + 1][$j - 1] && $temp_str[$i] == $temp_str[$j])
+            {
+                $matches[$i][$j] = TRUE;
+                if ($len > $max_len)
+                {
+                    $start = $i;
+                    $max_len = $len;
+                }
+            }
+        }
+    }
+
+    return substr($str, $start, $max_len);
+}
+
+function usage()
+{
+    exit("Usage: please provide a string that contains at least one palindrome");
+}
+
+// Exit if 1st command-line argument is missing is empty
+if (count($argv) < 2 || empty($argv[1]))
+{
+    usage();
+}
+
+// Get longest palindromic substring. Exit if none found
+$str = $argv[1];
+$longest = longest_palindromic_substring($str);
+if (strlen($longest) < 2)
+{
+    usage();
+}
+
+// Show longest palindromic substring
+echo "${longest}\n";
+
+
+
+import sys
+
+errorMessage = "Usage: please provide a string that contains at least one palindrome"
+
+def longestPalindrome(string):
+    longest = ""
+    string = string.lower()
+
+    centres = [len(string) - 1]
+    for diff in range(1, len(string)):
+        centres.append(centres[0] + diff)
+        centres.append(centres[0] - diff)
+
+    for centre in centres:
+        if (min(centre + 1, 2 * len(string) - 1 - centre) <= len(longest)):
+            break
+        if centre % 2 == 0:
+            left, right = (centre // 2) - 1, (centre // 2) + 1
+        else:
+            left, right = centre // 2, (centre // 2) + 1
+
+        while left >= 0 and right < len(
+                string) and string[left] == string[right]:
+            left -= 1
+            right += 1
+
+        if right - left > len(longest):
+            longest = string[left + 1:right]
+
+    return longest
+
+
+if __name__ == '__main__':
+    if (len(sys.argv) < 2):
+        print(errorMessage)
+    else:
+        string = sys.argv[1]
+        if string == "" or string == None:
+            print(errorMessage)
+        sub = longestPalindrome(string)
+        if len(sub) == 1:
+            print(errorMessage)
+        else:
+            print(sub)
+
+
+
+def bubble_sort(numbers)
+  n = numbers.length
+  for i in 0...n-1
+    for j in 0...n-i-1
+      if numbers[j] > numbers[j + 1]
+        numbers[j], numbers[j + 1] = numbers[j + 1], numbers[j]
+      end
+    end
+  end
+  return numbers
+end
+
+def err()
+  puts('Usage: please provide a list of at least two integers to sort in the format "1, 2, 3, 4, 5"')
+end
+
+begin
+  unsorted = ARGV[0].split(", ").map{|i| Integer(i)}
+  if unsorted.length > 1
+    sorted = bubble_sort(unsorted)
+    print(sorted)
+  else
+    err()
+  end
+rescue
+  err()
+end
+
+
+
+use std::env::args;
+use std::process::exit;
+use std::str::FromStr;
+use std::collections::{HashMap, HashSet};
+
+fn usage() -> ! {
+    println!("Usage: please provide a comma-separated list of integers");
+    exit(0);
+}
+
+fn parse_int<T: FromStr>(s: &str) -> Result<T, <T as FromStr>::Err> {
+    s.trim().parse::<T>()
+}
+
+fn parse_int_list<T: FromStr>(s: &str) -> Result<Vec<T>, <T as FromStr>::Err> {
+    s.split(',')
+        .map(parse_int)
+        .collect::<Result<Vec<T>, <T as FromStr>::Err>>()
+}
+
+#[derive(Debug, Clone)]
+struct Node {
+    index: usize,
+    children: HashMap<usize, i32>,
+}
+
+impl Node {
+    fn new(index: usize) -> Node {
+        Node {index: index, children: HashMap::<usize, i32>::new()}
+    }
+
+    fn add_child(&mut self, index: usize, weight: i32) {
+        self.children.insert(index, weight);
+    }
+}
+
+type Tree = Vec<Node>;
+
+fn create_tree(weights: &Vec<i32>, num_vertices: usize) -> Tree {
+    // Create nodes
+    let mut nodes: Vec<Node> = (0..num_vertices)
+        .map(|index| Node::new(index))
+        .collect();
+
+    // Add child nodes to each node based on non-zero values of adjacency matrix
+    let mut index = 0;
+    for row in 0..num_vertices {
+        for col in 0..num_vertices {
+            let weight = weights[index];
+            index += 1;
+            if weight > 0 {
+                nodes[row].add_child(col, weight);
+            }
+        }
+    }
+
+    nodes
+}
+
+#[derive(Debug)]
+struct MstResult {
+    src_index: usize,
+    dest_index: usize,
+    weight: i32,
+}
+
+impl MstResult {
+    fn new(src_index: usize, dest_index: usize, weight: i32) -> MstResult {
+        MstResult {src_index: src_index, dest_index: dest_index, weight: weight}
+    }
+}
+
+// Prim's Minimum Spanning Tree (MST) Algorithm based on C implementation of
+// https://www.geeksforgeeks.org/prims-minimum-spanning-tree-mst-greedy-algo-5/
+fn prim_mst(tree: &Tree) -> Vec<MstResult> {
+    let num_vertices = tree.len();
+
+    // Array to store constructed MST. Indicate no parents yet
+    let mut parents = vec![0; num_vertices];
+
+    // Key values used to pick minimum weight edge. Initialize to infinity
+    let mut keys = vec![i32::MAX; num_vertices];
+
+    // Indicate nothing in MST yet
+    let mut mst_set = HashSet::<usize>::new();
+
+    // Include first vertex in MST
+    keys[0] = 0;
+
+    // The MST will include all vertices
+    while mst_set.len() < num_vertices {
+        // Pick index of the minimum key value not already in MST
+        let u: usize = (0..num_vertices)
+            .filter(|index| !mst_set.contains(index))
+            .map(|index| (keys[index], index))
+            .min()
+            .unwrap()
+            .1;
+
+        // Add picked vertex to MST
+        mst_set.insert(u);
+
+        // Update key values and parent indices of picked adjacent
+        // vertices. Only consider vertices not yet in MST
+        for (v, weight) in tree[u].children.iter() {
+            if !mst_set.contains(v) && *weight < keys[*v] {
+                parents[*v] = u;
+                keys[*v] = *weight;
+            }
+        }
+    }
+
+    // Construct MST information to return, skipping over root
+    (1..num_vertices)
+        .map(|v| MstResult::new(parents[v], v, keys[v]))
+        .collect()
+}
+
+fn get_total_mst_weight(mst: &Vec<MstResult>) -> i32 {
+    mst.iter()
+        .map(|mst_item| mst_item.weight)
+        .sum()
+}
+
+fn main() {
+    let mut args = args().skip(1);
+
+    // Convert 1st command-line argument to list of integers
+    let weights: Vec<i32> = args
+        .next()
+        .and_then(|s| parse_int_list(&s).ok())
+        .unwrap_or_else(|| usage());
+
+    // Exit if number of weights is not a square
+    let num_weights = weights.len();
+    let num_vertices = (num_weights as f32).sqrt().round() as usize;
+    if num_weights != num_vertices * num_vertices
+    {
+        usage();
+    }
+
+    // Create tree
+    let tree = create_tree(&weights, num_vertices);
+
+    // Get MST using Prim's algorithm
+    let mst = prim_mst(&tree);
+
+    // Calculate total weight of MST and display
+    println!("{}", get_total_mst_weight(&mst));
+}
+
+
+
+import scala.io.Source
+import java.io.{FileNotFoundException, IOException, File, FileOutputStream, PrintWriter}
+
+object FileInputOutput {
+  // reading file then write to stdout
+  // write exception when fail
+  def readFromFile(filename: String) {
+    try {
+      val buffer = Source.fromFile(filename)
+      val lines = buffer.getLines
+
+      lines.foreach(println)
+      buffer.close
+    } catch {
+      case e: FileNotFoundException => println(s"File ${filename} does not exist.")
+      case e: IOException => println(s"I/O Exception when reading from ${filename}.")
+      case e: Throwable => println(s"Error ${e.getMessage} when reading from ${filename}.")
+    }
+  }
+
+  // write to file
+  // stdout exception when fail
+  def writeToFile(filename: String, contents: String) {
+    try {
+      val writer = new PrintWriter(new File(filename))
+      writer.write(contents)
+      writer.close
+    } catch {
+      case e: FileNotFoundException => println(s"Cannot write into file ${filename}.")
+      case e: Throwable => println(s"Error ${e.getMessage} when writing to file ${filename}.")
+    }
+  }
+
+  def main(args: Array[String]) {
+    // write succesfully
+    writeToFile("output.txt", "I am a string.\nI am also a string.\nScala is fun!\n")
+
+    // read successfully
+    readFromFile("output.txt")
+  }
+}
+
+
+
+// for System.exit()
+import Foundation
+
+
+/*
+    Implementation of the Euclid's Algorithm.
+    Used to simplify the fractions during initialization
+*/
+func gcd(_ a: Int, _ b:Int) -> Int {
+    var a = a >= 0 ? a : -a
+    var b = b
+    var tmp = 0
+    while b != 0 {
+        tmp = b
+        b = a % b
+        a = tmp
+    }
+    return a
+}
+
+/*
+    Used for Type conversion Bool => Int
+*/
+extension Bool {
+    var intValue: Int {
+        return self ? 1 : 0
+    }
+}
+
+struct IntFraction {
+    var numerator, denominator: Int
+
+    init(_ num:Int, _ denom:Int) {
+        guard denom != 0 else {
+            print("Error: Denominator cannot be 0")
+            exit(0)
+        }
+
+        var num = num
+        if denom < 0 {
+            num = -num
+        }
+        let gcd_ = gcd(num, denom)
+        numerator = num / gcd_
+        denominator = denom / gcd_
+    }
+
+    init?(fromString str:String) {
+        let parts = str.components(separatedBy: "/")
+        guard parts.count == 2, let num = Int(parts[0]), let denom = Int(parts[1]) else {
+            return nil
+        }
+
+        self.init(num, denom)
+    }
+
+
+    static func +(lhs: IntFraction, rhs: IntFraction) -> IntFraction {
+        let top = lhs.numerator*rhs.denominator + rhs.numerator*lhs.denominator
+        let bottom = lhs.denominator*rhs.denominator
+        return IntFraction(top, bottom)
+    }
+
+    static func -(lhs: IntFraction, rhs: IntFraction) -> IntFraction {
+        let top = lhs.numerator*rhs.denominator - rhs.numerator*lhs.denominator
+        let bottom = lhs.denominator*rhs.denominator
+        return IntFraction(top, bottom)
+    }
+
+    static func *(lhs: IntFraction, rhs: IntFraction) -> IntFraction {
+        return IntFraction(lhs.numerator*rhs.numerator, lhs.denominator*rhs.denominator)
+    }
+
+    static func /(lhs: IntFraction, rhs: IntFraction) -> IntFraction {
+        let top = lhs.numerator*rhs.denominator
+        let bottom = lhs.denominator*rhs.numerator
+        return IntFraction(top, bottom);
+    }
+
+    static func ==(lhs: IntFraction, rhs: IntFraction) -> Bool {
+        let res = lhs.numerator * rhs.denominator - rhs.numerator * lhs.denominator
+        return res == 0
+    }
+
+    static func >(lhs: IntFraction, rhs: IntFraction) -> Bool {
+        let res = lhs.numerator * rhs.denominator - rhs.numerator * lhs.denominator
+        return res > 0
+    }
+
+    static func <(lhs: IntFraction, rhs: IntFraction) -> Bool {
+        let res = lhs.numerator * rhs.denominator - rhs.numerator * lhs.denominator
+        return res < 0
+    }
+
+    static func >=(lhs: IntFraction, rhs: IntFraction) -> Bool {
+        return !(lhs < rhs)
+    }
+
+    static func <=(lhs: IntFraction, rhs: IntFraction) -> Bool {
+        return !(lhs > rhs)
+    }
+
+    static func !=(lhs: IntFraction, rhs: IntFraction) -> Bool {
+        return !(lhs == rhs)
+    }
+}
+
+
+/*
+    Check validity of command line arguments
+*/
+guard CommandLine.argc == 4 else {
+    print("Usage: \(CommandLine.arguments[0]) operand1 operator operand2")
+    exit(0)
+}
+guard let operand1 = IntFraction(fromString: CommandLine.arguments[1]), let operand2 = IntFraction(fromString: CommandLine.arguments[3]) else {
+    print("Invalid operand. Usage: a/b => 3/4")
+    exit(0)
+}
+
+let op = CommandLine.arguments[2]
+switch op {
+case "+":
+    let res = operand1 + operand2
+    print("\(res.numerator)/\(res.denominator)")
+case "-":
+    let res = operand1 - operand2
+    print("\(res.numerator)/\(res.denominator)")
+case "*":
+    let res = operand1 * operand2
+    print("\(res.numerator)/\(res.denominator)")
+case "/":
+    let res = operand1 / operand2
+    print("\(res.numerator)/\(res.denominator)")
+case "==":
+    let res = operand1 == operand2
+    print("\(res.intValue)")
+case ">":
+    let res = operand1 > operand2
+    print("\(res.intValue)")
+case "<":
+    let res = operand1 < operand2
+    print("\(res.intValue)")
+case ">=":
+    let res = operand1 >= operand2
+    print("\(res.intValue)")
+case "<=":
+    let res = operand1 <= operand2
+    print("\(res.intValue)")
+case "!=":
+    let res = operand1 != operand2
+    print("\(res.intValue)")
+default:
+    print("No matching operation for symbol: '\(op)'")
+    exit(0)
+}
+
+
+
+function quickSort(arr: number[]): number[] {
+  if (arr.length <= 1) {
+    return arr;
+  }
+
+  const pivot = arr[0];
+  const left = [];
+  const right = [];
+
+  for (let i = 1; i < arr.length; i++) {
+    if (arr[i] < pivot) {
+      left.push(arr[i]);
+    } else {
+      right.push(arr[i]);
+    }
+  }
+
+  return [...quickSort(left), pivot, ...quickSort(right)];
+}
+
+const error_msg: string =
+  'Usage: please provide a list of at least two integers to sort in the format "1, 2, 3, 4, 5"';
+
+if (process.argv.length != 3) {
+  console.log(error_msg);
+  process.exit(1);
+}
+
+let list_str: string = process.argv[2];
+
+if (list_str.length == 0) {
+  console.log(error_msg);
+  process.exit(1);
+}
+let list: number[] = list_str.split(",").map((x: string) => parseInt(x));
+if (list.length < 2) {
+  console.log(error_msg);
+  process.exit(1);
+}
+const sortedArray: number[] = quickSort(list);
+console.log(sortedArray.join(", "));
+
+
+
+section .data
+    fizz db "Fizz"
+    fizz_len equ $-fizz
+    buzz db "Buzz"
+    buzz_len equ $-buzz
+    newline db 10
+
+section .bss
+    ; Used to hold the ascii digits for printing
+    ; Sufficient size to hold any positive 64 bit number
+    digits resb 21
+
+section .text
+    global _start
+
+_start:
+    mov r12, 1    ; r12 holds current i
+    mov r13, 101  ; r13 holds loop end (exclusive)
+
+    loop:
+        ; Break loop once target reached
+        cmp r12, r13
+        je loop_end
+
+        mov rax, r12
+        call print_val
+
+        ; Print a newline character
+        mov rax, 1
+        mov rdi, 1
+        mov rsi, newline
+        mov rdx, 1
+        syscall
+
+        inc r12
+        jmp loop
+
+    loop_end:
+        ; Exit and return 0
+        mov rax, 60
+        xor rdi, rdi
+        syscall
+
+
+; Prints an int. Currently only works for positive values
+; rax holds input number
+print_num:
+    mov r8, 20 ; r8 holds the offset from the digits buffer. We start at the back
+    mov r9, 10 ; We will be repeatedly dividing by 10
+
+    div_loop:
+        ; Calculate ASCII value of last decimal digit of rax
+        xor rdx, rdx
+        div r9
+        add rdx, '0'
+
+        ; Fill ASCII values from the end of the buffer
+        mov byte [digits + r8], dl
+        dec r8
+        cmp rax, 0
+        jne div_loop
+
+    ; Move r8 offest to start of string
+    inc r8
+
+    ; Print the string
+    mov rax, 1
+    mov rdi, 1
+    lea rsi, [digits + r8]
+    mov rdx, 21
+    sub rdx, r8
+    syscall
+
+    ret
+
+
+print_val:
+    push r12
+    push r13
+
+    xor r12, r12 ; Flag as to whether fizz || buzz was printed
+    mov r13, rax ;  Keep a copy of the input to re-use
+
+    test_fizz:
+        ; Skip to next label if not divisible by 3
+        xor rdx, rdx
+        mov r8, 3
+        div r8
+        cmp rdx, 0
+        jne test_buzz
+
+        ; Print Fizz
+        mov rax, 1
+        mov rdi, 1
+        mov rsi, fizz
+        mov rdx, fizz_len
+        syscall
+
+        ; Mark that a wword was printed for this number
+        inc r12
+
+    test_buzz:
+        ; Restore the input value to rax
+        mov rax, r13
+
+        ; Skip to the next label if not divisible by 5
+        xor rdx, rdx
+        mov r8, 5
+        div r8
+        cmp rdx, 0
+        jne test_num
+
+        ; Print Buzz
+        mov rax, 1
+        mov rdi, 1
+        mov rsi, buzz
+        mov rdx, buzz_len
+        syscall
+
+        ; Mark that a wword was printed for this number
+        inc r12
+
+    test_num:
+        ; If fizz and/or buzz was already printed for this number, skip to cleanup
+        cmp r12, 0
+        jne cleanup
+
+        ; Restore the input to rax and print it
+        mov rax, r13
+        call print_num
+
+    cleanup:
+        pop r13
+        pop r12
+        ret
+
+
+using System;
+using System.Linq;
+using System.Collections.Generic;
+
+public class MergeSort
+{
+    public static List<int> Sort(List<int> xs) => Sort(xs.Select(x => new List<int>() {x}).ToList()).First();
+    public static List<List<int>> Sort(List<List<int>> xs)
+    {
+        if (xs.Count <= 1)
+            return xs;
+        var x0 = xs[0];
+        var x1 = xs[1];
+        xs.RemoveAt(0);
+        xs.RemoveAt(0);
+        return Sort(new List<List<int>>()
+        {
+            Merge(x0, x1)
+        }.Concat(Sort(xs).ToList()).ToList());
+    }
+
+    public static List<int> Merge(List<int> xs, List<int> ys)
+    {
+        if (!xs.Any())
+            return ys;
+        if (!ys.Any())
+            return xs;
+        if (xs[0] < ys[0])
+        {
+            var x0 = xs[0];
+            xs.RemoveAt(0);
+            return new List<int>() {x0}.Concat(Merge(xs, ys)).ToList();
+        }
+        var y0 = ys[0];
+        ys.RemoveAt(0);
+        return new List<int>() {y0}.Concat(Merge(xs, ys)).ToList();
+    }
+
+    public static void ErrorAndExit()
+    {
+        Console.WriteLine("Usage: please provide a list of at least two integers to sort in the format \"1, 2, 3, 4, 5\"");
+        Environment.Exit(1);
+    }
+
+    public static void Main(string[] args)
+    {
+        if (args.Length != 1)
+            ErrorAndExit();
+        try
+        {
+            var xs = args[0].Split(',').Select(i => Int32.Parse(i.Trim())).ToList();
+            if (xs.Count() <= 1)
+                ErrorAndExit();
+            var sortedXs = Sort(xs);
+            Console.WriteLine(string.Join(", ", sortedXs));
+        }
+        catch
+        {
+            ErrorAndExit();
+        }
+    }
+}
+
+
+
+/**
+ * Job Sequencing with deadlines
+ */
+
+class Job{
+  constructor(profit, deadline){
+    this.profit = profit;
+    this.deadline = deadline;
+  }
+}
+
+/* Function to create an array of Job objects */
+const createJobs = (array1, array2) => {
+  let addedJobs = [];
+  for(let index=0; index<array1.length; index++){
+    addedJobs.push(new Job(array1[index], array2[index]));
+  }
+  return addedJobs;
+}
+
+/* Sort Jobs based on profit in descending order */
+const sortJobs = (jobs) => jobs.sort((a,b) => {
+  if(a.profit > b.profit){
+    return -1;
+  }else if(a.profit > b.profit){
+    return 1;
+  }else{
+    return 0;
+  }
+});
+
+/* Function to find the maximum deadline to limit the total time slot */
+const findMaxDeadline = (jobs) => {
+  let maxDeadline = 0;
+  for(let index = 0; index<jobs.length; index++){
+    maxDeadline = Math.max(jobs[index].deadline, maxDeadline);
+  }
+  return maxDeadline;
+}
+
+/* Function to find the maximum profit */
+const findMaxProfit = (jobs, maxDeadline) => {
+  let jobSlotsFull = Array(maxDeadline).fill(false);
+  let maxProfit = 0;
+  let count=0;
+  for(let index=0; index < jobs.length; index++){
+    if(count === maxDeadline){
+      break;
+    }
+    let deadline = jobs[index].deadline;
+    if(deadline > maxDeadline){
+      continue;
+    }
+    for(let slotIndex = deadline-1; slotIndex >= 0; slotIndex--){
+      if(jobSlotsFull[slotIndex] === false){
+        maxProfit += jobs[index].profit;
+        jobSlotsFull[slotIndex] = true;
+        count++;
+        break;
+      }
+    }
+  }
+  return maxProfit;
+}
+
+/* Function to split strings into arrays */
+const splitString = (str) => str.split(',').map(each => parseInt(each.trim(),10));
+
+/* Function to check the validity of the number arrays */
+const checkValidity = (array1, array2) => {
+  if(array1.some(isNaN) ||
+      array2.some(isNaN) ||
+      array1.length != array2.length){
+        throw new Error();
+    }
+}
+
+/* Function to exit in case of invalid input */
+const exit = () => {
+  const USAGE = "Usage: please provide a list of profits and a list of deadlines";
+  console.log(USAGE);
+}
+
+/* Main Function */
+const main = (string1, string2) => {
+  try{
+    const array1  = splitString(string1);
+    const array2  = splitString(string2);
+    checkValidity(array1, array2);
+    let jobs = createJobs(array1, array2);
+    jobs = sortJobs(jobs);
+    let maxDeadline = findMaxDeadline(jobs);
+    console.log(findMaxProfit(jobs, maxDeadline));
+  }
+  catch(err){
+    exit();
+  }
+}
+
+main(process.argv[2], process.argv[3])
+
+
+
+package main
+
+import (
+	"fmt"
+	"math"
+	"os"
+	"regexp"
+	"strconv"
+)
+
+type job struct {
+	profit   int
+	deadline int
+}
+
+type jobSequence []job
+type jobMapping map[int]job
+
+func maxProfit(jobs jobSequence) int {
+	total := 0
+	seq := iterateJobSequence(jobs, jobMapping{})
+	for _, j := range seq {
+		total += j.profit
+	}
+	return total
+}
+
+func iterateJobSequence(available jobSequence, complete jobMapping) jobMapping {
+	if len(available) <= 0 {
+		return complete
+	}
+	maxJob, available := available.popMax()
+	if i := complete.newIndex(maxJob); i >= 0 {
+		complete[i] = maxJob
+	}
+	return iterateJobSequence(available, complete)
+}
+
+func (mapping jobMapping) newIndex(maxJob job) int {
+	var indexes []int
+	for i := 0; i < maxJob.deadline; i++ {
+		if _, ok := mapping[i]; !ok {
+			indexes = append(indexes, i)
+		}
+	}
+	if len(indexes) <= 0 {
+		return -1
+	}
+	return indexes[len(indexes)-1]
+}
+
+func (seq jobSequence) popMax() (job, jobSequence) {
+	max := job{math.MinInt32, math.MinInt32}
+	maxI := -1
+	for i, v := range seq {
+		if v.profit > max.profit {
+			max = v
+			maxI = i
+		}
+	}
+	return max, append(seq[:maxI], seq[maxI+1:]...)
+}
+
+func buildJobSequence(profits []int, deadlines []int) (jobs jobSequence) {
+	for i, profit := range profits {
+		newJob := job{profit: profit, deadline: deadlines[i]}
+		jobs = append(jobs, newJob)
+	}
+	return
+}
+
+func exitWithError() {
+	fmt.Println("Usage: please provide a list of profits and a list of deadlines")
+	os.Exit(1)
+}
+
+func strToSliceInt(strList string) []int {
+	list := regexp.MustCompile(", ?").Split(strList, -1)
+	if len(list) < 2 {
+		exitWithError()
+	}
+	var nums []int
+	for _, num := range list {
+		n, err := strconv.Atoi(num)
+		if err != nil {
+			exitWithError()
+		}
+		nums = append(nums, n)
+	}
+	return nums
+}
+
+func main() {
+	if len(os.Args) != 3 {
+		exitWithError()
+	}
+
+	profits := strToSliceInt(os.Args[1])
+	deadlines := strToSliceInt(os.Args[2])
+	if len(profits) != len(deadlines) {
+		exitWithError()
+	}
+	jobs := buildJobSequence(profits, deadlines)
+	max := maxProfit(jobs)
+	fmt.Println(max)
+
+}
+
+
+<?php
+function merge_sort($my_array)
+{
+    if (count($my_array) == 1) {
+        return $my_array;
+    }
+
+    $mid = count($my_array) / 2;
+    $left = array_slice($my_array, 0, $mid);
+    $right = array_slice($my_array, $mid);
+    $left = merge_sort($left);
+    $right = merge_sort($right);
+    return merge($left, $right);
+}
+function merge($left, $right)
+{
+    $res = array();
+    while (count($left) > 0 && count($right) > 0) {
+        if ($left[0] > $right[0]) {
+            $res[] = $right[0];
+            $right = array_slice($right, 1);
+        } else {
+            $res[] = $left[0];
+            $left = array_slice($left, 1);
+        }
+    }
+    while (count($left) > 0) {
+        $res[] = $left[0];
+        $left = array_slice($left, 1);
+    }
+    while (count($right) > 0) {
+        $res[] = $right[0];
+        $right = array_slice($right, 1);
+    }
+    return $res;
+}
+
+if (empty($argv[1])) {
+    exit('Usage: please provide a list of at least two integers to sort in the format "1, 2, 3, 4, 5"');
+}
+
+$test_array = array_map('intval', explode(',', $argv[1]));
+$array_size = count($test_array);
+
+if ($array_size <= 1) {
+    exit('Usage: please provide a list of at least two integers to sort in the format "1, 2, 3, 4, 5"');
+}
+
+echo implode(', ', merge_sort($test_array)) . "\n";
+
+
+
+<?php
+function usage()
+{
+    exit('Usage: please provide a list of integers ("1, 4, 5, 11, 12") and the integer to find ("11")');
+}
+
+function parse_int($str_value)
+{
+    // Remove leading and trailing spaces
+    $str_value = trim($str_value);
+
+    // Make sure all digits
+    if (preg_match("/[+-]?^\d+$/", $str_value) === FALSE)
+    {
+        return FALSE;
+    }
+
+    // Make sure valid integer
+    if (
+        filter_var(
+            $str_value,
+            FILTER_VALIDATE_INT,
+            array(
+                'options' => array(
+                    'decimal' => TRUE,
+                    'min_range' => PHP_INT_MIN,
+                    'max_range' => PHP_INT_MAX
+                )
+            )
+        ) === FALSE
+    )
+    {
+        return FALSE;
+    }
+
+    return intval($str_value);
+}
+
+function parse_int_array($str_values)
+{
+    $str_array = explode(",", $str_values);
+    $values = array();
+    foreach ($str_array as $str_value)
+    {
+        $value = parse_int($str_value);
+        if ($value === FALSE)
+        {
+            return FALSE;
+        }
+
+        array_push($values, $value);
+    }
+
+    return $values;
+}
+
+// Exit if too few arguments
+if (count($argv) < 3)
+{
+    usage();
+}
+
+// Parse 1st argument. Exit if invalid or too few values
+$values = parse_int_array($argv[1]);
+if ($values === FALSE || count($values) < 1)
+{
+    usage();
+}
+
+// Parse 2nd argument. Exit if invalid
+$target = parse_int($argv[2]);
+if ($target === FALSE)
+{
+    usage();
+}
+
+// Use built-in linear search and show result
+$index = array_search($target, $values);
+printf("%s\n", ($index !== FALSE) ? "true" : "false");
+
+
+
+package com.github.darderion.mundaneassignmentpolice.utils.codeDetector
+
+import java.io.BufferedReader
+import java.io.FileReader
+
+
+class Threshold {
+    companion object {
+        private const val FILE = "src/main/kotlin/com/github/darderion/mundaneassignmentpolice/utils/codeDetector/codeSample.txt"
+        var reader: BufferedReader? = null
+
+        private var counter = 0
+        private var totalProb = 0.0
+
+        private fun countingThreshold(line:String): Double {
+            val lineToList = CodeDetector.splitIntoList(line)
+            val codeFrequency: Double
+            val totalWords = lineToList.size
+            var codeWords = 0
+            if (CodeDetectorDB.can_start_with.contains(lineToList[0])) {
+//                codeWords++
+                return 1.0
+            }
+            codeWords += lineToList.filter { CodeDetectorDB.codePatterns.contains(it) || CodeDetectorDB.delimiters.contains(it) || CodeDetectorDB.can_start_with.contains(it) || CodeDetectorDB.can_be_the_only_element.contains(it) }.size
+//            if (line.startsWith("    ") || line.startsWith("\t")) codeWords++
+            for (word in lineToList) {
+                try {
+                    java.lang.Double.parseDouble(word)
+                    codeWords++
+                } catch (e: NumberFormatException) {
+                    continue
+                }
+            }
+            codeFrequency = (codeWords / totalWords).toDouble()
+            return codeFrequency
+        }
+
+
+        private fun getThreshold(): Double {
+            try {
+                reader = BufferedReader(FileReader(FILE))
+                var line: String?
+
+                while (reader!!.readLine().also { line = it } != null) {
+
+                    if (line!!.isNotEmpty()) {
+                        totalProb += countingThreshold(line!!)
+                        counter++
+                    }
+
+                }
+                //        println(totalProb / counter)
+            } catch (e: Exception) {
+                println("An error occurred: ${e.message}")
+            } finally {
+                try {
+                    reader?.close()
+                } catch (e: Exception) {
+                    println("An error occurred while closing the file: ${e.message}")
+                }
+            }
+            println(totalProb/ counter)
+            return totalProb/ counter
+        }
+
+        val THRESHOLD = getThreshold()
+    }
+
+}
+
