@@ -30,6 +30,9 @@ class CodeDetectorTests : StringSpec({
     "test case from database 4" {
         CodeDetector.isLikelyCode("(a) Item1") shouldBe false
     }
+    "test case from database 5" {
+        CodeDetector.isLikelyCode("4") shouldBe false
+    }
 
     // 0.5 is the highest border that can be reached in particular cases, not in average
     "FREQUENCY_THRESHOLD is counted correctly" {

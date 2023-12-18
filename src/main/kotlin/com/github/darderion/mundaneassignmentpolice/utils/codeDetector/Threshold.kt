@@ -46,7 +46,7 @@ class Threshold {
                     println("An error occurred while closing the file: ${e.message}")
                 }
             }
-            println(FT_totalProb / FT_counter.toDouble())
+//            println(FT_totalProb / FT_counter.toDouble())
             return FT_totalProb / FT_counter.toDouble()
         }
 
@@ -87,7 +87,7 @@ class Threshold {
                     println("An error occurred while closing the file: ${e.message}")
                 }
             }
-            println(PT_totalProb / PT_counter.toDouble())
+//            println(PT_totalProb / PT_counter.toDouble())
             return PT_totalProb / PT_counter.toDouble()
         }
 

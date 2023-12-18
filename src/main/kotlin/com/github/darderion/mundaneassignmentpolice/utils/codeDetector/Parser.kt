@@ -18,14 +18,22 @@ class Parser {
             for (s in line) {
                 if (index == line.indices.last) {
                     if (isDelim(s.toString())) {
-                        if (delimiter.isNotEmpty() && isDelim(delimiter.plus(s.toString()))) parseResult.add(delimiter.plus(s.toString()))
+                        if (word.isNotEmpty()) parseResult.add(word)
+                        if (delimiter.isNotEmpty() && isDelim(delimiter.plus(s.toString()))) parseResult.add(
+                            delimiter.plus(
+                                s.toString()
+                            )
+                        )
                         else {
                             parseResult.add(delimiter)
                             parseResult.add(s.toString())
                         }
+                        continue
+                    } else {
+                        if (word.isNotEmpty()) parseResult.add(word)
+                        else if (!s.isWhitespace()) parseResult.add(s.toString())
+                        continue
                     }
-                    if (word.isNotEmpty()) parseResult.add(word)
-                    continue
                 }
                 if (isDelim(s.toString())) {
                     if (word.isNotEmpty()) {
