@@ -1,8 +1,8 @@
 package com.github.darderion.mundaneassignmentpolice.utils.codeDetector
 
-class CodeDetectorDB {
+class CodeDetectorDataBase {
     companion object {
-        internal val codePatterns = listOf(
+        internal val keywords = listOf(
             // Common
             "true",
             "false",
@@ -1156,9 +1156,14 @@ class CodeDetectorDB {
             ">",
             "<",
             "->",
+            "=",
             "!=",
             "==",
-            "==="
+            "===",
+            "/",
+            "+=",
+            "-=",
+            "*="
         )
 
         internal val can_start_with =

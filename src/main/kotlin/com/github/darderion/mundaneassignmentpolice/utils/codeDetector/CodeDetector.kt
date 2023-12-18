@@ -1,81 +1,79 @@
 package com.github.darderion.mundaneassignmentpolice.utils.codeDetector
 
-import com.github.darderion.mundaneassignmentpolice.utils.codeDetector.CodeDetectorDB.Companion.codePatterns
-import com.github.darderion.mundaneassignmentpolice.utils.codeDetector.CodeDetectorDB.Companion.delimiters
-import com.github.darderion.mundaneassignmentpolice.utils.codeDetector.CodeDetectorDB.Companion.can_start_with
-import java.lang.Double.parseDouble
+import com.github.darderion.mundaneassignmentpolice.utils.codeDetector.CodeDetectorDataBase.Companion.can_be_the_only_element
+import com.github.darderion.mundaneassignmentpolice.utils.codeDetector.CodeDetectorDataBase.Companion.keywords
+import com.github.darderion.mundaneassignmentpolice.utils.codeDetector.CodeDetectorDataBase.Companion.delimiters
+import com.github.darderion.mundaneassignmentpolice.utils.codeDetector.CodeDetectorDataBase.Companion.can_start_with
+import com.github.darderion.mundaneassignmentpolice.utils.codeDetector.Parser.Companion.parseString
 
 class CodeDetector {
     companion object {
         private fun isCodePattern(word: String): Boolean {
-            return word in codePatterns
+            return keywords.contains(word)
         }
 
         private fun isDelimiter(word: String): Boolean {
-            return word in delimiters
+            return delimiters.contains(word)
         }
 
-        internal fun splitIntoList(line: String): List<String> { // splits a line of text into words by delimiters and stores them into list
-            val splitList: MutableList<String> = mutableListOf()
-            var word = ""
+//        internal fun parseString(line: String): List<String> {
+//            val parseResult: MutableList<String> = mutableListOf()
+//            var word = ""
+//
+//            for (l in line) { // TODO: check the parser
+//                if (!isDelimiter(l.toString()) && !l.isWhitespace()) {
+//                    word = word.plus(l.toString())
+//
+//                    if (l == line.last()) {
+//                        parseResult.add(word)
+//                    }
+//                    continue
+//                }
+//                if (isDelimiter(l.toString()) && l == line.last()) {
+//                    if (word != "") parseResult.add(word)
+//                    parseResult.add(l.toString())
+//                    continue
+//                }
+//                if (word != "" && l == line.last()) {
+//                    parseResult.add(word)
+//                    continue
+//                }
+//                if (l.isWhitespace()) {
+//                    if (word != "") parseResult.add(word)
+//                    if (isDelimiter(l.toString())) parseResult.add(l.toString())
+//                    word = ""
+//                    continue
+//                }
+//                if (isDelimiter(l.toString())) {
+//                    if (word != "") parseResult.add(word)
+//                    parseResult.add(l.toString())
+//                    word = ""
+//                }
+//            }
+//            return parseResult
+//        }
 
-            for (l in line) {
-                if (!isDelimiter(l.toString()) && !l.isWhitespace()) {
-                    word = word.plus(l.toString())
-
-                    if (l == line.last()) {
-                        splitList.add(word)
-                    }
-                    continue
-                }
-                if (isDelimiter(l.toString()) && l == line.last()) {
-                    if (word != "") splitList.add(word)
-                    splitList.add(l.toString())
-                    continue
-                }
-                if (word != "" && l == line.last()) {
-                    splitList.add(word)
-                    continue
-                }
-                if (l.isWhitespace()) {
-                    if (word != "") splitList.add(word)
-                    if (isDelimiter(l.toString())) splitList.add(l.toString())
-                    word = ""
-                    continue
-                }
-                if (isDelimiter(l.toString())) {
-                    if (word != "") splitList.add(word)
-                    splitList.add(l.toString())
-                    word = ""
-                }
+        fun calculateCodeWords(line: String): Double {
+            val lineToList = parseString(line)
+            var codeWords = lineToList.filter { isCodePattern(it) || isDelimiter(it)}.size
+            if (can_be_the_only_element.contains(lineToList[0]) || can_start_with.contains(lineToList[0])) return 1.0
+//            if (line.startsWith("    ") || line.startsWith("\t")) codeWords++
+            for (word in lineToList) {
+                if (word.toDoubleOrNull() != null) codeWords++
             }
-            return splitList
-        }
 
+            return codeWords.toDouble()
+        }
 
 
         fun isLikelyCode(line: String): Boolean {
-            val lineToList = splitIntoList(line)
-            val totalWords = lineToList.size
-            var codeWords = lineToList.filter { codePatterns.contains(it) || delimiters.contains(it) }.size
-            if (line.startsWith("    ") || line.startsWith("\t")) codeWords++
-            for (word in lineToList) {
-                try {
-                    parseDouble(word)
-                    codeWords++
-                } catch (e: NumberFormatException) {
-                    continue
-                }
-            }
+            val lineToList = parseString(line)
             if (lineToList[0] in can_start_with) {
                 return true
             }
-            if (lineToList[0] !in codePatterns && lineToList[0] !in can_start_with) {
-                codeWords--
-            }
-            if (!codePatterns.contains(lineToList[0]) && !delimiters.contains(lineToList[0])) codeWords--
-
-            return codeWords >= totalWords - codeWords
+            val codeWords = calculateCodeWords(line)
+            val totalWords = lineToList.size.toDouble()
+            return CodeDetectorLineEvaluation(lineToList, totalWords, codeWords).makeDecision()
         }
     }
 
