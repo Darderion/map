@@ -8,7 +8,7 @@ import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFRegion
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Line
 
 class ListRuleBuilder {
-	private var region: PDFRegion = PDFRegion.EVERYWHERE
+	private var region: PDFRegion = PDFRegion.EVERYWHERE.except(PDFArea.CODE)
 	private val singleListPredicates: MutableList<(list: PDFList<Line>) -> List<Line>> = mutableListOf()
 	private val multipleListsPredicatesWithDocument : MutableList<(lists: List<PDFList<Line>>, document: PDFDocument) -> List<Line>> = mutableListOf()
 	private val listsFilter : MutableList <(lists: List<PDFList<Line>>,document: PDFDocument) -> MutableList<PDFList<Line>>> = mutableListOf()

@@ -10,7 +10,7 @@ class URLRuleBuilder {
     private val predicatesOfIgnoring: MutableList<(url: Url) -> Boolean> = mutableListOf()
     private var type: RuleViolationType = RuleViolationType.Error
     private var name: String = "Rule name"
-    private var region: PDFRegion = PDFRegion.EVERYWHERE
+    private var region: PDFRegion = PDFRegion.EVERYWHERE.except(PDFArea.CODE)
 
     fun disallow(predicate: (urls: List<Url>) -> List<Pair<Url, List<Line>>>) = this.also { predicates.add(predicate) }
 

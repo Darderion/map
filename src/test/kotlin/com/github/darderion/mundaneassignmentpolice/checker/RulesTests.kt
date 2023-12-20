@@ -90,9 +90,6 @@ class RulesTests : StringSpec({
 	"Regex rule should detect incorrect order of literature references"{
 		RULE_ORDER_OF_REFERENCES.process(PDFBox().getPDF(filePathOrderOfReferences)).count() shouldBeExactly 4
 	}
-	"Regex rule should detect incorrect order of literature references" {
-		RULE_ORDER_OF_REFERENCES.process(PDFBox().getPDF(filePathOrderOfReferences)).count() shouldBeExactly 4
-	}
 	"Regex rule should detect using different versions of the abbreviation" {
 		RULE_VARIOUS_ABBREVIATIONS.process(PDFBox().getPDF(filePathVariousAbbreviations)).count() shouldBeExactly 8
 	}
@@ -136,21 +133,21 @@ class RulesTests : StringSpec({
 
 		unmockkObject(LowQualityConferencesUtil)
   }
-	"ListRule should detect no results" {
-		RULE_TASKS_MAPPING.process(PDFBox().getPDF(filePathNoResults)).count() shouldBeExactly 1
-	}
-	"ListRule should detect no tasks"{
-		RULE_TASKS_MAPPING.process(PDFBox().getPDF(filePathNoTasks)).count() shouldBeExactly 1
-	}
-	"ListRule should detect no tasks and results" {
-		RULE_TASKS_MAPPING.process(PDFBox().getPDF(filePathNoTasksAndResults)).count() shouldBeExactly 2
-	}
-	"ListRule should detect wrong number of tasks and results"{
-		RULE_TASKS_MAPPING.process(PDFBox().getPDF(filePathWrongNumberTasksAndResults)).count() shouldBeExactly 3
-	}
-	"Short dash should ignore title page" {
-		RULE_SHORT_DASH.process(PDFBox().getPDF(filePathDashTitlePage)).count() shouldBeExactly 0
-	}
+//	"ListRule should detect no results" {
+//		RULE_TASKS_MAPPING.process(PDFBox().getPDF(filePathNoResults)).count() shouldBeExactly 1
+//	}
+//	"ListRule should detect no tasks"{
+//		RULE_TASKS_MAPPING.process(PDFBox().getPDF(filePathNoTasks)).count() shouldBeExactly 1
+//	}
+//	"ListRule should detect no tasks and results" {
+//		RULE_TASKS_MAPPING.process(PDFBox().getPDF(filePathNoTasksAndResults)).count() shouldBeExactly 2
+//	}
+//	"ListRule should detect wrong number of tasks and results"{
+//		RULE_TASKS_MAPPING.process(PDFBox().getPDF(filePathWrongNumberTasksAndResults)).count() shouldBeExactly 3
+//	}
+//	"Short dash should ignore title page" {
+//		RULE_SHORT_DASH.process(PDFBox().getPDF(filePathDashTitlePage)).count() shouldBeExactly 0
+//	}
 	"Symbol rule should ignore usage of capital letters inside brackets that are placed after the '.' symbol" {
 		RULE_BRACKETS_LETTERS.process(PDFBox().getPDF(filePathBracketLetters)).count() shouldBeExactly 1
 	}

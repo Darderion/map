@@ -9,7 +9,8 @@ class Parser {
             ) || CodeDetectorDataBase.can_be_the_only_element.contains(letter))
         }
 
-        internal fun parseString(line: String): List<String> {
+        internal fun parseString(lineInput: String): List<String> {
+            val line = lineInput.trim()
             val parseResult: MutableList<String> = mutableListOf()
             var word = ""
             var delimiter = ""
@@ -25,12 +26,16 @@ class Parser {
                             )
                         )
                         else {
-                            parseResult.add(delimiter)
-                            parseResult.add(s.toString())
+                            if (delimiter.isEmpty()) parseResult.add(s.toString())
+                            else parseResult.add(delimiter)
+
                         }
                         continue
                     } else {
-                        if (word.isNotEmpty()) parseResult.add(word)
+                        if (word.isNotEmpty()) {
+                            word = word.plus(s.toString())
+                            parseResult.add(word)
+                        }
                         else if (!s.isWhitespace()) parseResult.add(s.toString())
                         continue
                     }
@@ -42,23 +47,17 @@ class Parser {
                     }
                     if (isDelim(delimiter.plus(s.toString()))) {
                         delimiter = delimiter.plus(s.toString())
-//                        continue
                     } else {
                         if (delimiter.isNotEmpty()) {
                             parseResult.add(delimiter)
                             delimiter = s.toString()
                         }
                     }
-//                    if (s.isWhitespace() && delimiter.isNotEmpty()) {
-//                        parseResult.add(delimiter)
-//                        delimiter = s.toString()
-//                    }
                 }
                 if (s.isWhitespace()) {
                     if (word.isNotEmpty()) {
                         parseResult.add(word)
                         word = ""
-//                        continue
                     }
                     if (delimiter.isNotEmpty()) {
                         parseResult.add(delimiter)
@@ -71,12 +70,11 @@ class Parser {
                         parseResult.add(delimiter)
                         delimiter = ""
                     }
-//                    continue
                 }
 
                 index++
             }
-//            println(parseResult)
+//            println(parseResult.toList())
             return parseResult
         }
     }

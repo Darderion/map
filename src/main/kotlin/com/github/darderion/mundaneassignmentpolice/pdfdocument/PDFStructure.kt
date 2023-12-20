@@ -58,7 +58,7 @@ class PDFStructure(text: List<Line>) {
                     } else {
                         if (it.content == BIBLIOGRAPHY_TITLE) {
                             BIBLIOGRAPHY
-                        } else if (it.content.isNotBlank() && CodeDetector.isLikelyCode(it.content)) {
+                        } else if (CodeDetector.isLikelyCode(it.content)) {
                             CODE
                         } else area
                     }
@@ -70,9 +70,6 @@ class PDFStructure(text: List<Line>) {
                     } else {
                         if (isFootnote(it)) {
                             FOOTNOTE
-                        }
-                        else if (isPageIndex(text,it,area)) {
-                            PAGE_INDEX
                         }
                         else if (it.content == BIBLIOGRAPHY_TITLE) {
                             BIBLIOGRAPHY

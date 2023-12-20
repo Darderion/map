@@ -10,17 +10,22 @@ class CodeDetectorLineEvaluation(
     private val can_be_the_only =
         lineAsList.size == 1 && CodeDetectorDataBase.can_be_the_only_element.contains(lineAsList[0])
 
-    private val starts_with_CanStartWith = CodeDetectorDataBase.can_start_with.contains(lineAsList[0])
+    private val starts_with_CanStartWith =
+        lineAsList.isNotEmpty() && CodeDetectorDataBase.can_start_with.contains(lineAsList[0])
 
-    private val starts_with_kw = isKW(lineAsList[0])
+    private val assignment_present = lineAsList.isNotEmpty() && lineAsList.any() { it == "=" }
+
+    private val rule_short = lineAsList.size >= 2 && (lineAsList[1] == "=" || lineAsList[1] == ":")
+
+    private val starts_with_kw = lineAsList.isNotEmpty() && isKW(lineAsList[0])
 
     private val only_kws = codeWords == totalWords
 
-    private val kws_and_delims_present =
-        lineAsList.any { isKW(it) || isDelim(it) }
+    private val kws_and_delims_present = lineAsList.isNotEmpty() &&
+            lineAsList.any { isKW(it) || isDelim(it) }
 
-    private val nums_and_delims_present =
-        lineAsList.any { it.toDoubleOrNull() != null || isDelim(it) }
+    private val nums_and_delims_present = lineAsList.isNotEmpty() &&
+            lineAsList.any { it.toDoubleOrNull() != null || isDelim(it) }
 
     private val kw_nonKW_delim =
         if (lineAsList.size >= 3)
@@ -39,7 +44,7 @@ class CodeDetectorLineEvaluation(
                 (lineAsList.any { isDelim(it) }) &&
                 (lineAsList.any { isNonKW(it) }))
 
-    private val delim_is_the_last = isDelim(lineAsList.last())
+    private val delim_is_the_last = lineAsList.isNotEmpty() && isDelim(lineAsList.last())
 
     // starts with nonKW
     private val nonKW_delim =
@@ -59,6 +64,9 @@ class CodeDetectorLineEvaluation(
 
     private val function_call = findFunctionCall(lineAsList)
 
+    private val operators_present =
+        lineAsList.isNotEmpty() && lineAsList.any() { CodeDetectorDataBase.operators.contains(it) }
+
     private fun isNonKW(word: String): Boolean {
         return (!CodeDetectorDataBase.keywords.contains(word) && !CodeDetectorDataBase.delimiters.contains(word) && word.toDoubleOrNull() == null)
     }
@@ -74,35 +82,39 @@ class CodeDetectorLineEvaluation(
     private fun findDotNotation(line: List<String>): Boolean {
         if ("." !in line) return false
         var functionCallStarted = 0
-        var functionCall = 0
+        var functionCallFinished = 0
         var dotCallStarted = 0
         var prevWord = ""
 
         if (line.size >= 2 && line[0] == "." && (isKW(line[1]) || isNonKW(line[1]))) return true
         else {
-            for (word in line) {
-                if (isKW(word) || isNonKW(word)) {
-                    if ((dotCallStarted == 1) && (prevWord == ".")) {
-                        return true
-                    } else {
+            if (line.size >= 2) {
+                for (word in line) {
+                    if (isKW(word) || isNonKW(word)) {
+                        if ((dotCallStarted == 1) && (prevWord == ".")) {
+                            prevWord = word
+                            continue
+                        } else {
+                            prevWord = word
+                            continue
+                        }
+                    }
+                    if ((word == "." && (isKW(prevWord) || isNonKW(prevWord) || (prevWord == ")" && functionCallFinished == 1)))) {
                         prevWord = word
+                        dotCallStarted = 1
                         continue
                     }
-                }
-                if ((word == "." && (isKW(prevWord) || isNonKW(prevWord) || (prevWord == ")" && functionCall == 1)))) {
-                    prevWord = word
-                    dotCallStarted = 1
-                    continue
-                }
-                if (word == "(" && (isKW(prevWord) || isNonKW(prevWord))) {
-                    functionCallStarted = 1
-                    prevWord = "("
-                    continue
-                }
-                if (word == ")" && (prevWord == "(" || (isKW(prevWord) || isNonKW(prevWord))) && functionCallStarted == 1) {
-                    functionCall = 1
-                    prevWord = ")"
-                    continue
+                    if (word == "(" && (isKW(prevWord) || isNonKW(prevWord))) {
+                        functionCallStarted = 1
+                        prevWord = "("
+                        continue
+                    }
+                    if ((word == ")" || word == ");") && (prevWord == "(" || (isKW(prevWord) || isNonKW(prevWord))) && functionCallStarted == 1) {
+                        if (dotCallStarted == 1) return true
+                        functionCallFinished = 1
+                        prevWord = ")"
+                        continue
+                    }
                 }
             }
         }
@@ -112,24 +124,25 @@ class CodeDetectorLineEvaluation(
     private fun findFunctionCall(line: List<String>): Boolean {
         var openBracket = 0
         var prevWord: String
-        var index = 0
+//        var index = 0
+//        if (line.size < 3) return false
         for (word in line) {
-            if (index == line.indices.last) {
-                if (word == ")") {
-                    return openBracket == 1
-                }
-            } else {
-                index++
-                prevWord = word
-                if (word == "(") {
-                    if (isKW(prevWord) || isNonKW(prevWord)) openBracket = 1
-                    else continue
-                }
-                if (word == ")") {
-                    return openBracket == 1
-                }
+//            if (index == line.indices.last) {
+//                if (word == ")" || word == ");") {
+//                    return openBracket == 1
+//                }
+
+//                index++
+            prevWord = word
+            if (word == "(") {
+                if (isKW(prevWord) || isNonKW(prevWord)) openBracket = 1
+                else continue
+            }
+            if (word == ")" || word == ");") {
+                return openBracket == 1
             }
         }
+
         return false
     }
 
@@ -139,9 +152,13 @@ class CodeDetectorLineEvaluation(
         // must be a code line
         can_be_the_only,
         starts_with_CanStartWith,
-        //--------------------
-        starts_with_kw,
+        assignment_present,
         only_kws,
+        dot_notation,
+        function_call,
+        //--------------------
+        operators_present,
+        starts_with_kw,
         kws_and_delims_present,
         nums_and_delims_present,
         kw_nonKW_delim,
@@ -149,9 +166,7 @@ class CodeDetectorLineEvaluation(
         kw_nonKWs_delim,
         delim_is_the_last,
         nonKW_delim,
-        two_nonKWs_delim,
-        dot_notation,
-        function_call,
+        two_nonKWs_delim
     )
 
     private val PROPERTIES_TOTAL = properties.size.toDouble()
@@ -166,6 +181,8 @@ class CodeDetectorLineEvaluation(
     private val PROPERTIES_PROBABILITY = calculatePropertiesThreshold()
 
     fun makeDecision(): Boolean {
+        if (!not_only_nonKW) return false
+        if (starts_with_CanStartWith || assignment_present || only_kws || function_call || dot_notation) return true
         return ((FREQUENCY_PROBABILITY >= FREQUENCY_THRESHOLD) && (PROPERTIES_PROBABILITY >= PROPERTIES_THRESHOLD))
     }
 

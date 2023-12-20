@@ -22,7 +22,7 @@ fun getPages(document: PDFDocument, word : String): Pair<Int,Int>
 {
 	var pages = -1 to -1
 	var linesIndexes = -1 to -1
-	var lines = document.text.filter {
+	val lines = document.text.filter {
 		document.areas!!.sections.forEachIndexed { index , section ->
 			if (section.title.contains(word) && word != conclusionWord)
 				linesIndexes = section.contentIndex to document.areas.sections[index+1].contentIndex
@@ -84,6 +84,7 @@ class ListRule(
 				rulesViolations.add(RuleViolation(lines, name, type))
 		}
 
+		println(rulesViolations.toList())
 		return rulesViolations.toList()
 	}
 }

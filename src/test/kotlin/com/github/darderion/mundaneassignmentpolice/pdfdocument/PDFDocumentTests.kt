@@ -31,9 +31,9 @@ class PDFDocumentTests: StringSpec({
 	"PDFDocument should contain BIBLIOGRAPHY's lines" {
 		PDFDocument(text = lines).text.any { it.area == BIBLIOGRAPHY } shouldBe true
 	}
-//	"PDFDocument should contain CODE's lines"{
-//		PDFDocument(text = lines).text.any { it.area == CODE } shouldBe true
-//	}
+	"PDFDocument should contain CODE's lines"{
+		PDFDocument(text = bochkarev).text.any { it.area == CODE } shouldBe true
+	}
 	"PDFDocument should contain sections with section's title, section's index and section's content index" {
 		val document = PDFDocument(text = lines)
 
@@ -128,6 +128,9 @@ class PDFDocumentTests: StringSpec({
 		const val filePathMultilineLineSectionTitle =
 			"${resourceFolder}pdfdocument/PDFDocumentTestsMultilineLineSectionTitle.pdf"
 
+		const val bochkarevArseniy = "${resourceFolder}pdfdocument/bochkarev.pdf"
+
+		private val bochkarev = PDFBox().getLines(bochkarevArseniy)
 		private val lines = PDFBox().getLines(filePathCW)
 
 		private val contentSections = listOf(
