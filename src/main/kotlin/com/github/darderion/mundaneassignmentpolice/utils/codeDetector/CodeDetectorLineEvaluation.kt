@@ -150,6 +150,7 @@ class CodeDetectorLineEvaluation(
         // if false -> not a code line
         not_only_nonKW,
         // must be a code line
+        rule_short,
         can_be_the_only,
         starts_with_CanStartWith,
         assignment_present,
@@ -182,7 +183,7 @@ class CodeDetectorLineEvaluation(
 
     fun makeDecision(): Boolean {
         if (!not_only_nonKW) return false
-        if (starts_with_CanStartWith || assignment_present || only_kws || function_call || dot_notation) return true
+        if (starts_with_CanStartWith || assignment_present || only_kws || function_call || dot_notation || rule_short) return true
         return ((FREQUENCY_PROBABILITY >= FREQUENCY_THRESHOLD) && (PROPERTIES_PROBABILITY >= PROPERTIES_THRESHOLD))
     }
 

@@ -192,14 +192,14 @@ class RulesTests : StringSpec({
 			"${TestsConfiguration.resourceFolder}checker/RegexRuleTestsVariousAbbreviations.pdf"
 		const val filePathOrderOfSections =
 			"${TestsConfiguration.resourceFolder}checker/TableOfContentRuleTestsSectionsOrder.pdf"
-		const val filePathNoTasksAndResults =
-			"${TestsConfiguration.resourceFolder}checker/NoTasksAndResults.pdf"
-		const val filePathNoTasks =
-			"${TestsConfiguration.resourceFolder}checker/NoTasks.pdf"
-		const val filePathNoResults =
-			"${TestsConfiguration.resourceFolder}checker/NoResults.pdf"
-		const val filePathWrongNumberTasksAndResults =
-			"${TestsConfiguration.resourceFolder}checker/WrongNumberTasksAndResults.pdf"
+//		const val filePathNoTasksAndResults =
+//			"${TestsConfiguration.resourceFolder}checker/NoTasksAndResults.pdf"
+//		const val filePathNoTasks =
+//			"${TestsConfiguration.resourceFolder}checker/NoTasks.pdf"
+//		const val filePathNoResults =
+//			"${TestsConfiguration.resourceFolder}checker/NoResults.pdf"
+//		const val filePathWrongNumberTasksAndResults =
+//			"${TestsConfiguration.resourceFolder}checker/WrongNumberTasksAndResults.pdf"
 		const val filePathIntroductionAndConclusionSizeError =
 			"${TestsConfiguration.resourceFolder}checker/SectionSizeRuleTestsIntroductionAndConclusionError.pdf"
 		const val filePathIntroductionAndConclusionSizeWarning =
@@ -212,8 +212,8 @@ class RulesTests : StringSpec({
 				"${TestsConfiguration.resourceFolder}checker/TableOfContentRuleTestsSectionNumberingFrom0.pdf"
 		const val filePathLowQualityConferences =
 			"${TestsConfiguration.resourceFolder}checker/URLRuleTestsLowQualityConferences.pdf"
-		const val filePathDashTitlePage =
-			"${TestsConfiguration.resourceFolder}checker/ShortDashAreaTitlePage.pdf"
+//		const val filePathDashTitlePage =
+//			"${TestsConfiguration.resourceFolder}checker/ShortDashAreaTitlePage.pdf"
 		const val filePathBracketLetters =
 			"${TestsConfiguration.resourceFolder}checker/BracketLetters.pdf"
 		const val filePathMultilineCitation =
