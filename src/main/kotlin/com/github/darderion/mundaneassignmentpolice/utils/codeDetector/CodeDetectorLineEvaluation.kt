@@ -7,13 +7,15 @@ class CodeDetectorLineEvaluation(
 ) {
     private val not_only_nonKW = codeWords != 0.0 // line consists not only of non-keywords
 
+    private val citation_or_link = lineAsList.any { it == "[" || it == "]"} && lineAsList.any { it.toIntOrNull() != null } && lineAsList.any { !isNonKW(it) && !isKW(it) }
+
     private val can_be_the_only =
         lineAsList.size == 1 && CodeDetectorDataBase.can_be_the_only_element.contains(lineAsList[0])
 
     private val starts_with_CanStartWith =
         lineAsList.isNotEmpty() && CodeDetectorDataBase.can_start_with.contains(lineAsList[0])
 
-    private val assignment_present = lineAsList.any() { it == "=" }
+    private val assignment_present = lineAsList.any { it == "=" }
 
     private val assignment_or_colon_size3 =
         lineAsList.size >= 2 && (lineAsList[1] == "=" || lineAsList[1] == ":") // '=' or ':' in specific position
@@ -29,7 +31,7 @@ class CodeDetectorLineEvaluation(
         lineAsList.any { isKW(it) || isDelim(it) }
 
     private val nums_and_delims_present =
-        lineAsList.any { it.toDoubleOrNull() != null || isDelim(it) }
+        lineAsList.any { it.toDoubleOrNull() != null } && lineAsList.any { isDelim(it) }
 
     private val kw_nonKW_delim = // Example: "int something = 0;"
         if (lineAsList.size >= 3)
@@ -141,34 +143,43 @@ class CodeDetectorLineEvaluation(
         return false
     }
 
-    private val properties = listOf(
-        // if false -> not a code line
-        not_only_nonKW,
-        // must be a code line
-        assignment_or_colon_size3,
-        assignment_or_colon_size4,
-        can_be_the_only,
-        starts_with_CanStartWith,
-        assignment_present,
-        only_kws,
-        dot_notation,
-        function_call,
-        // must be compared with PROPERTIES_THRESHOLD
-        operators_present,
-        starts_with_kw,
-        kws_and_delims_present,
-        nums_and_delims_present,
-        kw_nonKW_delim,
-        two_kws_nonKW_delim,
-        kw_nonKWs_delim,
-        delim_is_the_last,
-        nonKW_delim,
-        two_nonKWs_delim
-    )
+//    private val properties = listOf( // properties list needed for alternative method
+//        // if false -> not a code line
+//        not_only_nonKW,
+//        citation_or_link,
+//        // must be a code line
+//        can_be_the_only,
+//        starts_with_CanStartWith,
+//        assignment_present,
+//        only_kws,
+//        // must be compared with PROPERTIES_THRESHOLD
+//        dot_notation,
+//        function_call,
+//        assignment_or_colon_size3,
+//        assignment_or_colon_size4,
+//        operators_present,
+//        starts_with_kw,
+//        kws_and_delims_present,
+//        nums_and_delims_present,
+//        kw_nonKW_delim,
+//        two_kws_nonKW_delim,
+//        kw_nonKWs_delim,
+//        delim_is_the_last,
+//        nonKW_delim,
+//        two_nonKWs_delim
+//    )
 
-    private val PROPERTIES_TOTAL = properties.size.toDouble()
+    private val properties_position  = listOf(starts_with_kw, kw_nonKW_delim, two_kws_nonKW_delim, nonKW_delim, two_nonKWs_delim)
+    private val properties_else = listOf(dot_notation, function_call, assignment_or_colon_size3, assignment_or_colon_size4, operators_present, kws_and_delims_present, nums_and_delims_present, delim_is_the_last, kw_nonKWs_delim)
+
+    private val PROPERTIES_TOTAL = 1 + properties_else.size.toDouble()
+
+//    private val PROPERTIES_TOTAL = properties.size.toDouble() // alternative method
     internal fun calculatePropertiesThreshold(): Double {
-        val PROPERTIES_TRUE = properties.filter { it }.size.toDouble()
+        var PROPERTIES_TRUE = properties_else.filter { it }.size.toDouble()
+        if (properties_position.any {it}) PROPERTIES_TRUE++
+
+//        val PROPERTIES_TRUE = properties.filter { it }.size.toDouble() // alternative method
         val PROPERTIES_PROBABILITY = PROPERTIES_TRUE / PROPERTIES_TOTAL
 
         return PROPERTIES_PROBABILITY
@@ -178,8 +189,8 @@ class CodeDetectorLineEvaluation(
     private val PROPERTIES_PROBABILITY = calculatePropertiesThreshold()
 
     fun makeDecision(): Boolean {
-        if (!not_only_nonKW) return false
-        if (starts_with_CanStartWith || assignment_present || only_kws || function_call || dot_notation || assignment_or_colon_size3 || assignment_or_colon_size4) return true
+        if (!not_only_nonKW || citation_or_link) return false
+        if (starts_with_CanStartWith || assignment_present || only_kws || can_be_the_only) return true
         return ((FREQUENCY_PROBABILITY >= FREQUENCY_THRESHOLD) && (PROPERTIES_PROBABILITY >= PROPERTIES_THRESHOLD))
     }
 

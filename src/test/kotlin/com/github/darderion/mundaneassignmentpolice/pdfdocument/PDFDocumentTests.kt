@@ -153,11 +153,11 @@ class PDFDocumentTests: StringSpec({
 			Section("8.1.1. Lorem1–1",													149),
 			Section("8.2. Subsection Lorem2",											156),
 			Section("9. Section with two subsections and two ’subsubsections’",		162),
-			Section("9.1. Subsection Lorem1",											165),
+			Section("9.1. Subsection Lorem1",											164),
 			Section("9.1.1. Lorem1–1",													170),
 			Section("9.1.2. Lorem1–2",													177),
-			Section("9.2. Subsection Lorem2",											184),
-			Section("Заключение",														190)
+			Section("9.2. Subsection Lorem2",											183),
+			Section("Заключение",														189)
 		)
 	}
 }

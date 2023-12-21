@@ -31,7 +31,7 @@ class CodeDetectorTests : StringSpec({
         CodeDetector.isLikelyCode("(a) Item1") shouldBe false
     }
     "test case from database 5" {
-        CodeDetector.isLikelyCode("4") shouldBe false
+        CodeDetector.isLikelyCode("laborum.).\"") shouldBe false
     }
     "test case from A. Bochkarev's work" {
         CodeDetector.isLikelyCode("str.equals(\"greater\" || testField != sum) {") shouldBe true

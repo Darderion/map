@@ -84,7 +84,7 @@ class ListRule(
 				rulesViolations.add(RuleViolation(lines, name, type))
 		}
 
-		println(rulesViolations.toList())
+//		println(rulesViolations) // can be useful for debugging
 		return rulesViolations.toList()
 	}
 }
