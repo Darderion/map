@@ -5,7 +5,7 @@ class CodeDetectorLineEvaluation(
     totalWords: Double,
     codeWords: Double
 ) {
-    private val not_only_nonKW = codeWords != 0.0
+    private val not_only_nonKW = codeWords != 0.0 // line consists not only of non-keywords
 
     private val can_be_the_only =
         lineAsList.size == 1 && CodeDetectorDataBase.can_be_the_only_element.contains(lineAsList[0])
@@ -13,38 +13,42 @@ class CodeDetectorLineEvaluation(
     private val starts_with_CanStartWith =
         lineAsList.isNotEmpty() && CodeDetectorDataBase.can_start_with.contains(lineAsList[0])
 
-    private val assignment_present = lineAsList.isNotEmpty() && lineAsList.any() { it == "=" }
+    private val assignment_present = lineAsList.any() { it == "=" }
 
-    private val rule_short = lineAsList.size >= 2 && (lineAsList[1] == "=" || lineAsList[1] == ":")
+    private val assignment_or_colon_size3 =
+        lineAsList.size >= 2 && (lineAsList[1] == "=" || lineAsList[1] == ":") // '=' or ':' in specific position
 
-    private val starts_with_kw = lineAsList.isNotEmpty() && isKW(lineAsList[0])
+    private val assignment_or_colon_size4 = lineAsList.size >= 3 && (lineAsList[2] == "=" || lineAsList[2] == ":")
 
-    private val only_kws = codeWords == totalWords
 
-    private val kws_and_delims_present = lineAsList.isNotEmpty() &&
-            lineAsList.any { isKW(it) || isDelim(it) }
+    private val starts_with_kw = isKW(lineAsList[0])
 
-    private val nums_and_delims_present = lineAsList.isNotEmpty() &&
-            lineAsList.any { it.toDoubleOrNull() != null || isDelim(it) }
+    private val only_kws = codeWords == totalWords // line consists only of keywords
 
-    private val kw_nonKW_delim =
+    private val kws_and_delims_present =
+        lineAsList.any { isKW(it) || isDelim(it) }
+
+    private val nums_and_delims_present =
+        lineAsList.any { it.toDoubleOrNull() != null || isDelim(it) }
+
+    private val kw_nonKW_delim = // Example: "int something = 0;"
         if (lineAsList.size >= 3)
             (isKW(lineAsList[0]) && isNonKW(lineAsList[1]) && isDelim(lineAsList[2]))
         else false
 
     // OR
-    private val two_kws_nonKW_delim =
+    private val two_kws_nonKW_delim = // Example: "private val something = "something" "
         if (lineAsList.size >= 4)
             (isKW(lineAsList[0]) && isKW(lineAsList[1]) && isNonKW(lineAsList[2]) && isDelim(lineAsList[3]))
         else false
 
 
-    private val kw_nonKWs_delim =
+    private val kw_nonKWs_delim = // same as previous but for multiple non-KWs
         (lineAsList.size >= 4 && isKW(lineAsList[0]) &&
                 (lineAsList.any { isDelim(it) }) &&
                 (lineAsList.any { isNonKW(it) }))
 
-    private val delim_is_the_last = lineAsList.isNotEmpty() && isDelim(lineAsList.last())
+    private val delim_is_the_last = isDelim(lineAsList.last())
 
     // starts with nonKW
     private val nonKW_delim =
@@ -64,8 +68,7 @@ class CodeDetectorLineEvaluation(
 
     private val function_call = findFunctionCall(lineAsList)
 
-    private val operators_present =
-        lineAsList.isNotEmpty() && lineAsList.any() { CodeDetectorDataBase.operators.contains(it) }
+    private val operators_present = lineAsList.any() { CodeDetectorDataBase.operators.contains(it) }
 
     private fun isNonKW(word: String): Boolean {
         return (!CodeDetectorDataBase.keywords.contains(word) && !CodeDetectorDataBase.delimiters.contains(word) && word.toDoubleOrNull() == null)
@@ -124,15 +127,7 @@ class CodeDetectorLineEvaluation(
     private fun findFunctionCall(line: List<String>): Boolean {
         var openBracket = 0
         var prevWord: String
-//        var index = 0
-//        if (line.size < 3) return false
         for (word in line) {
-//            if (index == line.indices.last) {
-//                if (word == ")" || word == ");") {
-//                    return openBracket == 1
-//                }
-
-//                index++
             prevWord = word
             if (word == "(") {
                 if (isKW(prevWord) || isNonKW(prevWord)) openBracket = 1
@@ -150,14 +145,15 @@ class CodeDetectorLineEvaluation(
         // if false -> not a code line
         not_only_nonKW,
         // must be a code line
-        rule_short,
+        assignment_or_colon_size3,
+        assignment_or_colon_size4,
         can_be_the_only,
         starts_with_CanStartWith,
         assignment_present,
         only_kws,
         dot_notation,
         function_call,
-        //--------------------
+        // must be compared with PROPERTIES_THRESHOLD
         operators_present,
         starts_with_kw,
         kws_and_delims_present,
@@ -183,7 +179,7 @@ class CodeDetectorLineEvaluation(
 
     fun makeDecision(): Boolean {
         if (!not_only_nonKW) return false
-        if (starts_with_CanStartWith || assignment_present || only_kws || function_call || dot_notation || rule_short) return true
+        if (starts_with_CanStartWith || assignment_present || only_kws || function_call || dot_notation || assignment_or_colon_size3 || assignment_or_colon_size4) return true
         return ((FREQUENCY_PROBABILITY >= FREQUENCY_THRESHOLD) && (PROPERTIES_PROBABILITY >= PROPERTIES_THRESHOLD))
     }
 

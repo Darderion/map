@@ -58,7 +58,7 @@ class PDFStructure(text: List<Line>) {
                     } else {
                         if (it.content == BIBLIOGRAPHY_TITLE) {
                             BIBLIOGRAPHY
-                        } else if (CodeDetector.isLikelyCode(it.content)) {
+                        } else if (CodeDetector.isLikelyCode(it.content.trim())) {
                             CODE
                         } else area
                     }

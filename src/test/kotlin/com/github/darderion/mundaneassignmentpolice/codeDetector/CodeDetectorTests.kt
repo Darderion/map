@@ -33,14 +33,14 @@ class CodeDetectorTests : StringSpec({
     "test case from database 5" {
         CodeDetector.isLikelyCode("4") shouldBe false
     }
-    "test case from A.Bochkarev" {
+    "test case from A. Bochkarev's work" {
         CodeDetector.isLikelyCode("str.equals(\"greater\" || testField != sum) {") shouldBe true
     }
-
-    // 0.5 is the highest border that can be reached in particular cases, not in average
+    // 0.7 is the highest border that can be reached in particular cases but not in average
     "FREQUENCY_THRESHOLD is counted correctly" {
-        (Threshold.FREQUENCY_THRESHOLD <= 0.95) shouldBe true
+        (Threshold.FREQUENCY_THRESHOLD <= 0.7) shouldBe true
     }
+    // 0.5 is the highest border that can be reached in particular cases but not in average
     "PROPERTIES_THRESHOLD is counted correctly" {
         (Threshold.PROPERTIES_THRESHOLD <= 0.5) shouldBe true
     }

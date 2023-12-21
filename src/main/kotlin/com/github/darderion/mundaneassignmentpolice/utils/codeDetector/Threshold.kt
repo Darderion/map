@@ -3,7 +3,9 @@ package com.github.darderion.mundaneassignmentpolice.utils.codeDetector
 import java.io.BufferedReader
 import java.io.FileReader
 
-
+/**
+ * counts THRESHOLDs using real code samples from codeSample.txt
+ */
 class Threshold {
     companion object {
         private const val FILE =
@@ -46,7 +48,7 @@ class Threshold {
                     println("An error occurred while closing the file: ${e.message}")
                 }
             }
-//            println(FT_totalProb / FT_counter.toDouble())
+//            println(FT_totalProb / FT_counter.toDouble()) // can be useful for debugging
             return FT_totalProb / FT_counter.toDouble()
         }
 
@@ -87,7 +89,7 @@ class Threshold {
                     println("An error occurred while closing the file: ${e.message}")
                 }
             }
-//            println(PT_totalProb / PT_counter.toDouble())
+//            println(PT_totalProb / PT_counter.toDouble()) // can be useful for debugging
             return PT_totalProb / PT_counter.toDouble()
         }
 

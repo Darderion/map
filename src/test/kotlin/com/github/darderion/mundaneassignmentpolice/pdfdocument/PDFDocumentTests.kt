@@ -128,10 +128,13 @@ class PDFDocumentTests: StringSpec({
 		const val filePathMultilineLineSectionTitle =
 			"${resourceFolder}pdfdocument/PDFDocumentTestsMultilineLineSectionTitle.pdf"
 
+		/**
+		 * An existing work that contains plenty of code material; reasonable to test on it
+		 */
 		const val bochkarevArseniy = "${resourceFolder}pdfdocument/bochkarev.pdf"
 
-		private val bochkarev = PDFBox().getLines(bochkarevArseniy)
 		private val lines = PDFBox().getLines(filePathCW)
+		private val bochkarev = PDFBox().getLines(bochkarevArseniy)
 
 		private val contentSections = listOf(
 			Section("Introduction",													55),

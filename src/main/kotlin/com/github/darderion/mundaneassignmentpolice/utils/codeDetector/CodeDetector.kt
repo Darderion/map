@@ -20,7 +20,6 @@ class CodeDetector {
             val lineToList = parseString(line)
             var codeWords = lineToList.filter { isCodePattern(it) || isDelimiter(it)}.size
             if (can_be_the_only_element.contains(lineToList[0]) || can_start_with.contains(lineToList[0])) return 1.0
-//            if (line.startsWith("    ") || line.startsWith("\t")) codeWords++
             for (word in lineToList) {
                 if (word.toDoubleOrNull() != null) codeWords++
             }
