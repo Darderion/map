@@ -6,6 +6,7 @@ import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFArea
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFRegion
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFRegion.Companion.EVERYWHERE
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFRegion.Companion.NOWHERE
+import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFArea.CODE
 import java.util.regex.Pattern
 
 // Extension method
@@ -27,7 +28,7 @@ class SymbolRuleBuilder {
 	private var neighborhoodSize: Int = 1
 	private var type: RuleViolationType = RuleViolationType.Error
 	private var name: String = "Rule name"
-	private var region: PDFRegion = EVERYWHERE
+	private var region: PDFRegion = EVERYWHERE.except(CODE)
 
 	infix fun symbol(symbol: Char) = this.also { this.symbol = symbol }
 
