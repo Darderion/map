@@ -5,7 +5,7 @@ import RuleViolation from '../RuleViolation/RuleViolation';
 interface RuleViolationListProps {
   categoryName: string;
   categories: string[];
-  violations: any[]; // Replace with the actual type of violations
+  violations: any[]; 
 }
 
 const RuleViolationList: FC<RuleViolationListProps> = ({ categoryName, categories, violations }) => {

@@ -69,10 +69,6 @@ function App(): JSX.Element {
             <Route path="/download" element={<Download />} />
             <Route path="/presets" element={<Presets />} />
             <Route path='/processFile' element={<ProcessFile />} />
-
-
-
-        // Other routes
           </Routes>
         </Router>
       </div>

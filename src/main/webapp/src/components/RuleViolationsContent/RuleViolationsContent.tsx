@@ -1,7 +1,6 @@
 import React, { FC, useMemo, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { List, Accordion, ScrollArea, ActionIcon } from '@mantine/core';
-
 import RuleViolationList from '../RuleViolationList/RuleViolationsList';
 import RuleSelect from '../RuleSelect/RuleSelect';
 import RuleList from '../RuleList/RuleList';
@@ -11,6 +10,7 @@ import FeedbackForm from '../FeedbackForm/FeedbackForm';
 import { setCurrentPage, setCurrentLine } from '../../reducers/counterReducer';
 import './RuleViolationsContent.css';
 import { RuleProps } from '../Rule/Rule';
+import { RootState } from '../../store';
 interface RuleViolation {
   message: string;
   lines: {
@@ -33,7 +33,7 @@ interface TargetArrayItem {
 }
 
 const RuleViolationsContent = () => {
-  const rulesFull = useSelector((state: any) => state.file.ruleSet);
+  const rulesFull = useSelector((state: RootState) => state.file.ruleSet);
   const dispatch = useDispatch();
   const ruleViolations = useSelector((state: any) => state.file.ruleViolations);
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
@@ -80,7 +80,7 @@ const RuleViolationsContent = () => {
     return [...new Set(selectedRuleViolations.map(violation => String(violation[selectedSort])))];
   }, [selectedSort, selectedRuleViolations]);
 
-  const currentFile = useSelector((state: any) => state.file.currentFile);
+  const currentFile = useSelector((state: RootState) => state.file.currentFile);
   const [modal, setModal] = useState<boolean>(false);
 
   if (currentFile != null) {
@@ -99,7 +99,7 @@ const RuleViolationsContent = () => {
           <div className="sortedRuleViolationsList">
             <RuleSelect
               value={selectedSort}
-              onChange={setSelectedSort as any} // Casting to 'any' to bypass strict typing temporarily
+              onChange={setSelectedSort as any}
               options={options}
               defaultValue={options[0]}
             />
@@ -159,7 +159,7 @@ const RuleViolationsContent = () => {
     );
   }
 
-  return null; // Render null if no current file
+  return null; 
 };
 
 export default RuleViolationsContent;

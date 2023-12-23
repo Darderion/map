@@ -3,28 +3,30 @@ import { Button, Group } from '@mantine/core';
 import { useDispatch, useSelector } from 'react-redux';
 import { Textarea } from '@mantine/core';
 import axios from 'axios';
+import { RootState } from '../../store';
 
 interface FeedbackFormProps {
 }
 
 const FeedbackForm: React.FC<FeedbackFormProps> = () => {
-  const pdfName: string = useSelector((state: any) => state.file.currentFileName);
-  const page: string = useSelector((state: any) => state.file.currentPage);
-  const line: string = useSelector((state: any) => state.file.currentLine);
-  const title: string = useSelector((state: any) => state.file.selectedItem);
+  const pdfName: string|null = useSelector((state: RootState) => state.file.currentFileName);
+  const page: number = useSelector((state: RootState) => state.file.currentPage);
+  const line: number = useSelector((state: RootState) => state.file.currentLine);
+  const title: string = useSelector((state: RootState) => state.file.selectedItem);
+  const apiUrl: string = useSelector((state: RootState) => state.file.apiUrl);
   const [comment, setComment] = useState<string>('');
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
 
     const formData = new FormData();
-    formData.append('pdfName', pdfName);
-    formData.append('page', page);
+    formData.append('pdfName', pdfName+"");
+    formData.append('page', page+"");
     formData.append('title', title);
-    formData.append('line', line);
+    formData.append('line', line+"");
     formData.append('comment', comment);
 
-    axios.post('http://localhost:8081/api/submitFeedback', formData)
+    axios.post(apiUrl+'/submitFeedback', formData)
       .then(response => {
         console.log(response.data);
       })

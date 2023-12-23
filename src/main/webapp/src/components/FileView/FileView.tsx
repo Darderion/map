@@ -25,18 +25,9 @@ const FileView: React.FC<FileViewProps> = () => {
       setPdfData(response.data);
     };
 
-    const fetchFirstPagePdfData = async () => {
-      const response = await axios.get<ArrayBuffer>(apiUrl +
-        `/api/viewPDF.pdf?pdfName=${currentFileName}`,
-        {
-          responseType: 'arraybuffer',
-        }
-      );
-      setFirstPagePdfData(response.data);
-    };
+
 
     fetchPdfData();
-    fetchFirstPagePdfData();
   }, [currentLine, currentPage]);
 
 
@@ -55,4 +46,4 @@ const FileView: React.FC<FileViewProps> = () => {
   );
 };
 
-export default FileView;
+export default FileView;  

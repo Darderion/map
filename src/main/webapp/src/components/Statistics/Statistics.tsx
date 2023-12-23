@@ -2,9 +2,9 @@ import { FC, useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
 import { useSelector } from 'react-redux';
 import { Title, RingProgress, ColorSwatch, Text } from '@mantine/core';
-import { MantineReactTable, useMantineReactTable } from 'mantine-react-table'; // Примерное название, проверьте наличие нужных импортов в документации библиотеки
+import { MantineReactTable, useMantineReactTable } from 'mantine-react-table'; 
 import './Statistics.css';
-
+import { RootState } from '../../store';
 interface WordsStatisticResponse {
   topKWords: Record<string, number>;
   wordCount: number;
@@ -35,29 +35,17 @@ interface PageData {
   sizePercentage: number;
 }
 
-interface FileState {
-  apiUrl: string;
-  ruleSet: any[]; // Замените any на фактический тип, если он есть
-  files: File[];
-  currentFile: File | null;
-  currentPage: string | null;
-  currentLine: number;
-  currentFileName: string | null;
-  ruleViolations: any[]; // Замените any на фактический тип, если он есть
-  selectedItem: any | null; // Замените any на фактический тип, если он есть
-  currentPreset: any[]; // Замените any на фактический тип, если он есть
-}
-
 const Statistics: FC = () => {
   const [wordData, setWordData] = useState<WordData[]>([]);
   const [pageData, setPageData] = useState<PageData[]>([]);
   const [wordCount, setWordCount] = useState<number>(0);
   const [pageCount, setPageCount] = useState<number>(0);
-  const currentFileName = useSelector((state: FileState) => state.currentFileName);
+  const currentFileName = useSelector((state: RootState) => state.file.currentFileName);
+  const apiUrl = useSelector((state: RootState) => state.file.apiUrl);
   const colors: string[] = ['#FF7F50', '#FFD700', '#40E0D0', '#FF69B4', '#7CFC00', '#FF1493', '#00CED1', '#FF8C00', '#8A2BE2', '#00FF00'];
 
   useEffect(() => {
-    axios.get<ApiResponse>(`http://localhost:8081/api/viewPDFStatistic?pdfName=${currentFileName}`, {
+    axios.get<ApiResponse>(apiUrl+`/viewPDFStatistic?pdfName=${currentFileName}`, {
       responseType: 'json',
     })
       .then(res => {

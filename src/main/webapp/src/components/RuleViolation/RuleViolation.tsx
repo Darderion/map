@@ -7,6 +7,7 @@ import { ActionIcon } from '@mantine/core';
 import { IconAlertHexagon } from '@tabler/icons-react';
 import RuleModal from '../RuleModal/RuleModal'
 import FeedbackFrom from '../FeedbackForm/FeedbackForm';
+import { RootState } from '../../store';
 
 interface RuleViolationProps {
   categoryName: string;
@@ -16,7 +17,7 @@ interface RuleViolationProps {
 
 const RuleViolation: React.FC<RuleViolationProps> = ({ categoryName, category, violations }) => {
   const dispatch = useDispatch();
-  const selectedItemId = useSelector((state: any) => state.file.selectedItem);
+  const selectedItemId = useSelector((state: RootState) => state.file.selectedItem);
 
   const [modal, setModal] = useState(false)
 

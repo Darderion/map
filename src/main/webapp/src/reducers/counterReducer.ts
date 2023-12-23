@@ -2,6 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import RuleViolation from "../classes/RuleViolation";
 import Rule from "../classes/Rule"
 interface FileState {
+  selectedItem: any;
   apiUrl: string;
   ruleSet: Rule[];
   files: File[];
@@ -23,6 +24,7 @@ const initialState: FileState = {
   currentFileName: null,
   ruleViolations: [],
   currentPreset: [],
+  selectedItem: undefined
 };
 
 const fileSlice = createSlice({
