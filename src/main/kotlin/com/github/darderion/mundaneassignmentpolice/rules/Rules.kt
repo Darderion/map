@@ -622,6 +622,8 @@ val RULE_ORDER_OF_REFERENCES = RegexRuleBuilder()
 		}.map { it.second }
 	}.getRule()
 
+val exclusionsForAbbreviations = arrayOf(Regex("или", RegexOption.IGNORE_CASE), Regex("по", RegexOption.IGNORE_CASE))
+
 val RULE_VARIOUS_ABBREVIATIONS = RegexRuleBuilder()
 	.called("Использованы различные версии сокращения")
 	.regex(Regex("""[a-zA-Zа-яА-Я]+"""))
@@ -644,6 +646,9 @@ val RULE_VARIOUS_ABBREVIATIONS = RegexRuleBuilder()
 				allWords[word.lowercase()]?.size!! > 1
 			else
 				false
+		}.filter{ pair ->
+			val word = pair.first
+			exclusionsForAbbreviations.none { it.containsMatchIn(word) }
 		}.map { it.second }
 	}.getRule()
 
