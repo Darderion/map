@@ -674,3 +674,10 @@ val RULE_OUTSIDE_FIELDS = LineRuleBuilder()
 		}
 	}
 	.getRule()
+
+val RULE_DOUBLE_SPACE = SymbolRuleBuilder()
+	.symbol(' ')
+	.called("Два пробела подряд")
+	.inArea(PDFRegion.EVERYWHERE)
+	.shouldNotHaveNeighbor(' ')
+	.getRule()
