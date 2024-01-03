@@ -7,3 +7,6 @@
     width: calc(100px + 495 * (100vw / 1280)) !important;
     max-width: 355px;
 }
+.ruleName .mantine-Checkbox-label { 
+    text-align: left;
+  }
