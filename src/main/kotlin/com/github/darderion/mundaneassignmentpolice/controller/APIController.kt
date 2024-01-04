@@ -1,5 +1,6 @@
 package com.github.darderion.mundaneassignmentpolice.controller
-
+import com.fasterxml.jackson.databind.DeserializationFeature
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.github.darderion.mundaneassignmentpolice.checker.Checker
 import com.github.darderion.mundaneassignmentpolice.checker.DocumentReport
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.Annotations
@@ -12,23 +13,23 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.servlet.view.RedirectView
 import java.io.File
+import  com.github.darderion.mundaneassignmentpolice.rules.RULE_SET_RU
+import com.github.darderion.mundaneassignmentpolice.statisticsservice.StatisticsService
+
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
 
 const val pdfFolder = "uploads/"
-
-const val developmentURL = "http://localhost:8080"
+const val developmentURL = "http://localhost:3000"
 const val deploymentURL = "http://91.109.207.113"
 
 const val url = developmentURL
-
+data class Feedback(val pdfName: String, val comment: String, val title: String, val line: Int, val page: Int)
 @RestController
 @CrossOrigin(origins = [url])
 class APIController {
 	val pdfBox = PDFBox()
 	val ruleSet = RULE_SET_RU
-
-	@GetMapping("/api/viewPDFText")
-	fun getPDFText(@RequestParam pdfName: String) =
-		pdfBox.getText("$pdfFolder$pdfName").also { logger.info("ViewPDF(pdfName = $pdfName)") }
 
 	@GetMapping("/api/viewPDFSections")
 	fun getPDFSections(@RequestParam pdfName: String): List<Section> {
@@ -47,13 +48,23 @@ class APIController {
 	@GetMapping("/api/viewPDFImages")
 	fun getPDFImages(@RequestParam pdfName: String) =
 		pdfBox.getImages("$pdfFolder$pdfName").toList().also { logger.info("ViewPDFImages(pdfName = $pdfName)") }
-
+	@GetMapping("/api/viewPDFStatistic")
+	fun getPDFStatistic(@RequestParam pdfName: String) =
+		StatisticsService().getPDFStatistic("$pdfFolder$pdfName")
+	@GetMapping("/api/viewRULE_SET")
+	@ResponseBody
+	fun viewRuleSet(): RuleSet {
+		val ruleSet = RULE_SET_RU
+		val uniqueRules = ruleSet.rules.distinctBy { it.name }
+		return RuleSet(uniqueRules)
+	}
 	@PostMapping("/api/getPDFReview")
 	fun getPDFReview(
 		@RequestParam("pdf") multipartFile: MultipartFile,
-		@RequestParam("locale") locale: String
+		@RequestParam("locale") locale: String,
+		@RequestParam("ruleSet") ruleSet2: List<String>
 	): RedirectView? {
-		val pdfReport = uploadPDF(multipartFile)
+		val pdfReport = uploadPDF(multipartFile,ruleSet2)
 		if (pdfReport.errorCode != 0) {
 			return null
 		}
@@ -91,18 +102,62 @@ class APIController {
 
 	@GetMapping("/api/getPDFSize")
 	fun getPDFSize(@RequestParam pdfName: String) = pdfBox.getPDFSize("$pdfFolder$pdfName")
+	@GetMapping("/api/listUploadedPDFsWithReports")
+	fun listUploadedPDFsWithReports(): List<Map<String, Any?>> {
+		val folder = File(pdfFolder)
+		val reports = mutableListOf<Map<String, Any?>>()
+		val mapper = jacksonObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+		val pdfFiles = folder.listFiles()?.filter { it.isFile&& it.name.endsWith(".pdf") }
+		pdfFiles?.forEach { pdfFile ->
+			val reportFile = File("$pdfFolder${File.separator}${pdfFile.name.plus("_report")}")
+
+			val report = if (reportFile.exists()) {
+				val jsonString = reportFile.readText()
+				mapper.readValue(jsonString, DocumentReport::class.java)
+			} else {
+				null
+			}
+			val reportMap = mutableMapOf<String, Any?>()
+			reportMap["name"] = pdfFile.name
+			reportMap["documentReport"] = report
+			reports.add(reportMap)
+		}
+		return reports
+	}
 
 	@PostMapping("/api/uploadPDF")
-	fun uploadPDF(@RequestParam("file") multipartFile: MultipartFile): DocumentReport {
+	fun uploadPDF(@RequestParam("file") multipartFile: MultipartFile, @RequestParam("ruleSet") ruleSet2: List<String>): DocumentReport {
 		if (multipartFile.originalFilename == null) {
 			return DocumentReport.emptyFileName
 		}
-		val pdfName = FileUploadUtil.saveFile(pdfFolder, multipartFile, folderMaxSize = 1000)
-		val ruleViolations = Checker().getRuleViolations("$pdfFolder$pdfName", ruleSet)
-
-		return DocumentReport(pdfName, ruleViolations, 0)
+		val pdfName = FileUploadUtil.saveFile(pdfFolder, multipartFile,multipartFile.originalFilename!!)
+		val filteredRules = if (ruleSet2.isNotEmpty()) {
+			RULE_SET_RU.rules.filter { ruleSet2.contains(it.name) }
+		} else {
+			RULE_SET_RU.rules
+		}
+		val newRuleSet = RuleSet(filteredRules.toMutableList())
+		val ruleViolations = Checker().getRuleViolations("$pdfFolder$pdfName", newRuleSet)
+		val docReport = DocumentReport(pdfName, ruleViolations, 0)
+		val mapper = jacksonObjectMapper()
+		val jsonString = mapper.writeValueAsString(docReport)
+		File("$pdfFolder${File.separator}${pdfName.plus("_report")}").writeText(jsonString)
+		return docReport
 	}
 
+	@PostMapping("/api/submitFeedback")
+	fun submitFeedback(@RequestParam("pdfName") pdfName: String,
+					   @RequestParam("comment") comment: String,
+					   @RequestParam("title") title: String,
+					   @RequestParam("line") line: Int,
+					   @RequestParam("page") page: Int): Feedback {
+		val feedback = Feedback(pdfName, comment, title, line, page)
+		val feedbackFolder = "feedback/"
+		val mapper = jacksonObjectMapper()
+		val jsonString = mapper.writeValueAsString(feedback)
+		File("$feedbackFolder${File.separator}_${feedback.pdfName}_${feedback.line}_${feedback.page}.json").writeText(jsonString)
+		return feedback
+	}
 	private companion object {
 		private val logger = KotlinLogging.logger {}
 	}
