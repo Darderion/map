@@ -17,5 +17,4 @@ cp -a build/. ../resources/static/ &&
 rm -rf ../resources/static/app &&
 mkdir ../resources/static/app &&
 mv ../resources/static/index.html ../resources/static/app/index.html
-# serve -s build 
-
+# serve -s build
