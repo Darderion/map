@@ -1,0 +1,54 @@
+.pageContainer {
+  margin-top: 50px;
+  display: flex;
+  justify-content: center;
+}
+
+.listPage {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  background-color: rgb(233, 233, 233);
+  padding: 30px 10px 10px 20px;
+  max-width: 1000px;
+  min-height: 100vh;
+  height: auto;
+}
+
+.listHead {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  justify-content: space-between;
+  margin-left: 10px;
+}
+
+.listContent {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.listName {
+  display: inline-block;
+  margin-top: 20px;
+}
+
+.listButtons {
+  display: flex;
+  justify-content: space-between;
+}
+
+.listButton {
+  margin: 5px;
+  font-size: 20px;
+  padding-top: 5px;
+}
+
+.search {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}

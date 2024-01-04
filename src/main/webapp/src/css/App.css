@@ -1,0 +1,22 @@
+html, body {
+  height: 100%;
+}
+
+.menu{
+  color:rgb(224, 143, 20);
+  margin-top: 30px;
+  margin-left: 10px;
+  margin-bottom: 0px;
+}
+
+li.mantine-1pb67v2{
+  list-style-type: none;
+}
+
+.mantine-1oy32v8[data-active]{
+  background-color: rgb(255, 255, 255);
+}
+
+ul.mantine-List-root{
+  margin-top: 10px;
+}

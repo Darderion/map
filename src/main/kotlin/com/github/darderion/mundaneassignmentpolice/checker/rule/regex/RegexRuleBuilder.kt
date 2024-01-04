@@ -12,6 +12,7 @@ class RegexRuleBuilder {
 	private var type: RuleViolationType = RuleViolationType.Error
 	private var region: PDFRegion = PDFRegion.EVERYWHERE.except(PDFArea.CODE)
 	private var name: String = "Rule name"
+	private var description: String = ""
 
 	fun regex(regex: Regex) = this.also { this.regex = regex }
 
@@ -24,7 +25,7 @@ class RegexRuleBuilder {
 	fun type(type: RuleViolationType) = this.also { this.type = type }
 
 	fun inArea(region: PDFRegion) = this.also { this.region = region }
-
+	infix fun setDescription(description: String) = this.also { this.description = description }
 	fun called(name: String) = this.also { this.name = name }
 
 	fun getRule() = RegexRule(
@@ -33,6 +34,7 @@ class RegexRuleBuilder {
 		numberOfNearestLinesToSearch,
 		type,
 		region,
-		name
+		name,
+		description
 	)
 }

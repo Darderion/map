@@ -21,7 +21,8 @@ private class SequenceURLRule(
     emptyList(),
     sequenceOfRules.first().type,
     sequenceOfRules.first().area,
-    sequenceOfRules.first().name
+    sequenceOfRules.first().name,
+    sequenceOfRules.first().description
 ) {
     override fun getRuleViolations(urls: List<Url>): List<Pair<Url, RuleViolation>> {
         val rulesViolations = mutableSetOf<Pair<Url, RuleViolation>>()

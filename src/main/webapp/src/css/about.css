@@ -1,0 +1,22 @@
+.aboutPage {
+    margin-top: 50px;
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    font-size: 26px;
+}
+
+.label {
+    font-weight: 700;
+    line-height: 1;
+}
+
+.lead {
+    font-weight: 700;
+    margin: 10px;
+}
+
+.githubButton {
+    padding-top: 15px;
+    padding-bottom: 15px;
+}

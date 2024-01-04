@@ -15,8 +15,9 @@ open class URLRule(
     protected val predicatesOfIgnoring: List<(url: Url) -> Boolean>,
     type: RuleViolationType,
     area: PDFRegion,
-    name: String
-) : Rule(area, name, type) {
+    name: String,
+    description: String
+) : Rule(area, name, type, description) {
     open fun getRuleViolations(urls: List<Url>): List<Pair<Url, RuleViolation>> {
         val ruleViolations = mutableSetOf<Pair<Url, RuleViolation>>()
 
