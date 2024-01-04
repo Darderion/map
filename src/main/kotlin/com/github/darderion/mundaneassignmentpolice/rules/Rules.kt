@@ -590,8 +590,8 @@ val RULE_URLS_UNIFORMITY = URLRuleBuilder()
 	.inArea(PDFRegion.NOWHERE.except(PDFArea.FOOTNOTE, PDFArea.BIBLIOGRAPHY))
 	.disallow { urls ->
 		var filteredUrls = urls.filter { url ->
-			!url.text.startsWith("https://www") 
-		}.filter {url -> !url.text.startsWith("http://www") }								
+			!url.text.startsWith("https://www") && !url.text.startsWith("http://www")
+		}
 
 		if (urls.size == filteredUrls.size) {
 			filteredUrls = filteredUrls.filter { url ->
@@ -670,7 +670,7 @@ val RULE_LOW_QUALITY_CONFERENCES = URLRuleBuilder()
 		}.map { it to it.lines }
 	}.getRule()
 
-val fieldsCoordinateX = 560
+const val fieldsCoordinateX = 560
 val RULE_OUTSIDE_FIELDS = LineRuleBuilder()
 	.called("Слово вышло за поля")
 	.inArea(PDFRegion.EVERYWHERE.except(PDFArea.BIBLIOGRAPHY, PDFArea.FOOTNOTE, PDFArea.TITLE_PAGE))

@@ -10,8 +10,8 @@ import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Line
 
 open class RegexRule(
 	val regex: Regex,
-	val predicates: List<(matches: List<Pair<String, List<Line>>>) -> List<List<Line>>>,
-	val numberOfNearestLinesToSearch: Int,        //without including this line
+	private val predicates: List<(matches: List<Pair<String, List<Line>>>) -> List<List<Line>>>,
+	private val numberOfNearestLinesToSearch: Int,        //without including this line
 	type: RuleViolationType,
 	area: PDFRegion,
 	name: String,
@@ -28,7 +28,7 @@ open class RegexRule(
 		return ruleViolations
 	}
 
-	fun getAllMatches(document: PDFDocument): List<Pair<String, List<Line>>> {
+	private fun getAllMatches(document: PDFDocument): List<Pair<String, List<Line>>> {
 		val matches: MutableList<Pair<String, List<Line>>> = mutableListOf()
 
 		val linesInsideArea = document.text.filter { it.area!! inside area }
@@ -50,6 +50,6 @@ open class RegexRule(
 			})
 		}
 
-		return matches.sortedBy{it.first}.toSet().toList()
+		return matches.toSet().toList().sortedBy { it.first }
 	}
 }
