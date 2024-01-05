@@ -1,12 +1,10 @@
 import React, { useState } from 'react';
-import { Button, Group } from '@mantine/core';
+import { Button, Textarea, Group } from '@mantine/core';
 import { useDispatch, useSelector } from 'react-redux';
-import { Textarea } from '@mantine/core';
 import axios from 'axios';
 import { RootState } from '../../store';
 
-interface FeedbackFormProps {
-}
+interface FeedbackFormProps {}
 
 const FeedbackForm: React.FC<FeedbackFormProps> = () => {
   const pdfName: string|null = useSelector((state: RootState) => state.file.currentFileName);
@@ -19,14 +17,19 @@ const FeedbackForm: React.FC<FeedbackFormProps> = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
 
-    const formData = new FormData();
-    formData.append('pdfName', pdfName+"");
-    formData.append('page', page+"");
-    formData.append('title', title);
-    formData.append('line', line+"");
-    formData.append('comment', comment);
+    if (!pdfName) {
+      console.error('PDF name is required.');
+      return;
+    }
 
-    axios.post(apiUrl+'/submitFeedback', formData)
+    const params = new URLSearchParams();
+    params.append('pdfName', pdfName);
+    params.append('page', page.toString());
+    params.append('title', "FEEDBACK");
+    params.append('line', line.toString());
+    params.append('comment', comment);
+
+    axios.post(apiUrl+`/submitFeedback`, params)
       .then(response => {
         console.log(response.data);
       })
@@ -41,14 +44,14 @@ const FeedbackForm: React.FC<FeedbackFormProps> = () => {
         size="xl"
         radius="md"
         label="Почему вам кажется что правило сработало неверно?"
-        description="Comment"
+        description="Описание"
         placeholder=""
         value={comment}
         onChange={(e) => setComment(e.target.value)}
       />
       <Group mt="md">
         <Button type="submit" color="violet" size="md">
-          Save
+          Отправить
         </Button>
       </Group>
     </form>

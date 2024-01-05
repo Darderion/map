@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { List, Accordion, Text } from '@mantine/core';
 import { useDispatch, useSelector } from 'react-redux';
-import { setCurrentPage, setCurrentLine } from '../../reducers/counterReducer';
+import { setCurrentPage, setCurrentLine, setCurrentItem } from '../../reducers/counterReducer';
 import './RuleViolation.css';
 import { ActionIcon } from '@mantine/core';
 import { IconAlertHexagon } from '@tabler/icons-react';
@@ -24,9 +24,9 @@ const RuleViolation: React.FC<RuleViolationProps> = ({ categoryName, category, v
 
 
   return (
-    <Accordion.Item value={categoryName + category}>
+    <Accordion.Item value={ category}>
       <Accordion.Control>
-        {categoryName} {category}
+        {} {category}
       </Accordion.Control>
       <Accordion.Panel>
 
@@ -40,7 +40,7 @@ const RuleViolation: React.FC<RuleViolationProps> = ({ categoryName, category, v
 
                     dispatch(setCurrentPage(violation.page));
                     dispatch(setCurrentLine(violation.line));
-
+                    dispatch(setCurrentItem(violation.id));
                   }}
                   className={selectedItemId === violation.id ? 'selected-item' : ''}
                   icon={

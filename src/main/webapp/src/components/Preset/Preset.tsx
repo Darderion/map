@@ -15,7 +15,6 @@ interface PresetProps {
 }
 
 const Preset: FC<PresetProps> = ({ preset, visible }) => {
-    const listVisibility: string = visible ? "hidden" : "";
     const dispatch = useDispatch();
 
     return (
@@ -36,7 +35,7 @@ const Preset: FC<PresetProps> = ({ preset, visible }) => {
 
             <Accordion.Panel >
                 <Title
-                    order={4}>Rules
+                    order={4}>Правила
                 </Title>
 
                 <List color="dimmed" withPadding>

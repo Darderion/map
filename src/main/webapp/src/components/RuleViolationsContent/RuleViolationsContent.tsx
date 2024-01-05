@@ -11,10 +11,11 @@ import { setCurrentPage, setCurrentLine } from '../../reducers/counterReducer';
 import './RuleViolationsContent.css';
 import { RuleProps } from '../Rule/Rule';
 import { RootState } from '../../store';
+import { IconAlertHexagon } from '@tabler/icons-react';
 interface RuleViolation {
   message: string;
   lines: {
-    page: string;
+    page: number;
     area: string;
     index: number;
   }[];
@@ -49,7 +50,6 @@ const RuleViolationsContent = () => {
       uniqueRules.push(obj);
     }
   });
-
   const rules: Rule[] = rulesFull.filter((item: any) => uniqueRules.some(i => i.name === item.name));
   const targetArray: TargetArrayItem[] = (ruleViolations.length > 0) ? ruleViolations.map((item: RuleViolation) => ({
     name: item.message,
@@ -62,24 +62,29 @@ const RuleViolationsContent = () => {
       line: item.lines[0].index,
     }),
   })) : [];
-
+  console.log(targetArray)
   const options: (keyof TargetArrayItem)[] = ['name', 'page'];
 
   const [selectedRules, setSelectedRules] = useState<string[]>([...rules].map(r => r.name));
   const [selectedSort, setSelectedSort] = useState<keyof TargetArrayItem | ''>('');
 
   const selectedRuleViolations = useMemo(() => {
-    return targetArray.filter(r => selectedRules.includes(r.name));
+    return targetArray .sort((a, b) => a.page - b.page) 
+    .filter(r => selectedRules.includes(r.name));
   }, [selectedRules, targetArray]);
 
   const categories: string[] = useMemo(() => {
-    if (!selectedSort) {
-      return [];
-    }
+    const categories: string[] = []
 
-    return [...new Set(selectedRuleViolations.map(violation => String(violation[selectedSort])))];
-  }, [selectedSort, selectedRuleViolations]);
+    selectedRuleViolations
+    .forEach((violation: any) => {
+      if (!categories.includes(violation[selectedSort])) {
+        categories.push(violation[selectedSort])
+      }
+    })
 
+    return categories
+  }, [selectedSort, selectedRules])
   const currentFile = useSelector((state: RootState) => state.file.currentFile);
   const [modal, setModal] = useState<boolean>(false);
 
@@ -111,7 +116,7 @@ const RuleViolationsContent = () => {
               defaultValue="customization"
             >
               <Accordion.Item value="customization">
-                <Accordion.Control>Rule Violations</Accordion.Control>
+                <Accordion.Control>Нарушения правил</Accordion.Control>
                 <Accordion.Panel>
                   {selectedSort === '' ? (
                     <List withPadding spacing="xs">
@@ -127,11 +132,10 @@ const RuleViolationsContent = () => {
                               }}
                               className={selectedItemId === v.id ? 'selected-item' : ''}
                               icon={
-                                <ActionIcon
-                                  style={{ border: 'solid' }}
-                                  size="xl"
-                                  onClick={() => setModal(true)}
-                                >
+                                <ActionIcon 
+                                style={{border: 'solid'}}
+                                size="xl" onClick={() => setModal(true)}>
+                                  <IconAlertHexagon />
                                 </ActionIcon>
                               }
                             >

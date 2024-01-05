@@ -22,7 +22,6 @@
   justify-content: space-between;
   margin-left: 10px;
 }
-
 .listContent {
   display: flex;
   flex-direction: column;

@@ -19,7 +19,7 @@ const initialState: FileState = {
   ruleSet: [],
   files: [],
   currentFile: null,
-  currentPage: 0,
+  currentPage: -2,
   currentLine: 0,
   currentFileName: null,
   ruleViolations: [],
@@ -58,6 +58,9 @@ const fileSlice = createSlice({
     setRuleSet(state, action: PayloadAction<any[]>) {
       state.ruleSet = action.payload;
     },
+    setCurrentItem(state, action: PayloadAction<any>){
+      state.selectedItem = action.payload
+    }
   }
 });
 
@@ -71,6 +74,7 @@ export const {
   setRuleViolations,
   setCurrentPreset,
   setRuleSet,
+  setCurrentItem,
 } = fileSlice.actions;
 
 export default fileSlice;

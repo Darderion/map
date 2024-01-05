@@ -13,8 +13,8 @@ const RuleSelect: FC<RuleSelectProps> = ({ options, defaultValue, value, onChang
     <Select
       value={value}
       defaultValue={defaultValue}
-      label="Sort"
-      placeholder="Pick sort"
+      label="Сортировать"
+      placeholder="."
       data={options}
       onChange={onChange}
     />

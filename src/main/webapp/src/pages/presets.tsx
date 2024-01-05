@@ -46,9 +46,6 @@ const Presets: React.FC = () => {
         localStorage.setItem('presets', JSON.stringify(newPresets));
         setModal(false);
     };
-    const currentPreset = useSelector((state: RootState) => state.file.currentPreset);
-    const searchVisibility = modal ? "hidden" : "";
-
     const buttons: React.ReactNode[] = [
         <Link to="/Download" key="download">
             <Button
@@ -56,7 +53,7 @@ const Presets: React.FC = () => {
                 color="violet"
                 size="md"
             >
-                Go to upload
+                Перейти к загрузке
             </Button>
         </Link>,
 
@@ -67,7 +64,7 @@ const Presets: React.FC = () => {
             color="violet"
             size="md"
         >
-            Add Preset
+            Добавить набор
         </Button>,
     ];
 
@@ -81,10 +78,13 @@ const Presets: React.FC = () => {
 
     const presetsList = <PresetList key="presets-list" presets={selectedPresets} visible={modal} />;
 
+    const footnote = "Если не выбран ни один набор, то будут искаться сразу все ошибки.";
+
     return (
         <div>
             <ListContainer
-                title="Rule Presets"
+                title="Наборы правил"
+                subtitle={footnote} 
                 buttons={buttons}
                 search={search}
                 list={presetsList}

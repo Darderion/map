@@ -21,24 +21,24 @@ const Home = () => {
       <div className="homeHeader">
         <Container size={700} className="homeText">
           <Title className="name">
-            The application{' '}<br />
+            Приложение{' '}<br />
             <Text component="span" color="violet">
               MAP
             </Text>{' '}<br />
-            is a tool designed<br /> to check student's <br />work
+            это инструмент<br /> для проверки студенческих <br />работ
           </Title>
 
           <Text className="description" color="dimmed">
-            "Map" scans the text of the paper and highlights
-            problematic areas. This way, students receive
-            immediate feedback and have the opportunity
-            to enhance their writing skills.
-            The application provides statistics of work.
-            "Map" analyzes parameters such as word frequency,
-            use of academic vocabulary,
-            and text structure. This information allows students
-            to better understand their weaknesses and
-            focus on improving.
+          "Map" сканирует текст работы и выделяет
+            проблемные участки. Таким образом, студенты получают
+            немедленную обратную связь и имеют возможность
+            улучшить свои навыки письма.
+            Приложение предоставляет статистику работы.
+            "Map" анализирует параметры, такие как частотность слов,
+            использование академической лексики,
+            и структуру текста. Эта информация позволяет студентам
+            лучше понимать свои слабые стороны и
+            сосредоточиться на их улучшении.
           </Text>
 
           <Group>
@@ -48,7 +48,7 @@ const Home = () => {
               size="xl"
               color="violet"
               onClick={handleReset}>
-                Get started
+                Начать
               </Button></Link>
           </Group>
 
@@ -57,7 +57,7 @@ const Home = () => {
 
 
       </div>
-      <Title style={{ paddingTop: '200px', paddingBottom: '30px' }}>Rules</Title>
+      <Title style={{ paddingTop: '200px', paddingBottom: '30px' }}>Правила</Title>
       <div className='list'>
         <Accordion style={{ width: 'calc(180px + 495 * (100vw / 1280))' }} variant="default">
           {rulesFul.map((rule: { name: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | null | undefined; description: any; }, index: number) => (

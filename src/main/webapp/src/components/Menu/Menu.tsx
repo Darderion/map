@@ -21,10 +21,10 @@ const Menu = () => {
         value={activeTab}
       >
         <Tabs.List>
-          <Tabs.Tab value="Home" onClick={() => navigateTo('/Home')}>Home</Tabs.Tab>
-          <Tabs.Tab value="About" onClick={() => navigateTo('/About')}>About</Tabs.Tab>
-          <Tabs.Tab value="Presets" onClick={() => navigateTo('/Presets')}>RULES SETUP</Tabs.Tab>
-          <Tabs.Tab value="Download" onClick={() => navigateTo('/Download')}>UPLOAD FILES</Tabs.Tab>
+          <Tabs.Tab value="Home" onClick={() => navigateTo('/Home')}>Главная</Tabs.Tab>
+          <Tabs.Tab value="About" onClick={() => navigateTo('/About')}>Контакты</Tabs.Tab>
+          <Tabs.Tab value="Presets" onClick={() => navigateTo('/Presets')}>Наборы правил</Tabs.Tab>
+          <Tabs.Tab value="Download" onClick={() => navigateTo('/Download')}>Загрузка файлов</Tabs.Tab>
         </Tabs.List>
       </Tabs>
     </Container>
