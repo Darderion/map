@@ -24,7 +24,7 @@ const RuleViolation: React.FC<RuleViolationProps> = ({ categoryName, category, v
 
 
   return (
-    <Accordion.Item value={ category}>
+    <Accordion.Item value={ category.toString()}>
       <Accordion.Control>
         {} {category}
       </Accordion.Control>
