@@ -8,14 +8,14 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store';
 
 const Home = () => {
-  const rulesFul = useSelector((state: RootState) => state.file.ruleSet);
+  const rulesFull = useSelector((state: RootState) => state.file.ruleSet);
 
   const dispatch = useDispatch();
   const handleReset = () => {
     sessionStorage.setItem("tabs", "Presets");
     dispatch(resetVariable());
   };
-  console.log(rulesFul)
+
   return (
     <div className='homePage'>
       <div className="homeHeader">
@@ -33,10 +33,10 @@ const Home = () => {
             проблемные участки. Таким образом, студенты получают
             немедленную обратную связь и имеют возможность
             улучшить свои навыки письма.
-            Приложение предоставляет статистику работы.
+            Приложение также предоставляет статистику работы.
             "Map" анализирует параметры, такие как частотность слов,
-            использование академической лексики,
-            и структуру текста. Эта информация позволяет студентам
+            использование академической лексики и структуру текста.
+						Эта информация позволяет студентам
             лучше понимать свои слабые стороны и
             сосредоточиться на их улучшении.
           </Text>
@@ -60,7 +60,7 @@ const Home = () => {
       <Title style={{ paddingTop: '200px', paddingBottom: '30px' }}>Правила</Title>
       <div className='list'>
         <Accordion style={{ width: 'calc(180px + 495 * (100vw / 1280))' }} variant="default">
-          {rulesFul.map((rule: { name: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | null | undefined; description: any; }, index: number) => (
+          {rulesFull.map((rule: { name: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | null | undefined; description: any; }, index: number) => (
             <Accordion.Item
               value={"id" + index}
             >

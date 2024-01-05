@@ -13,9 +13,6 @@ const Download: React.FC = () => {
   const dispatch = useDispatch();
   const [refreshKey, setRefreshKey] = useState<number>(0);
 
-
-  console.log(files);
-
   const selectedFiles = useMemo(() => {
     return files.filter(file => file && file.name && file.name.toLowerCase().includes(searchQuery.toLowerCase()))
   }, [searchQuery, files]);

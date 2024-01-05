@@ -62,7 +62,6 @@ const RuleViolationsContent = () => {
       line: item.lines[0].index,
     }),
   })) : [];
-  console.log(targetArray)
   const options: (keyof TargetArrayItem)[] = ['name', 'page'];
 
   const [selectedRules, setSelectedRules] = useState<string[]>([...rules].map(r => r.name));

@@ -67,7 +67,7 @@ const File: React.FC<FileProps> = ({ file, remove, index }) => {
 
                   variant="light"
                 >
-                  {'Колличество ошибок - ' + documentReport.ruleViolations.length }
+                  {'Количество ошибок - ' + documentReport.ruleViolations.length }
                 </Button>
               </Link>
               <Button className="fileButton" color="violet" onClick={() => remove(file)}>

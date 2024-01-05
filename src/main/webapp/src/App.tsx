@@ -40,7 +40,6 @@ function App(): JSX.Element {
           ...rule,
           description: replaceLinks(rule.description),
         }));
-        console.log(modifiedRules)
         dispatch(setRuleSet(modifiedRules));
         setLoading(false);
       } catch (error) {
