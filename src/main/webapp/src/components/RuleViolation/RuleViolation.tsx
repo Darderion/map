@@ -55,7 +55,7 @@ const RuleViolation: React.FC<RuleViolationProps> = ({ categoryName, category, v
 
                   {violation.name}
                   <RuleModal visible={modal} setVisible={setModal}>
-                    <FeedbackFrom />
+                    <FeedbackFrom setModal = {setModal} />
                   </RuleModal>
                 </List.Item>
               ))}

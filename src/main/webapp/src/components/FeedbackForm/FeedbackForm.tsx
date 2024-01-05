@@ -4,9 +4,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
 import { RootState } from '../../store';
 
-interface FeedbackFormProps {}
+interface FeedbackFormProps {
+	setModal: (modal: boolean) => void
+}
 
-const FeedbackForm: React.FC<FeedbackFormProps> = () => {
+const FeedbackForm: React.FC<FeedbackFormProps> = (props: FeedbackFormProps) => {
   const pdfName: string|null = useSelector((state: RootState) => state.file.currentFileName);
   const page: number = useSelector((state: RootState) => state.file.currentPage);
   const line: number = useSelector((state: RootState) => state.file.currentLine);
@@ -36,6 +38,8 @@ const FeedbackForm: React.FC<FeedbackFormProps> = () => {
       .catch(error => {
         console.error('Error submitting feedback:', error);
       });
+
+		props.setModal(false);
   };
 
   return (
@@ -43,7 +47,7 @@ const FeedbackForm: React.FC<FeedbackFormProps> = () => {
       <Textarea
         size="xl"
         radius="md"
-        label="Почему вам кажется что правило сработало неверно?"
+        label="Почему вам кажется, что правило сработало неверно?"
         description="Описание"
         placeholder=""
         value={comment}

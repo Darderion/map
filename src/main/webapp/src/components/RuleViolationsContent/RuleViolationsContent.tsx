@@ -156,7 +156,7 @@ const RuleViolationsContent = () => {
           </div>
         </div>
         <RuleModal visible={modal} setVisible={setModal}>
-          <FeedbackForm />
+          <FeedbackForm setModal={setModal}/>
         </RuleModal>
       </div>
     );

@@ -43,6 +43,7 @@ const File: React.FC<FileProps> = ({ file, remove, index }) => {
         setDocumentReport(null);
       });
   };
+
   const handleViewFile = (fileName: string) => {
     dispatch(setCurrentFileName(fileName));
     dispatch(setCurrentPage(0));

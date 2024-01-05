@@ -10,6 +10,7 @@ interface FileViewProps { }
 const FileView: React.FC<FileViewProps> = () => {
   const [pdfData, setPdfData] = useState<BlobPart | null>(null);
   const [firstPagePdfData, setFirstPagePdfData] = useState<ArrayBuffer | null>(null);
+	const [pageInitialized, setPageInitialized] = useState<boolean>(false);
   const currentPage = useSelector((state: RootState) => state.file.currentPage);
   const currentLine = useSelector((state: RootState) => state.file.currentLine);
   const apiUrl = useSelector((state: RootState) => state.file.apiUrl);
@@ -23,13 +24,17 @@ const FileView: React.FC<FileViewProps> = () => {
           responseType: 'arraybuffer',
         }
       );
-      setPdfData(response.data);
+			if (pageInitialized) {
+				setPdfData(response.data);
+			} else {
+				setPageInitialized(true);
+			}
     };
-    fetchPdfData();
+		fetchPdfData();
   }, [currentLine, currentPage]);
   return (
     <div className="filePage">
-      {(pdfData ?? currentPage > -1)  ? (
+      {(pdfData && currentPage > -1)  ? (
         <Document
           file={new Blob([(pdfData || firstPagePdfData)!], { type: 'application/pdf' })}
         >
@@ -37,9 +42,9 @@ const FileView: React.FC<FileViewProps> = () => {
         </Document>
       ) : (
         <div className="noPdfMessage">
-        <Text className="instructions">Для начала выберите одну из ошибок</Text>
-        <Text className="instructions">Вы также можете выбрать какие правила хотите видеть</Text>
-        <Text className="instructions">Или отсортировать правила по предложенным категориям</Text>
+        <Text className="instructions">Для начала выберите одну из ошибок.</Text>
+        <Text className="instructions">Вы также можете выбрать, какие правила хотите видеть,</Text>
+        <Text className="instructions">или отсортировать правила по предложенным категориям.</Text>
         <div className="arrow">  ➜➤</div>
       </div>
       )}
