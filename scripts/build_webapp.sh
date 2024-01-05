@@ -7,5 +7,8 @@ cd ../../.. &&
 mkdir -p build &&
 mkdir -p build/logs &&
 
-echo "Webapp has been built"
+mkdir -p build/webapp &&
+cp -r src/main/webapp/build/. build/webapp &&
+cp scripts/webapp.sh build/webapp.sh &&
 
+echo "Webapp has been built"

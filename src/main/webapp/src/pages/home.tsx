@@ -24,7 +24,7 @@ const Home = () => {
             Приложение{' '}<br />
             <Text component="span" color="violet">
               MAP
-            </Text>{' '}<br />
+            </Text>{' '}<br />-
             это инструмент<br /> для проверки студенческих <br />работ
           </Title>
 
