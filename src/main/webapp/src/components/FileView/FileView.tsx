@@ -4,6 +4,7 @@ import axios from 'axios';
 import { Document, Page, pdfjs } from 'react-pdf';
 import './FileView.css';
 import { RootState } from '../../store';
+import { Text } from '@mantine/core';
 
 interface FileViewProps { }
 const FileView: React.FC<FileViewProps> = () => {
@@ -24,23 +25,23 @@ const FileView: React.FC<FileViewProps> = () => {
       );
       setPdfData(response.data);
     };
-
-
-
     fetchPdfData();
   }, [currentLine, currentPage]);
-
-
   return (
     <div className="filePage">
-      {(pdfData && currentPage) || firstPagePdfData ? (
+      {(pdfData ?? currentPage > -1)  ? (
         <Document
           file={new Blob([(pdfData || firstPagePdfData)!], { type: 'application/pdf' })}
         >
           <Page renderAnnotationLayer={false} renderTextLayer={false} pageNumber={currentPage + 1} />
         </Document>
       ) : (
-        <div>No PDF data available.</div>
+        <div className="noPdfMessage">
+        <Text className="instructions">Для начала выберите одну из ошибок</Text>
+        <Text className="instructions">Вы также можете выбрать какие правила хотите видеть</Text>
+        <Text className="instructions">Или отсортировать правила по предложенным категориям</Text>
+        <div className="arrow">  ➜➤</div>
+      </div>
       )}
     </div>
   );

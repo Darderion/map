@@ -19,3 +19,22 @@
     height: 100% !important;
 }
 
+.noPdfMessage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%; 
+    text-align: center;
+    color: #0a0a0a; 
+    font-size: 1.25rem; 
+  }
+  
+  .noPdfMessage .instructions {
+    margin-bottom: 20px; 
+  }
+  
+  .noPdfMessage .arrow {
+    font-size: 5.5rem; 
+    color: #b10fda; 
+  }

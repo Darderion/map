@@ -20,7 +20,7 @@ const RuleList: React.FC<RuleListProps> = ({ rules, value, onChange, visibility 
         chevronPosition="left"
         defaultValue="customization">
         <Accordion.Item value="customization">
-          <Accordion.Control>Rules</Accordion.Control>
+          <Accordion.Control>Правила</Accordion.Control>
           <Accordion.Panel>
             <Checkbox.Group
               value={value}

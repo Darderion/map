@@ -41,7 +41,7 @@ const Download: React.FC = () => {
           onChange={handleFileChange}
           {...props}
           color="violet">
-          Add Files
+          Добавить файл
         </Button>}
     </FileButton>
   ]
@@ -52,7 +52,8 @@ const Download: React.FC = () => {
   />
 
   return (
-    <ListContainer title='Files'
+    <ListContainer title='Файлы'
+      subtitle = ''
       buttons={buttons}
       search={search}
       list={<FileList files={selectedFiles} remove={removeFile} />} />

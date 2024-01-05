@@ -10,12 +10,12 @@ interface RuleViolationListProps {
 
 const RuleViolationList: FC<RuleViolationListProps> = ({ categoryName, categories, violations }) => {
   return (
-    <Accordion multiple variant="filled" chevronPosition="left">
+    <Accordion style={{ maxHeight: '900px', overflowY: 'auto' }}multiple variant="filled" chevronPosition="left">
       {categories.map(category => (
         <RuleViolation violations={violations} categoryName={categoryName} category={category} />
       ))}
     </Accordion>
   );
-}
+} 
 
 export default RuleViolationList;

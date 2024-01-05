@@ -45,9 +45,7 @@ const RuleViolationsHeader: React.FC<RuleViolationsHeaderProps> = ({ tabs }) => 
             <RuleViolationsContent />
           </Tabs.Panel>
 
-          <Tabs.Panel value="Statistics">
-            <Statistics />
-          </Tabs.Panel>
+
         </Tabs>
       </Container>
     </div>

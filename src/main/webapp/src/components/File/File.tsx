@@ -23,8 +23,6 @@ const File: React.FC<FileProps> = ({ file, remove, index }) => {
   const handleButtonClick = () => {
     setLoad(true);
     const formData = new FormData();
-    console.log(currentPreset)
-    console.log("5")
     formData.append('file', file);
     if (currentPreset[0]) {
       formData.append('ruleSet', currentPreset[0]);
@@ -69,7 +67,7 @@ const File: React.FC<FileProps> = ({ file, remove, index }) => {
 
                   variant="light"
                 >
-                  {documentReport.ruleViolations.length + ' errors'}
+                  {'Колличество ошибок - ' + documentReport.ruleViolations.length }
                 </Button>
               </Link>
               <Button className="fileButton" color="violet" onClick={() => remove(file)}>
@@ -86,7 +84,7 @@ const File: React.FC<FileProps> = ({ file, remove, index }) => {
                 loaderProps={{ color: 'violet', size: 'md', type: 'dots' }}
               />
               <Button color="violet" className="fileButton" onClick={handleButtonClick}>
-                Start
+                Начать обработку
               </Button>
             </Box>
             <Button className="fileButton" color="violet" onClick={() => remove(file)}>

@@ -151,12 +151,16 @@ class APIController {
 					   @RequestParam("title") title: String,
 					   @RequestParam("line") line: Int,
 					   @RequestParam("page") page: Int): Feedback {
-		val feedback = Feedback(pdfName, comment, title, line, page)
 		val feedbackFolder = "feedback/"
+		val feedbackDirectory = File(feedbackFolder)
+		if (!feedbackDirectory.exists()) {
+			feedbackDirectory.mkdirs() // Создать каталог если его нет
+		}
+		val feedback = Feedback(pdfName, comment, title, line, page)
 		val mapper = jacksonObjectMapper()
 		val jsonString = mapper.writeValueAsString(feedback)
 		File("$feedbackFolder${File.separator}_${feedback.pdfName}_${feedback.line}_${feedback.page}.json").writeText(jsonString)
-		return feedback
+		return feedback;
 	}
 	private companion object {
 		private val logger = KotlinLogging.logger {}

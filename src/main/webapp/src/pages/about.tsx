@@ -8,12 +8,12 @@ const About: FC = () => {
       <Card shadow="sm" padding="lg" radius="md" withBorder>
 
         <Group mt="md" mb="xs">
-          <Text className='label'>Contacts</Text>
+          <Text className='label'>Контакты</Text>
         </Group>
 
         <Text color="dimmed">
-          <Text className='lead'>For any suggestions, bug reports and questions: </Text>
-          <Text className='lead'>Discord: Darderion#8682 </Text>
+          <Text className='lead'>Любые предложения, сообщения об ошибках и вопросы: </Text>
+          <Text className='lead'>Discord: Darderion </Text>
           <Text className='lead'>Mail: Eobard1SA@gmail.com </Text>
         </Text>
 
