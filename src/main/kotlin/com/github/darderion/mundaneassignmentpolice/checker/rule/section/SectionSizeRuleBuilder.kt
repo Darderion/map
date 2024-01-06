@@ -7,7 +7,7 @@ import com.github.darderion.mundaneassignmentpolice.checker.SectionName
 
 class SectionSizeRuleBuilder {
     private var ruleName: String = "Rule name"
-    private var type: RuleViolationType = RuleViolationType.Error
+    private var type: RuleViolationType = RuleViolationType.Ошибка
     private var sections: MutableList<SectionName> = mutableListOf()
     private var pageLimit: Int? = null
     private var percentageLimit: Number? = null

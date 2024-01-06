@@ -7,7 +7,7 @@ import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Line
 
 class LineRuleBuilder {
 	private val predicates: MutableList<(list: List<Line>) -> List<Line>> = mutableListOf()
-	private var type: RuleViolationType = RuleViolationType.Error
+	private var type: RuleViolationType = RuleViolationType.Ошибка
 	private var name: String = "Rule name"
 	private var region: PDFRegion = PDFRegion.EVERYWHERE.except(PDFArea.CODE)
 	private var description: String = ""

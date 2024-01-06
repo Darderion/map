@@ -12,7 +12,7 @@ class Checker {
 			RuleViolation(
 				listOf(document.text.first()),
 				"PDFArea",
-				RuleViolationType.System
+				RuleViolationType.Система
 			)
 		)
 

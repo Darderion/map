@@ -26,7 +26,7 @@ class SymbolRuleBuilder {
 	private var requiredNeighbors: MutableList<Char> = mutableListOf()
 	private var direction: Direction = Direction.BIDIRECTIONAL
 	private var neighborhoodSize: Int = 1
-	private var type: RuleViolationType = RuleViolationType.Error
+	private var type: RuleViolationType = RuleViolationType.Ошибка
 	private var name: String = "Rule name"
 	private var region: PDFRegion = EVERYWHERE.except(CODE)
 	private  var description: String = ""

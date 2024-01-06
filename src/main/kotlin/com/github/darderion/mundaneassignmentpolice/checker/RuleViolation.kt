@@ -3,7 +3,7 @@ package com.github.darderion.mundaneassignmentpolice.checker
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Line
 
 enum class RuleViolationType {
-	System, Error, Warning
+	Система, Ошибка, Предупреждение
 }
 
 data class RuleViolation(

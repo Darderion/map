@@ -8,7 +8,7 @@ import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Line
 
 class SentenceRuleBuilder {
     private val predicates: MutableList<(list: MutableList<Line>) -> List<Line>> = mutableListOf()
-    private var type: RuleViolationType = RuleViolationType.Warning
+    private var type: RuleViolationType = RuleViolationType.Предупреждение
     private var region: PDFRegion = PDFRegion.NOWHERE.except(PDFArea.SECTION)
     private var name: String = "Rule name"
     private var description:String = ""

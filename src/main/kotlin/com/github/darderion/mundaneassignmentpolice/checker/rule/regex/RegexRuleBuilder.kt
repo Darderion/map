@@ -9,7 +9,7 @@ class RegexRuleBuilder {
 	private var regex: Regex = Regex("")
 	private val predicates: MutableList<(matches: List<Pair<String, List<Line>>>) -> List<List<Line>>> = mutableListOf()
 	private var numberOfNearestLinesToSearch: Int = 0
-	private var type: RuleViolationType = RuleViolationType.Error
+	private var type: RuleViolationType = RuleViolationType.Ошибка
 	private var region: PDFRegion = PDFRegion.EVERYWHERE.except(PDFArea.CODE)
 	private var name: String = "Rule name"
 	private var description: String = ""

@@ -138,7 +138,7 @@ val RULE_BRACKETS_LETTERS = List(2) {
 		.ignoringAdjusting(' ')
 		.called("Большая русская буква после скобки")
 		.setDescription("После открывающей круглой скобки следует ставить маленькую букву, если речь идет не о названиях и других сложных случаев")
-		.type(RuleViolationType.Warning)
+		.type(RuleViolationType.Предупреждение)
 }.apply {
 	first()
 		.fromLeft()
@@ -396,7 +396,7 @@ val urlShortenersListRule = URLRuleBuilder()
 	.called(shortenedUrlRuleName)
 	.setDescription("Нельзя пользоваться url-сокращателями. Ведь если сайт исчезнет или потеряет базу данных то работа потеряет в читабельности.")
 	.inArea(shortenedUrlRuleArea)
-	.type(RuleViolationType.Error)
+	.type(RuleViolationType.Ошибка)
 	.disallow { urls ->
 		val urlShorteners = ResourcesUtil.getResourceLines("URLShorteners.txt")
 		urls.filter { url ->
@@ -409,7 +409,7 @@ val urlWithRedirectRule = URLRuleBuilder()
 	.called(shortenedUrlRuleName)
 	.setDescription("Нельзя пользоваться url-сокращателями. Ведь если сайт исчезнет или потеряет базу данных то работа потеряет в читабельности.")
 	.inArea(shortenedUrlRuleArea)
-	.type(RuleViolationType.Warning)
+	.type(RuleViolationType.Предупреждение)
 	.ignoreIf { url ->
 		val allowedUrls = ResourcesUtil.getResourceLines("AllowedDomainsWithRedirect.txt")
 		allowedUrls.any { allowedUrl -> URLUtil.equalDomainName(allowedUrl, url.text) }

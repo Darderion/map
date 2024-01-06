@@ -8,7 +8,7 @@ import com.github.darderion.mundaneassignmentpolice.pdfdocument.text.Line
 class URLRuleBuilder {
     private val predicates: MutableList<(urls: List<Url>) -> List<Pair<Url, List<Line>>>> = mutableListOf()
     private val predicatesOfIgnoring: MutableList<(url: Url) -> Boolean> = mutableListOf()
-    private var type: RuleViolationType = RuleViolationType.Error
+    private var type: RuleViolationType = RuleViolationType.Ошибка
     private var name: String = "Rule name"
     private var region: PDFRegion = PDFRegion.EVERYWHERE.except(PDFArea.CODE)
     private var description: String = ""

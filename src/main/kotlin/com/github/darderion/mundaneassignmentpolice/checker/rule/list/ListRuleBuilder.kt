@@ -12,7 +12,7 @@ class ListRuleBuilder {
 	private val singleListPredicates: MutableList<(list: PDFList<Line>) -> List<Line>> = mutableListOf()
 	private val multipleListsPredicatesWithDocument : MutableList<(lists: List<PDFList<Line>>, document: PDFDocument) -> List<Line>> = mutableListOf()
 	private val listsFilter : MutableList <(lists: List<PDFList<Line>>,document: PDFDocument) -> MutableList<PDFList<Line>>> = mutableListOf()
-	private var type: RuleViolationType = RuleViolationType.Error
+	private var type: RuleViolationType = RuleViolationType.Ошибка
 	private var name: String = "Rule name"
 	private var description: String =" "
 
