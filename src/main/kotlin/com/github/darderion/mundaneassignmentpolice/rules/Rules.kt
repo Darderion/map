@@ -45,7 +45,7 @@ val RULE_LITLINK = SymbolRuleBuilder()
 	.shouldNotHaveNeighbor(*"[]".toCharArray())
 	//.called("Symbol '?' in litlink")
 	.called("Символ ? в ссылке на литературу")
-	.setDescription("Дефис используется только для описания диапазонов. Например: 1941–1945 или стр. 25–45. Подробнее написано тут: https://www.vgsa.ru/blogs/mos/80/index.php?special=Y и https://ru.wikipedia.org/wiki/%D0%A2%D0%B8%D1%80%D0%B5#%D0%A1%D1%80%D0%B5%D0%B4%D0%BD%D0%B5%D0%B5_%D1%82%D0%B8%D1%80%D0%B5\"")
+	.setDescription("Символ ? не должен встречаться в ссылках на литературу")
 	.getRule()
 
 val shortDash = '-'
@@ -107,7 +107,7 @@ val RULE_CLOSING_QUOTATION = SymbolRuleBuilder()
 	.fromLeft().shouldHaveNeighbor(openingQuote)
 	.inNeighborhood(20)
 	.called("Неправильное использование закрывающей кавычки")
-	.setDescription("Дефис используется только для описания диапазонов. Например: 1941–1945 или стр. 25–45. Подробнее написано тут: https://www.vgsa.ru/blogs/mos/80/index.php?special=Y и https://ru.wikipedia.org/wiki/%D0%A2%D0%B8%D1%80%D0%B5#%D0%A1%D1%80%D0%B5%D0%B4%D0%BD%D0%B5%D0%B5_%D1%82%D0%B8%D1%80%D0%B5")
+	.setDescription("Следует использовать кавычки такого вида (“...”), кроме того все кавычки должны быть закрыты")
 	.getRule()
 
 val RULE_OPENING_QUOTATION = SymbolRuleBuilder()
@@ -115,7 +115,7 @@ val RULE_OPENING_QUOTATION = SymbolRuleBuilder()
 	.ignoringEveryCharacterExcept(*"$closingQuote$openingQuote".toCharArray())
 	.fromRight().shouldHaveNeighbor(closingQuote)
 	.inNeighborhood(20)
-	.setDescription("Дефис используется только для описания диапазонов. Например: 1941–1945 или стр. 25–45. Подробнее написано тут: https://www.vgsa.ru/blogs/mos/80/index.php?special=Y и https://ru.wikipedia.org/wiki/%D0%A2%D0%B8%D1%80%D0%B5#%D0%A1%D1%80%D0%B5%D0%B4%D0%BD%D0%B5%D0%B5_%D1%82%D0%B8%D1%80%D0%B5")
+	.setDescription("Следует использовать кавычки такого вида (“...”), кроме того все кавычки должны быть закрыты")
 	.called("Неправильное использование открывающей кавычки")
 	.getRule()
 
@@ -252,6 +252,7 @@ val sectionsThatMayPrecedeThis = mapOf<String, HashSet<String>>(
 val RULE_NO_TASKS = LineRuleBuilder()
 	.inArea(PDFRegion.NOWHERE.except(PDFArea.TABLE_OF_CONTENT))
 	.called("Задачи не выделены в содержании")
+	.setDescription("В содержании следует выделять задачи в отдельном пункте")
 	.disallow {
 		val tasks = it.filter { it.text.toString().contains("адач") }
 		if (tasks.isEmpty()) listOf(it.first()) else listOf()
@@ -259,6 +260,7 @@ val RULE_NO_TASKS = LineRuleBuilder()
 	.getRule()
 val RULE_UNSCIENTIFIC_SENTENCE = SentenceRuleBuilder()
 	.called("Ненаучный стиль")
+	.setDescription("В тексте встречена фраза или слово, не соответствующее научному стилю текста")
 	.disallow { lines ->
 		val results = mutableListOf<Line>()
 		splitIntoSentences(lines).forEach { sentence ->
@@ -376,7 +378,7 @@ val RULE_DISALLOWED_WORDS = WordRuleBuilder()
 				Regex("""[Tt]heorem"""),
 				Regex("""[Dd]efinition"""),
 				Regex("""[Ll]emma"""))
-	.setDescription("Скорее всего было неправильно настроено окрудение. Подробнее написано тут: https://www.overleaf.com/learn/latex/Theorems_and_proofs и https://tex.stackexchange.com/questions/12913/customizing-theorem-name")
+	.setDescription("Скорее всего было неправильно настроено окружение. Подробнее написано тут: https://www.overleaf.com/learn/latex/Theorems_and_proofs и https://tex.stackexchange.com/questions/12913/customizing-theorem-name")
 		.getRule()
 
 val RULE_INCORRECT_ABBREVIATION = WordRuleBuilder()
@@ -539,6 +541,7 @@ val RULE_OUTSIDE_FIELDS = LineRuleBuilder()
 val RULE_DOUBLE_SPACE = SymbolRuleBuilder()
 	.symbol(' ')
 	.called("Два пробела подряд")
+	.setDescription("В тексте не должно встречаться двух пробелов подряд")
 	.inArea(PDFRegion.EVERYWHERE)
 	.shouldNotHaveNeighbor(' ')
 	.getRule()
