@@ -33,6 +33,11 @@ interface TargetArrayItem {
   id: string;
 }
 
+type listItemRuleViolationType = {
+	name: keyof TargetArrayItem;
+	displayName: string;
+}
+
 const RuleViolationsContent = () => {
   const rulesFull = useSelector((state: RootState) => state.file.ruleSet);
   const dispatch = useDispatch();
@@ -62,10 +67,18 @@ const RuleViolationsContent = () => {
       line: item.lines[0].index,
     }),
   })) : [];
-  const options: (keyof TargetArrayItem)[] = ['name', 'page'];
+
+  const options: listItemRuleViolationType[] = [
+    { name: 'name', displayName: 'Наименование правила' },
+    { name: 'page', displayName: 'Страница' }
+  ];
 
   const [selectedRules, setSelectedRules] = useState<string[]>([...rules].map(r => r.name));
-  const [selectedSort, setSelectedSort] = useState<keyof TargetArrayItem | ''>('');
+  const [selectedSort, setSelectedSort] = useState<listItemRuleViolationType | null>( null );
+
+	const setSortType = (type: string) => {
+		setSelectedSort(options.filter(it => it.displayName == type)[0])
+	}
 
   const selectedRuleViolations = useMemo(() => {
     return targetArray .sort((a, b) => a.page - b.page) 
@@ -75,10 +88,12 @@ const RuleViolationsContent = () => {
   const categories: string[] = useMemo(() => {
     const categories: string[] = []
 
+		let selectedKey = selectedSort ? selectedSort.name: ''
+
     selectedRuleViolations
     .forEach((violation: any) => {
-      if (!categories.includes(violation[selectedSort])) {
-        categories.push(violation[selectedSort])
+      if (!categories.includes(violation[selectedKey])) {
+        categories.push(violation[selectedKey])
       }
     })
 
@@ -102,10 +117,10 @@ const RuleViolationsContent = () => {
 
           <div className="sortedRuleViolationsList">
             <RuleSelect
-              value={selectedSort}
-              onChange={setSelectedSort as any}
-              options={options}
-              defaultValue={options[0]}
+              value={selectedSort?.displayName ?? ''}
+              onChange={setSortType}
+              options={options.map(it => it.displayName)}
+              defaultValue={options[0].displayName}
             />
 
             <Accordion
@@ -117,7 +132,7 @@ const RuleViolationsContent = () => {
               <Accordion.Item value="customization">
                 <Accordion.Control>Нарушения правил</Accordion.Control>
                 <Accordion.Panel>
-                  {selectedSort === '' ? (
+                  {(selectedSort == null) ? (
                     <List withPadding spacing="xs">
                       <ScrollArea h={560} type="never" offsetScrollbars scrollbarSize={8} scrollHideDelay={0}>
                         {selectedRuleViolations
@@ -147,7 +162,7 @@ const RuleViolationsContent = () => {
                     <RuleViolationList
                       violations={selectedRuleViolations}
                       categories={categories}
-                      categoryName={selectedSort}
+                      categoryName={selectedSort.name ?? ''}
                     />
                   )}
                 </Accordion.Panel>

@@ -5,7 +5,7 @@ interface RuleSelectProps {
   options: string[];
   defaultValue: string;
   value: string;
-  onChange: (value: string | null) => void;
+  onChange: (value: string) => void;
 }
 
 const RuleSelect: FC<RuleSelectProps> = ({ options, defaultValue, value, onChange }) => {
