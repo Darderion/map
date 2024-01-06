@@ -35,13 +35,13 @@ const RuleViolationsHeader: React.FC<RuleViolationsHeaderProps> = ({ tabs }) => 
     <div style={headerStyles}>
       <Container>
         <Tabs
-          defaultValue="Violations"
+          defaultValue="Нарушения"
           variant="outline"
-          value={tabValue || 'Violations'}
+          value={tabValue || 'Нарушения'}
         >
           <Tabs.List>{items}</Tabs.List>
 
-          <Tabs.Panel value="Violations">
+          <Tabs.Panel value="Нарушения">
             <RuleViolationsContent />
           </Tabs.Panel>
 
