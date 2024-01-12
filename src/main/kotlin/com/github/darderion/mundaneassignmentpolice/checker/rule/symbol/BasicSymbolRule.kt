@@ -23,8 +23,9 @@ class BasicSymbolRule(
 	private val neighborhoodSize: Int,
 	type: RuleViolationType,
 	area: PDFRegion,
-	name: String
-): SymbolRule(symbol, type, area, name) {
+	name: String,
+	description: String
+): SymbolRule(symbol, type, area, name, description) {
 	override fun isViolated(document: PDFDocument, line: Int, index: Int): Boolean {
 		if (!ignoredIndexes.contains(index)) {
 			val symbolIndex = index + document.getTextFromLines(line - neighborhoodSize, line - 1, area).length +

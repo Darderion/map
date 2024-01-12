@@ -27,6 +27,6 @@ You can also use this command to ensure that the port is available:
 \\\$ kill \\\$(lsof -t -i :PORT); bash server.sh"
 EOF
 
-echo "bash pause_app.sh; bash pause_server.sh" > map_pause.sh
+echo "bash pause_server.sh; bash pause_server.sh" > map_pause.sh
 chmod u+x map_pause.sh
 chmod u+x pause_server.sh

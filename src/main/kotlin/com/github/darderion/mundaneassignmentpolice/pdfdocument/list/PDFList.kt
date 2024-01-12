@@ -110,7 +110,8 @@ data class PDFList<T>(val value: MutableList<T> = mutableListOf(), val nodes: Mu
 		}
 
 		private fun isListItem(line: Line) =
-			"•–*·".contains(line.first!!) || (
+//			"•–*·".contains(line.first!!) || (
+			"–·∗•".contains(line.first!!) || ( // took symbols from a new PDFListTests.pdf --> previous didn't work
 					(line.first!!.contains(".") ||
 							(line.first!!.contains("(") && line.first!!.contains(")") && line.first!!.length == 3)) &&
 							line.first!!.replace(".", "").isNotEmpty() &&

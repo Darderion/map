@@ -35,11 +35,11 @@ class WordRuleBuilder {
 	private var type: RuleViolationType = RuleViolationType.Error
 	private var name: String = "Rule name"
 	private var region: PDFRegion = PDFRegion.EVERYWHERE
-
+	private var description: String = ""
 	infix fun word(word: String) = this.also { this.word = word }
 
 	infix fun called(name: String) = this.also { this.name = name }
-
+	infix fun setDescription(description: String) = this.also { this.description = description }
 	fun ignoringAdjusting(vararg words: Regex) = this.also {
 		if (notIgnoredNeighbors.isEmpty()) ignoredNeighbors.addAll(words.toList())
 		else throw Exception(
@@ -110,6 +110,7 @@ class WordRuleBuilder {
 		numberOfNeighbors,
 		type,
 		region,
-		name
+		name,
+		description
 	) as WordRule
 }

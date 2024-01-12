@@ -10,4 +10,7 @@ mkdir -p build/logs &&
 cp target/app.jar build/app.jar &&
 cp scripts/server.sh build/server.sh &&
 
+mkdir -p build/resources &&
+cp -r src/main/resources/ build/ &&
+
 echo "Server has been built"

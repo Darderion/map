@@ -1,4 +1,3 @@
-
 import PDFLine from "./PDFLine";
 
 export default class RuleViolation {

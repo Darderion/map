@@ -12,6 +12,7 @@ class SectionSizeRuleBuilder {
     private var pageLimit: Int? = null
     private var percentageLimit: Number? = null
     private var comparisonType: ComparisonType = LESS_THAN
+    private var description: String =""
 
     infix fun called(name: String) = this.also { this.ruleName = name }
 
@@ -48,6 +49,7 @@ class SectionSizeRuleBuilder {
     fun getRule() = SectionSizeRule(
         ruleName,
         type,
+        description,
         sections,
         comparisonType,
         pageLimit,

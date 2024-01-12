@@ -1,0 +1,3 @@
+.ruleInput {
+    width: calc(25px + 875 * (100vw / 1280));
+}

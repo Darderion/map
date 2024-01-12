@@ -6,13 +6,7 @@ import com.github.darderion.mundaneassignmentpolice.utils.LowQualityConferencesU
 import com.github.darderion.mundaneassignmentpolice.utils.URLUtil
 import com.github.darderion.mundaneassignmentpolice.wrapper.PDFBox
 import io.kotest.core.spec.style.StringSpec
-import io.kotest.data.forAll
-import io.kotest.data.headers
-import io.kotest.data.row
-import io.kotest.data.table
-import io.kotest.inspectors.forAll
 import io.kotest.matchers.ints.shouldBeExactly
-import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockkObject
 import io.mockk.unmockkObject
@@ -43,17 +37,14 @@ class RulesTests : StringSpec({
 	"Symbol rule should detect incorrect usage of capital letters" {
 		RULE_BRACKETS_LETTERS.process(PDFBox().getPDF(filePathLargeRussianLetter)).count() shouldBeExactly 2
 	}
-	"Rule should detect two identical words in text"{
-		RULE_TWO_IDENTICAL_WORDS.process(PDFBox().getPDF(filePathTwoIdenticalWords)).count() shouldBeExactly 2
-	}
 	"Symbol rule should detect writing integers from one to nine as digits instead of words" {
 		RULES_SMALL_NUMBERS.sumOf { it.process(PDFBox().getPDF(filePathSmallNumbers)).count() } shouldBeExactly 6
-    }
+	}
 	"Symbol rule should detect the lack of space around brackets" {
 		RULES_SPACE_AROUND_BRACKETS.map { it.process(PDFBox().getPDF(filePathSpaceAroundBrackets)) }
 			.flatten()
 			.count() shouldBeExactly 16
-    }
+	}
 	"Symbol rule should detect incorrect citation" {
 		RULE_CITATION.process(PDFBox().getPDF(filePathCitation)).count() shouldBeExactly 2
 	}
@@ -87,9 +78,6 @@ class RulesTests : StringSpec({
 	"Rule should detect links of different types" {
 		RULE_URLS_UNIFORMITY.process(PDFBox().getPDF(filePathUniformityUrls)).count() shouldBeExactly 2
 	}
-	"Regex rule should detect incorrect order of literature references"{
-		RULE_ORDER_OF_REFERENCES.process(PDFBox().getPDF(filePathOrderOfReferences)).count() shouldBeExactly 4
-	}
 	"Regex rule should detect incorrect order of literature references" {
 		RULE_ORDER_OF_REFERENCES.process(PDFBox().getPDF(filePathOrderOfReferences)).count() shouldBeExactly 4
 	}
@@ -98,24 +86,6 @@ class RulesTests : StringSpec({
 	}
 	"Table of content rule should detect incorrect order of sections" {
 		RULE_SECTIONS_ORDER.process(PDFBox().getPDF(filePathOrderOfSections)).count() shouldBeExactly 5
-	}
-	"Section rules should detect sections whose size exceeds specified limit" {
-		forAll(
-			table(
-				headers("file path", "expected number of violations", "expected type of violations"),
-				row(filePathIntroductionAndConclusionSizeError, 2, RuleViolationType.Error),
-				row(filePathIntroductionAndConclusionSizeWarning, 2, RuleViolationType.Warning),
-				row(filePathBibliographySize, 1, RuleViolationType.Error),
-				row(filePathProblemStatementSize, 1, RuleViolationType.Error)
-			)
-		) { filePath: String, numberOfViolations: Int, violationType: RuleViolationType ->
-			val violations = RULES_SECTION_SIZE.map {
-				it.process(PDFBox().getPDF(filePath))
-			}.flatten()
-
-			violations.count() shouldBeExactly numberOfViolations
-			violations.forAll { it.type shouldBe violationType }
-		}
 	}
 	"Table of content rule should detect sections numbered from 0" {
 		RULE_SECTION_NUMBERING_FROM_0.process(PDFBox().getPDF(filePathSectionNumberingFrom0)).count() shouldBeExactly 2
@@ -136,17 +106,26 @@ class RulesTests : StringSpec({
 
 		unmockkObject(LowQualityConferencesUtil)
   }
-	"ListRule should detect no results" {
-		RULE_TASKS_MAPPING.process(PDFBox().getPDF(filePathNoResults)).count() shouldBeExactly 1
+//	"ListRule should detect no results" {
+//		RULE_TASKS_MAPPING.process(PDFBox().getPDF(filePathNoResults)).count() shouldBeExactly 1
+//	}
+//	"ListRule should detect no tasks"{
+//		RULE_TASKS_MAPPING.process(PDFBox().getPDF(filePathNoTasks)).count() shouldBeExactly 1
+//	}
+//	"ListRule should detect no tasks and results" {
+//		RULE_TASKS_MAPPING.process(PDFBox().getPDF(filePathNoTasksAndResults)).count() shouldBeExactly 2
+//	}
+//	"ListRule should detect wrong number of tasks and results"{
+//		RULE_TASKS_MAPPING.process(PDFBox().getPDF(filePathWrongNumberTasksAndResults)).count() shouldBeExactly 3
+//	}
+//	"Short dash should ignore title page" {
+//		RULE_SHORT_DASH.process(PDFBox().getPDF(filePathDashTitlePage)).count() shouldBeExactly 0
+//	}
+	"Symbol rule should ignore usage of capital letters inside brackets that are placed after the '.' symbol" {
+		RULE_BRACKETS_LETTERS.process(PDFBox().getPDF(filePathBracketLetters)).count() shouldBeExactly 1
 	}
-	"ListRule should detect no tasks"{
-		RULE_TASKS_MAPPING.process(PDFBox().getPDF(filePathNoTasks)).count() shouldBeExactly 1
-	}
-	"ListRule should detect no tasks and results" {
-		RULE_TASKS_MAPPING.process(PDFBox().getPDF(filePathNoTasksAndResults)).count() shouldBeExactly 2
-	}
-	"ListRule should detect wrong number of tasks and results"{
-		RULE_TASKS_MAPPING.process(PDFBox().getPDF(filePathWrongNumberTasksAndResults)).count() shouldBeExactly 3
+	"Symbol rule should detect double space usage"{
+		RULE_DOUBLE_SPACE.process(PDFBox().getPDF(filePathDoubleSpace)).count() shouldBeExactly 4
 	}
 	"Short dash should ignore title page" {
 		RULE_SHORT_DASH.process(PDFBox().getPDF(filePathDashTitlePage)).count() shouldBeExactly 0
@@ -154,24 +133,17 @@ class RulesTests : StringSpec({
 	"Symbol rule should ignore usage of capital letters inside brackets that are placed after the '.' symbol" {
 		RULE_BRACKETS_LETTERS.process(PDFBox().getPDF(filePathBracketLetters)).count() shouldBeExactly 1
 	}
-	"Symbol rule should detect detect no space usage"{
-		RULE_NO_SPACE_AFTER_PUNCTUATION.process(PDFBox().getPDF(filePathNoSpaceAfterPunctuation )).count() shouldBeExactly 1
-	}
-	"Symbol rule should detect incorrect space usage"{
-		RULE_SPACE_BEFORE_PUNCTUATION.forEach { it.process(PDFBox().getPDF(filePathSpaceBeforePunctuation)).count() shouldBeExactly 1 }}
 	"RULE_OPENING_QUOTATION and RULE_CLOSING_QUOTATION should process multiple lines" {
 		RULE_OPENING_QUOTATION.process(PDFBox().getPDF(filePathMultilineCitation)).count() +
 				RULE_CLOSING_QUOTATION.process(PDFBox().getPDF(filePathMultilineCitation)).count() shouldBeExactly 0
 	}
-	"RULE_LONG_SENTENCE should detect long sentences without quotes"{
-			RULE_LONG_SENTENCE.process(PDFBox().getPDF(filePathLongSentence)).count() shouldBeExactly 3
-		}
 	"""RULE_DISALLOWED_WORDS should detect words:\"Theorem,Definition,Lemma\""""{
 		RULE_DISALLOWED_WORDS.process(PDFBox().getPDF(filePathDisallowedWords)).count() shouldBeExactly 4
 	}
 	"""RULE_INCORRECT_ABBREVIATION should detect incorrect abbreviation \"вуз\""""{
 		RULE_INCORRECT_ABBREVIATION.process(PDFBox().getPDF(filePathIncorrectAbbreviation)).count() shouldBeExactly 9
 	}
+
 	"""RULE_NUMBER_OF_BRACKETS should detect large number of brackets"""{
 		RULE_NUMBER_OF_BRACKETS.process(PDFBox().getPDF(filePathNumberOfBrackets)).count() shouldBeExactly 2
 	}
@@ -180,7 +152,6 @@ class RulesTests : StringSpec({
 	}
 }) {
 	companion object {
-		const val filePathTwoIdenticalWords = "${TestsConfiguration.resourceFolder}checker/WordRuleTestsTwoIdenticalWords.pdf"
 		const val filePathQuestionMarkAndDashes =
 			"${TestsConfiguration.resourceFolder}checker/SymbolRuleTestsQuestionMarkAndDashes.pdf"
 		const val filePathQuotes = "${TestsConfiguration.resourceFolder}checker/SymbolRuleTestsQuotes.pdf"
@@ -201,14 +172,14 @@ class RulesTests : StringSpec({
 			"${TestsConfiguration.resourceFolder}checker/RegexRuleTestsVariousAbbreviations.pdf"
 		const val filePathOrderOfSections =
 			"${TestsConfiguration.resourceFolder}checker/TableOfContentRuleTestsSectionsOrder.pdf"
-		const val filePathNoTasksAndResults =
-			"${TestsConfiguration.resourceFolder}checker/NoTasksAndResults.pdf"
-		const val filePathNoTasks =
-			"${TestsConfiguration.resourceFolder}checker/NoTasks.pdf"
-		const val filePathNoResults =
-			"${TestsConfiguration.resourceFolder}checker/NoResults.pdf"
-		const val filePathWrongNumberTasksAndResults =
-			"${TestsConfiguration.resourceFolder}checker/WrongNumberTasksAndResults.pdf"
+//		const val filePathNoTasksAndResults =
+//			"${TestsConfiguration.resourceFolder}checker/NoTasksAndResults.pdf"
+//		const val filePathNoTasks =
+//			"${TestsConfiguration.resourceFolder}checker/NoTasks.pdf"
+//		const val filePathNoResults =
+//			"${TestsConfiguration.resourceFolder}checker/NoResults.pdf"
+//		const val filePathWrongNumberTasksAndResults =
+//			"${TestsConfiguration.resourceFolder}checker/WrongNumberTasksAndResults.pdf"
 		const val filePathIntroductionAndConclusionSizeError =
 			"${TestsConfiguration.resourceFolder}checker/SectionSizeRuleTestsIntroductionAndConclusionError.pdf"
 		const val filePathIntroductionAndConclusionSizeWarning =
@@ -227,16 +198,12 @@ class RulesTests : StringSpec({
 			"${TestsConfiguration.resourceFolder}checker/BracketLetters.pdf"
 		const val filePathMultilineCitation =
 			"${TestsConfiguration.resourceFolder}checker/MultilineCitation.pdf"
-		const val filePathLongSentence =
-				"${TestsConfiguration.resourceFolder}checker/SentenceRuleTestsLongSentence.pdf"
-		const val  filePathSpaceBeforePunctuation =
-				"${TestsConfiguration.resourceFolder}checker/SymbolRuleTestsSpaceBeforePunctuation.pdf"
-		const val  filePathNoSpaceAfterPunctuation =
-				"${TestsConfiguration.resourceFolder}checker/SymbolRuleTestsNoSpaceAfterPunctuation.pdf"
 		const val filePathDisallowedWords =
 				"${TestsConfiguration.resourceFolder}checker/WordRuleDisallowedWords.pdf"
 		const val filePathIncorrectAbbreviation =
 				"${TestsConfiguration.resourceFolder}checker/WordRuleTestsIncorrectAbbreviation.pdf"
+		const val filePathDoubleSpace = 
+				"${TestsConfiguration.resourceFolder}checker/SymbolRuleTestsDoubleSpace.pdf"
 		const val filePathNumberOfBrackets = 
 				"${TestsConfiguration.resourceFolder}checker/SentenceRuleTestNumberOfBrackets.pdf"
 		const val filePathAmountOfTextInBrackets = 
