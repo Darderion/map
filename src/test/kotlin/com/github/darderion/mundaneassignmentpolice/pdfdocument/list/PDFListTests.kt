@@ -15,7 +15,6 @@ class PDFListTests: StringSpec({
 		val document = PDFBox().getPDF(filePath)
 
 		val lists = document.areas!!.lists
-
 		lists.count() shouldBeExactly 8
 	}
 	"getLists should return correct lists" {

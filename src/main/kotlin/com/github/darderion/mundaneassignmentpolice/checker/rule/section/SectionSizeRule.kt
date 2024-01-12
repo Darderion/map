@@ -1,5 +1,6 @@
 package com.github.darderion.mundaneassignmentpolice.checker.rule.section
 
+import com.fasterxml.jackson.databind.BeanDescription
 import com.github.darderion.mundaneassignmentpolice.checker.ComparisonType
 import com.github.darderion.mundaneassignmentpolice.checker.RuleViolation
 import com.github.darderion.mundaneassignmentpolice.checker.RuleViolationType
@@ -15,11 +16,13 @@ import com.github.darderion.mundaneassignmentpolice.utils.floatEquals
 class SectionSizeRule(
     name: String,
     type: RuleViolationType,
+    description: String,
     val sections: List<SectionName>,
     val comparisonType: ComparisonType,
     val pageLimit: Int?,
     val percentageLimit: Number?
-) : Rule(PDFRegion.EVERYWHERE, name, type) {
+
+) : Rule(PDFRegion.EVERYWHERE, name, type, description) {
     init {
         if (pageLimit == null && percentageLimit == null) throw Exception("Size limit was not specified")
     }

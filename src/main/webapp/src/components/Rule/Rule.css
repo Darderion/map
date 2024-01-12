@@ -1,0 +1,12 @@
+.ruleItem {
+    border-color: #e9e7e7;
+    border-radius: 15px;
+    border-style: solid; 
+    margin: 3px;
+    padding: 5px;
+    width: calc(100px + 495 * (100vw / 1280)) !important;
+    max-width: 355px;
+}
+.ruleName .mantine-Checkbox-label { 
+    text-align: left;
+  }
