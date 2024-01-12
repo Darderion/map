@@ -454,27 +454,27 @@ val allowedWordsOnLeft = arrayOf(
 	Regex("""[Рр]азд[а-я]*"""), Regex("""[Нн]омер[а-я]*"""), Regex("""[Лл]емм[а-я]*"""),Regex(""" """)
 	)
 	
-val hyphenSymbols = arrayOf(Regex("""\n"""),Regex("""\s"""),Regex("""-"""))
+val newlineSplittingSymbols = arrayOf(Regex("""\n"""),Regex("""\s"""),Regex("""-"""))
 
 val hyphenatedWordsOnLeft = arrayOf(
-	arrayOf(Regex("""[Рр]и[а-я]*"""), *hyphenSymbols, Regex("""н[а-я]*""")),
-	arrayOf(Regex("""[Тт]аб[а-я]*"""), *hyphenSymbols,Regex("""ц[а-я]*""")),
-	arrayOf(Regex("""[Сс]хе"""), *hyphenSymbols,Regex("""м[а-я]*""")),
-	arrayOf(Regex("""[Оо]п[а-я]*"""), *hyphenSymbols, Regex("""ни[а-я]*""")),
-	arrayOf(Regex("""[Тт]ео[а-я]*"""), *hyphenSymbols, Regex("""м[а-я]*""")),
-	arrayOf(Regex("""[Дд]и[а-я]*"""), *hyphenSymbols, Regex("""м[а-я]*""")),
-	arrayOf(Regex("""[Пп]унк"""), *hyphenSymbols, Regex("""т[а-я]*""")),
-	arrayOf(Regex("""[Сс]тро"""), *hyphenSymbols, Regex("""к[а-я]*""")),
-	arrayOf(Regex("""[Лл]ис"""), *hyphenSymbols, Regex("""г[а-я]*""")),
-	arrayOf(Regex("""[Пп]ри[а-я]*"""), *hyphenSymbols, Regex("""ни[а-я]*""")),
-	arrayOf(Regex("""[Зз]на[а-я]*"""), *hyphenSymbols, Regex("""ни[а-я]*""")),
-	arrayOf(Regex("""[Гг]ла"""), *hyphenSymbols, Regex("""в[а-я]*""")),
-	arrayOf(Regex("""[Шш]а"""), *hyphenSymbols, Regex("""г[а-я]*""")),
-	arrayOf(Regex("""[Зз]а[а-я]*"""), *hyphenSymbols, Regex("""c[а-я]*""")),
-	arrayOf(Regex("""[Ии]л[а-я]*"""), *hyphenSymbols, Regex("""ц[а-я]*""")),
-	arrayOf(Regex("""[Рр]аз[а-я]*"""), *hyphenSymbols, Regex("""л[а-я]*""")),
-	arrayOf(Regex("""[Нн]о[а-я]*"""), *hyphenSymbols, Regex("""р[а-я]*""")),
-	arrayOf(Regex("""[Лл]ем"""), *hyphenSymbols, Regex("""м[а-я]*"""))
+	arrayOf(Regex("""[Рр]и[а-я]*"""), *newlineSplittingSymbols, Regex("""н[а-я]*""")),
+	arrayOf(Regex("""[Тт]аб[а-я]*"""), *newlineSplittingSymbols,Regex("""ц[а-я]*""")),
+	arrayOf(Regex("""[Сс]хе"""), *newlineSplittingSymbols,Regex("""м[а-я]*""")),
+	arrayOf(Regex("""[Оо]п[а-я]*"""), *newlineSplittingSymbols, Regex("""ни[а-я]*""")),
+	arrayOf(Regex("""[Тт]ео[а-я]*"""), *newlineSplittingSymbols, Regex("""м[а-я]*""")),
+	arrayOf(Regex("""[Дд]и[а-я]*"""), *newlineSplittingSymbols, Regex("""м[а-я]*""")),
+	arrayOf(Regex("""[Пп]унк"""), *newlineSplittingSymbols, Regex("""т[а-я]*""")),
+	arrayOf(Regex("""[Сс]тро"""), *newlineSplittingSymbols, Regex("""к[а-я]*""")),
+	arrayOf(Regex("""[Лл]ис"""), *newlineSplittingSymbols, Regex("""г[а-я]*""")),
+	arrayOf(Regex("""[Пп]ри[а-я]*"""), *newlineSplittingSymbols, Regex("""ни[а-я]*""")),
+	arrayOf(Regex("""[Зз]на[а-я]*"""), *newlineSplittingSymbols, Regex("""ни[а-я]*""")),
+	arrayOf(Regex("""[Гг]ла"""), *newlineSplittingSymbols, Regex("""в[а-я]*""")),
+	arrayOf(Regex("""[Шш]а"""), *newlineSplittingSymbols, Regex("""г[а-я]*""")),
+	arrayOf(Regex("""[Зз]а[а-я]*"""), *newlineSplittingSymbols, Regex("""c[а-я]*""")),
+	arrayOf(Regex("""[Ии]л[а-я]*"""), *newlineSplittingSymbols, Regex("""ц[а-я]*""")),
+	arrayOf(Regex("""[Рр]аз[а-я]*"""), *newlineSplittingSymbols, Regex("""л[а-я]*""")),
+	arrayOf(Regex("""[Нн]о[а-я]*"""), *newlineSplittingSymbols, Regex("""р[а-я]*""")),
+	arrayOf(Regex("""[Лл]ем"""), *newlineSplittingSymbols, Regex("""м[а-я]*"""))
 )
 
 val allowedWordsOnRight = arrayOf(
@@ -499,7 +499,7 @@ val smallNumbersRuleBuilder1Right = WordRuleBuilder()       //as previous, but f
 	.inArea(smallNumbersRuleArea)
 	.fromRight()
 	.ignoringAdjusting(Regex("""\s"""), Regex("""\."""))
-	.shouldHaveNeighbor(*allowedWordsOnRight)//, Regex("""\."""), Regex(""","""), Regex("""[0-9]+"""))
+	.shouldHaveNeighbor(*allowedWordsOnRight)
 	.ignoringIfIndex(0)
 	
 val smallNumbersRuleBuilder2 = WordRuleBuilder()        //for decimal fractions and version numbers
@@ -526,17 +526,18 @@ val smallNumbersRuleBuilderHyphenated = WordRuleBuilder() //for hyphenated words
 	.shouldHaveNumberOfNeighbors(5)                                  
 
 val smallNumbersRuleBuilder4 = hyphenatedWordsOnLeft.map { hyphenatedWord ->
-		smallNumbersRuleBuilderHyphenated.shouldHaveNeighbor(*hyphenatedWord)
-	}
+	smallNumbersRuleBuilderHyphenated.shouldHaveNeighbor(*hyphenatedWord)
+}
 	
 val RULES_SMALL_NUMBERS = List<WordRule>(9) { index ->
-			smallNumbersRuleBuilder1Left.word((index + 1).toString()).getRule() or
-			smallNumbersRuleBuilder1Right.word((index + 1).toString()).getRule() or
-			smallNumbersRuleBuilder2.word((index + 1).toString()).fromLeft().getRule() or
-			smallNumbersRuleBuilder2.fromRight().getRule() or
-			smallNumbersRuleBuilder3.word((index + 1).toString()).fromLeft().getRule() or
-			smallNumbersRuleBuilder3.fromRight().getRule() or
-			combinedWordRules(smallNumbersRuleBuilder4.map { it.word((index+1).toString()).getRule() })
+	smallNumbersRuleBuilder1Left.word((index + 1).toString()).getRule() or
+	smallNumbersRuleBuilder1Right.word((index + 1).toString()).getRule() or
+	smallNumbersRuleBuilder2.word((index + 1).toString()).fromLeft().getRule() or
+	smallNumbersRuleBuilder2.fromRight().getRule() or
+	smallNumbersRuleBuilder3.word((index + 1).toString()).fromLeft().getRule() or
+	smallNumbersRuleBuilder3.fromRight().getRule() or
+	smallNumbersRuleBuilder4.map { it.word((index + 1).toString()).getRule() }
+	.reduce { acc, cur -> acc or cur}
 }
 
 private const val sectionSizeRuleName = "Слишком длинная секция"
