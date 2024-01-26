@@ -23,7 +23,6 @@ const Statistics = () => {
             .map(([word, count], index) => ({ number: index + 1, word, count }));
         setWordData(sortedWords);
         setWordCount(res.data.wordsStatistic.wordCount); 
-        console.log(res.data.pageStatistic.sectionsStatistics)
         const pageResults = res.data.pageStatistic.sectionsStatistics.map((item: {
           areaSizeInPage: number; section: { title: string; };}) => ({
           title: item.section.title.replace(/^\d+\.\s*/, ''),
