@@ -546,20 +546,12 @@ val RULE_DOUBLE_SPACE = SymbolRuleBuilder()
 const val maxNumberOfBrackets = 5
 val RULE_NUMBER_OF_BRACKETS = SentenceRuleBuilder()
 	.called("Предложение с большим количеством скобок")
-	.inArea(PDFRegion.EVERYWHERE)
+	.setDescription("В предложении не рекомендуется использовать больше $maxNumberOfBrackets пар скобок")
 	.disallow { lines ->
 		val results = mutableListOf<Line>()
-		splitIntoSentences(lines, ".!?").forEach { sentence ->
-			var openingBracketsCount = 0
-			var isQuote = false
-
-			sentence.forEachIndexed { index, word ->
-				openingBracketsCount += word.text.count { it == '(' }
-			}
-			if (openingBracketsCount > maxNumberOfBrackets) {
-				results.addAll(lines)
-			}
-		}
+		if(splitIntoSentences(lines, ".!?").any 
+		{ sentence -> sentence.count{ it.text.contains('(') } > maxNumberOfBrackets})
+		{ results.addAll(lines) }
 		results.toList()
 	}
 	.getRule()
@@ -567,24 +559,19 @@ val RULE_NUMBER_OF_BRACKETS = SentenceRuleBuilder()
 const val maxPercentageInBrackets = 25
 val RULE_TEXT_IN_BRACKETS = SentenceRuleBuilder()
 	.called("Большое количество текста внутри скобок")
+	.setDescription("Стоит уменьшить количество текста внутри скобок. Рекомендуется помещать в скобки не более $maxPercentageInBrackets% от общего количества слов в предложении")
 	.inArea(PDFRegion.EVERYWHERE.except(PDFArea.BIBLIOGRAPHY))
 	.disallow { lines ->
 		val results = mutableListOf<Line>()
-		splitIntoSentences(lines, ".!?").forEach { sentence -> 
+		if( splitIntoSentences(lines, ".!?").any { sentence -> 
 			val sentenceText = sentence.joinToString(separator = " ") { it.text }
-			val regex = Regex("\\(([^)]+)\\)")
-			val matches = regex.findAll(sentenceText)
-	
-			var countOfWordsInBrackets = 0
-			for (match in matches) {
-				val wordsInsideBrackets = match.groupValues[1].split("\\s+".toRegex())
-				countOfWordsInBrackets += wordsInsideBrackets.count()
-			}
-			val percentInBrackets = countOfWordsInBrackets.toDouble() / sentence.size * 100 
-			if (percentInBrackets > maxPercentageInBrackets) {
-				results.addAll(lines)
-			}
-		}
+			val percentInBrackets = Regex("\\(([^)]+)\\)").findAll(sentenceText)
+			.sumBy { words ->
+				words.groupValues[1].split("\\s+".toRegex()).count()
+			}.toDouble() / sentence.size * 100 
+			percentInBrackets > maxPercentageInBrackets
+		})
+		{ results.addAll(lines) }
 		results.toList()
 	}
 	.getRule()
