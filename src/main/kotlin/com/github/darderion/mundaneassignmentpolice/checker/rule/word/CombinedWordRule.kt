@@ -31,11 +31,3 @@ class CombinedWordRule(
 			}
 		}
 }
-
-fun combinedWordRules(rules: List<WordRule>): WordRule {
-	var combinedRule = rules[0]
-	for (i in 1 until rules.size) {
-		combinedRule = combinedRule or rules[i]
-	}
-	return combinedRule
-}
