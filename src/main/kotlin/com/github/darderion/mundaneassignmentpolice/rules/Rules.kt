@@ -542,3 +542,36 @@ val RULE_DOUBLE_SPACE = SymbolRuleBuilder()
 	.inArea(PDFRegion.EVERYWHERE)
 	.shouldNotHaveNeighbor(' ')
 	.getRule()
+
+const val maxNumberOfBrackets = 5
+val RULE_NUMBER_OF_BRACKETS = SentenceRuleBuilder()
+	.called("Предложение с большим количеством скобок")
+	.setDescription("В предложении не рекомендуется использовать больше $maxNumberOfBrackets пар скобок")
+	.disallow { lines ->
+		val results = mutableListOf<Line>()
+		if(splitIntoSentences(lines, ".!?").any 
+		{ sentence -> sentence.count{ it.text.contains('(') } > maxNumberOfBrackets})
+		{ results.addAll(lines) }
+		results.toList()
+	}
+	.getRule()
+
+const val maxPercentageInBrackets = 25
+val RULE_TEXT_IN_BRACKETS = SentenceRuleBuilder()
+	.called("Большое количество текста внутри скобок")
+	.setDescription("Стоит уменьшить количество текста внутри скобок. Рекомендуется помещать в скобки не более $maxPercentageInBrackets% от общего количества слов в предложении")
+	.inArea(PDFRegion.EVERYWHERE.except(PDFArea.BIBLIOGRAPHY))
+	.disallow { lines ->
+		val results = mutableListOf<Line>()
+		if( splitIntoSentences(lines, ".!?").any { sentence -> 
+			val sentenceText = sentence.joinToString(separator = " ") { it.text }
+			val percentInBrackets = Regex("\\(([^)]+)\\)").findAll(sentenceText)
+			.sumBy { words ->
+				words.groupValues[1].split("\\s+".toRegex()).count()
+			}.toDouble() / sentence.size * 100 
+			percentInBrackets > maxPercentageInBrackets
+		})
+		{ results.addAll(lines) }
+		results.toList()
+	}
+	.getRule()
