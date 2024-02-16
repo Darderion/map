@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import PDFLines from './PDFLine';
 import PDFLine from '../../classes/PDFLine';
 import axios from 'axios';
@@ -8,12 +8,13 @@ import { RootState } from '../../store';
 let lines: PDFLine[] = [];
 
 const Sections: React.FC = () => {
+    const [lines, setLines] = useState<PDFLine[]>([]);
     const currentFileName = useSelector((state: RootState) => state.file.currentFileName);
     const apiUrl = useSelector((state: RootState) => state.file.apiUrl);
     useEffect(() => {
         axios.get(apiUrl+`/viewPDFLines?pdfName=${currentFileName}`)
           .then(res => {           
-            lines = res.data
+            setLines(res.data);
           })        
       }, [currentFileName]); 
   return (
