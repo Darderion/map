@@ -14,8 +14,10 @@ class ListRuleBuilder {
 	private val listsFilter : MutableList <(lists: List<PDFList<Line>>,document: PDFDocument) -> MutableList<PDFList<Line>>> = mutableListOf()
 	private var type: RuleViolationType = RuleViolationType.Error
 	private var name: String = "Rule name"
+	private var description: String =" "
 
 	fun disallowInSingleList(predicate: (list: PDFList<Line>) -> List<Line>) = this.also { singleListPredicates.add(predicate) }
+	infix fun setDescription(description: String) = this.also { this.description = description }
 	fun disallowInMultipleLists(predicate: (lists: List<PDFList<Line>>, document: PDFDocument) -> List<Line> ) = this.also { multipleListsPredicatesWithDocument.add(predicate) }
 	fun addListsFilter (predicate: (lists: List<PDFList<Line>>, document: PDFDocument) -> MutableList<PDFList<Line>>) = this.also { listsFilter.add(predicate) }
 	infix fun inArea(area: PDFArea) = this.also { region = PDFRegion.NOWHERE.except(area) }
@@ -27,9 +29,10 @@ class ListRuleBuilder {
 	infix fun type(type: RuleViolationType) = this.also { this.type = type }
 
 	fun getRule() = ListRule(singleListPredicates,
-		multipleListsPredicatesWithDocument, 
+		multipleListsPredicatesWithDocument,
 		listsFilter,
-		type, 
-		region, 
-		name)
+		type,
+		region,
+		name,
+		description)
 }

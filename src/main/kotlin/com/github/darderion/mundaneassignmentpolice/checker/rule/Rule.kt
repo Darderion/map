@@ -8,7 +8,8 @@ import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFRegion
 abstract class Rule(
 	val area: PDFRegion,
 	val name: String,
-	val type: RuleViolationType
+	val type: RuleViolationType,
+	val description: String
 ) {
 	abstract fun process(document: PDFDocument): List<RuleViolation>
 }

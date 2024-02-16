@@ -1,5 +1,6 @@
 package com.github.darderion.mundaneassignmentpolice.checker.rule.list
 
+import com.fasterxml.jackson.databind.BeanDescription
 import com.github.darderion.mundaneassignmentpolice.checker.RuleViolation
 import com.github.darderion.mundaneassignmentpolice.checker.RuleViolationType
 import com.github.darderion.mundaneassignmentpolice.checker.rule.Rule
@@ -22,7 +23,7 @@ fun getPages(document: PDFDocument, word : String): Pair<Int,Int>
 {
 	var pages = -1 to -1
 	var linesIndexes = -1 to -1
-	var lines = document.text.filter {
+	val lines = document.text.filter {
 		document.areas!!.sections.forEachIndexed { index , section ->
 			if (section.title.contains(word) && word != conclusionWord)
 				linesIndexes = section.contentIndex to document.areas.sections[index+1].contentIndex
@@ -46,8 +47,9 @@ class ListRule(
 	val listsFilter : MutableList<(lists: List<PDFList<Line>>,document: PDFDocument) -> MutableList<PDFList<Line>>>,
 	type: RuleViolationType,
 	area: PDFRegion,
-	name: String
-	): Rule(area, name, type) {
+	name: String,
+	description: String
+): Rule(area, name, type,description) {
 	override fun process(document: PDFDocument): List<RuleViolation> {
 		val rulesViolations: MutableSet<RuleViolation> = mutableSetOf()
 
@@ -69,7 +71,7 @@ class ListRule(
 		listsFilter.forEach { pdfLists = it(pdfLists, document) }
 
 		singleListPredicates.forEach { predicate ->
-				rulesViolations.addAll(
+			rulesViolations.addAll(
 				pdfLists.map {
 					predicate(it)
 				}.filter { it.isNotEmpty() }.map {
@@ -84,6 +86,7 @@ class ListRule(
 				rulesViolations.add(RuleViolation(lines, name, type))
 		}
 
+//		println(rulesViolations) // can be useful for debugging
 		return rulesViolations.toList()
 	}
 }

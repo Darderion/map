@@ -1,0 +1,100 @@
+.homePage {
+  margin-top: 100px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+}
+.homeHeader {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+.list {
+    display: flex;
+    justify-content: center;
+    padding-bottom: 200px;
+}
+
+
+.name>br {
+  display: none;
+}
+
+.name {
+  font-size: 60px;
+}
+
+.description {
+  display: inline-block;
+  max-width: 600px;
+  font-size: 1.5rem;
+  margin-top: 10px;
+  margin-bottom: 20px;
+}
+
+.description>br{
+  display: none;
+}
+
+.mantine-Group-root {
+  display: flex;
+  justify-content: center;
+}
+
+.mantine-Container-root {
+  margin: 0;
+}
+
+.papers {
+  margin-top: 30px;
+  display: inline-block;
+  position: relative;
+  top: 0;
+  left: 0;
+}
+
+.paper2 {
+  box-shadow: 0px 0px 15px 10px #bfbebe;
+  transform: rotate(90deg);
+  width: 615px;
+  height: 476px;
+  display: inline-block;
+  position: relative;
+  top: 0;
+  left: 0;
+}
+
+.paper1 {
+  box-shadow: 0px 0px 15px 10px #bfbebe;
+  transform: rotate(90deg);
+  width: 615px;
+  height: 476px;
+  display: inline-block;
+  position: absolute;
+  top: 50px;
+  left: 50px;
+}
+
+@media (max-width: 1400px) {
+  .papers {
+    display: none;
+  }
+
+  .name {
+    font-size: calc(16px + 44 * (100vw / 1280));
+  }
+
+  .name>br {
+    display: initial;
+  }
+
+  .description {
+    font-size: calc(16px + 4 * (100vw / 1280));
+  }
+
+  .description>br {
+    display: initial;
+  }
+}

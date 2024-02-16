@@ -6,6 +6,7 @@ import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFArea
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFRegion
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFRegion.Companion.EVERYWHERE
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFRegion.Companion.NOWHERE
+import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFArea.CODE
 import java.util.regex.Pattern
 
 // Extension method
@@ -27,10 +28,10 @@ class SymbolRuleBuilder {
 	private var neighborhoodSize: Int = 1
 	private var type: RuleViolationType = RuleViolationType.Error
 	private var name: String = "Rule name"
-	private var region: PDFRegion = EVERYWHERE
-
+	private var region: PDFRegion = EVERYWHERE.except(CODE)
+	private  var description: String = ""
 	infix fun symbol(symbol: Char) = this.also { this.symbol = symbol }
-
+	infix fun setDescription(description: String) = this.also { this.description = description }
 	infix fun called(name: String) = this.also { this.name = name }
 
 	fun ignoringAdjusting(vararg symbols: Char) = this.also { if (notIgnoredNeighbors.isEmpty()) ignoredNeighbors.addAll(symbols.toList())
@@ -74,6 +75,7 @@ class SymbolRuleBuilder {
 		neighborhoodSize,
 		type,
 		region,
-		name
+		name,
+		description
 	) as SymbolRule
 }

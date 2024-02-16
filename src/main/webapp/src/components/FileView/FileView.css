@@ -1,0 +1,40 @@
+.filePage {
+    margin-top: 30px;
+}
+.react-pdf__Document{
+    width: calc(180px + 470 * (100vw / 1280)) !important;
+    height: 100% !important;
+}
+.react-pdf__Page{
+    box-shadow: 0px 0px 15px 10px #bfbebe;
+    margin: 0px;
+    margin-bottom: 25px;
+    width: calc(180px + 470 * (100vw / 1280)) !important;
+    height: 100% !important;
+}
+
+.react-pdf__Page__canvas {
+    margin: 0 auto;
+    width: calc(180px + 470 * (100vw / 1280)) !important;
+    height: 100% !important;
+}
+
+.noPdfMessage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%; 
+    text-align: center;
+    color: #0a0a0a; 
+    font-size: 1.25rem; 
+  }
+  
+  .noPdfMessage .instructions {
+    margin-bottom: 20px; 
+  }
+  
+  .noPdfMessage .arrow {
+    font-size: 5.5rem; 
+    color: #b10fda; 
+  }

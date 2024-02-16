@@ -15,7 +15,7 @@ class ListRuleTests: StringSpec({
 			.disallowInSingleList {
 				if (it.nodes.count() == 1) it.getText() else listOf()
 			}.getRule()
-			.process(PDFBox().getPDF(filePathTableOfContent)).count() shouldBeExactly 2
+			.process(PDFBox().getPDF(filePathTableOfContent)).count() shouldBeExactly 1 // new diploma template does not show 'subsubsections'
 	}
 	"List rule should detect lists of incorrect size in SECTION" {
 		ListRuleBuilder()
