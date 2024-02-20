@@ -322,51 +322,106 @@ val allowedWordsOnLeft = arrayOf(
 	Regex("""[Рр]ис[a-я]*"""),
 	Regex("""[Тт]абл[a-я]*"""), Regex("""[Сс]х[a-я]*"""),
 	Regex("""[Dd]ef[a-z]*"""), Regex("""[Оо]пр[а-я]*"""),
-	Regex("""[Tt]h[a-z]*"""), Regex("""[Тт]еорема""")
+	Regex("""[Tt]h[a-z]*"""), Regex("""[Тт]еорем[а-я]*"""), Regex("""№"""),
+	Regex("""[Дд]иаграм[а-я]*"""), Regex("""[Пп]ункт[а-я]*"""),Regex("""[Сс]тро[а-я]*"""),
+	Regex("""[Ll]ist[a-z]*"""), Regex("""[Лл]истинг[а-я]*"""),
+	Regex("""[Пп]риложе[а-я]*"""), Regex("""[Зз]начени[а-я]*"""),
+	Regex("""[Гг]лав[а-я]*"""),Regex("""[Шш]аг[а-я]*"""),Regex("""[Зз]апро[а-я]*"""),
+	Regex("""[Пп]риме[а-я]*"""),Regex("""[Ии]ллюстрац[а-я]*"""),
+	Regex("""[Рр]азд[а-я]*"""), Regex("""[Нн]омер[а-я]*"""), Regex("""[Лл]емм[а-я]*"""),Regex(""" """)
+	)
+	
+val newlineSplittingSymbols = arrayOf(Regex("""\n"""),Regex("""\s"""),Regex("""-"""))
+
+val hyphenatedWordsOnLeft = arrayOf(
+	arrayOf(Regex("""[Рр]и[а-я]*"""), *newlineSplittingSymbols, Regex("""н[а-я]*""")),
+	arrayOf(Regex("""[Тт]аб[а-я]*"""), *newlineSplittingSymbols,Regex("""ц[а-я]*""")),
+	arrayOf(Regex("""[Сс]хе"""), *newlineSplittingSymbols,Regex("""м[а-я]*""")),
+	arrayOf(Regex("""[Оо]п[а-я]*"""), *newlineSplittingSymbols, Regex("""ни[а-я]*""")),
+	arrayOf(Regex("""[Тт]ео[а-я]*"""), *newlineSplittingSymbols, Regex("""м[а-я]*""")),
+	arrayOf(Regex("""[Дд]и[а-я]*"""), *newlineSplittingSymbols, Regex("""м[а-я]*""")),
+	arrayOf(Regex("""[Пп]унк"""), *newlineSplittingSymbols, Regex("""т[а-я]*""")),
+	arrayOf(Regex("""[Сс]тро"""), *newlineSplittingSymbols, Regex("""к[а-я]*""")),
+	arrayOf(Regex("""[Лл]ис"""), *newlineSplittingSymbols, Regex("""г[а-я]*""")),
+	arrayOf(Regex("""[Пп]ри[а-я]*"""), *newlineSplittingSymbols, Regex("""ни[а-я]*""")),
+	arrayOf(Regex("""[Зз]на[а-я]*"""), *newlineSplittingSymbols, Regex("""ни[а-я]*""")),
+	arrayOf(Regex("""[Гг]ла"""), *newlineSplittingSymbols, Regex("""в[а-я]*""")),
+	arrayOf(Regex("""[Шш]а"""), *newlineSplittingSymbols, Regex("""г[а-я]*""")),
+	arrayOf(Regex("""[Зз]а[а-я]*"""), *newlineSplittingSymbols, Regex("""c[а-я]*""")),
+	arrayOf(Regex("""[Ии]л[а-я]*"""), *newlineSplittingSymbols, Regex("""ц[а-я]*""")),
+	arrayOf(Regex("""[Рр]аз[а-я]*"""), *newlineSplittingSymbols, Regex("""л[а-я]*""")),
+	arrayOf(Regex("""[Нн]о[а-я]*"""), *newlineSplittingSymbols, Regex("""р[а-я]*""")),
+	arrayOf(Regex("""[Лл]ем"""), *newlineSplittingSymbols, Regex("""м[а-я]*"""))
 )
+
 val allowedWordsOnRight = arrayOf(
 	Regex("""[Gg][Bb]"""), Regex("""[Гг][Бб]"""),
 	Regex("""[Mm][Bb]"""), Regex("""[Мм][Бб]"""),
-	Regex("""[Gg][Hh][Zz]"""), Regex("""[Гг][Цц]"""),
-	Regex("""→""")
+	Regex("""[Gg][Hh][Zz]"""), Regex("""[Гг][Гг][Цц]"""),
+	Regex("""→"""), Regex("""[Кк]илобайт[а-я]*"""), Regex("""[Кк][Бб]"""),
+	Regex("""[Kk][Bb]"""),Regex("""[Бб]айт[а-я]*"""), Regex("""[Kk]byte[s]"""),
+	Regex("""[Bb]ytes"""), Regex("""[Бб]ит""")
 )
 
-val smallNumbersRuleBuilder1 = WordRuleBuilder()		//for nearest words
-	.called(smallNumbersRuleName)
-	.inArea(smallNumbersRuleArea)
-	.ignoringAdjusting(Regex("""\s"""), Regex("""\."""))
-	.ignoringIfIndex(0)
-	.setDescription("Целые числа от 1 до 9  в тексте работы следует заменять словами за исключением ряда случаев таких как: таблицы, даты, сравнение, формулы, код и др.")
-
-val smallNumbersRuleBuilder2 = WordRuleBuilder()		//for decimal fractions and version numbers
-	.called(smallNumbersRuleName)
-	.inArea(smallNumbersRuleArea)
-	.shouldHaveNeighbor(Regex("""\."""), Regex(""","""),
-		Regex("""[0-9]+"""))
-	.shouldHaveNumberOfNeighbors(2)
-	.setDescription("Целые числа от 1 до 9  в тексте работы следует заменять словами за исключением ряда случаев таких как: таблицы, даты, сравнение, формулы, код и др.")
-
-val smallNumbersRuleBuilder3 = WordRuleBuilder()		//for links
+val smallNumbersRuleBuilder1Left = WordRuleBuilder()        //for nearest words
 	.called(smallNumbersRuleName)
 	.inArea(smallNumbersRuleArea)
 	.fromLeft()
-	.ignoringWords(true)
-	.ignoringAdjusting(Regex(""","""), Regex("""\s"""))
-	.shouldHaveNeighbor(Regex("""\["""))
+	.ignoringAdjusting(Regex("""\."""))
+	.shouldHaveNeighbor(*allowedWordsOnLeft)
+	.shouldHaveNumberOfNeighbors(2)
 	.setDescription("Целые числа от 1 до 9  в тексте работы следует заменять словами за исключением ряда случаев таких как: таблицы, даты, сравнение, формулы, код и др.")
 
+val smallNumbersRuleBuilder1Right = WordRuleBuilder()       //as previous, but for right
+	.called(smallNumbersRuleName)
+	.inArea(smallNumbersRuleArea)
+	.fromRight()
+	.ignoringAdjusting(Regex("""\s"""), Regex("""\."""))
+	.shouldHaveNeighbor(*allowedWordsOnRight)
+	.ignoringIfIndex(0)
+	.setDescription("Целые числа от 1 до 9  в тексте работы следует заменять словами за исключением ряда случаев таких как: таблицы, даты, сравнение, формулы, код и др.")
 
+val smallNumbersRuleBuilder2 = WordRuleBuilder()        //for decimal fractions and version numbers
+	.called(smallNumbersRuleName)
+	.inArea(smallNumbersRuleArea)
+	.shouldHaveNeighbor(
+		Regex("""\."""), Regex(""","""),
+		Regex("""[0-9]+""")
+	)
+	.shouldHaveNumberOfNeighbors(2)
+	.setDescription("Целые числа от 1 до 9  в тексте работы следует заменять словами за исключением ряда случаев таких как: таблицы, даты, сравнение, формулы, код и др.")
 
-val RULES_SMALL_NUMBERS = List<WordRule>(9) { index ->
-	smallNumbersRuleBuilder1.word((index + 1).toString())
-		.fromLeft().shouldHaveNeighbor(*allowedWordsOnLeft).getRule() or
-			smallNumbersRuleBuilder1.word((index + 1).toString())
-				.fromRight().shouldHaveNeighbor(*allowedWordsOnRight).getRule() or
-			smallNumbersRuleBuilder2.word((index + 1).toString()).fromLeft().getRule() or
-			smallNumbersRuleBuilder2.fromRight().getRule() or
-			smallNumbersRuleBuilder3.word((index + 1).toString()).getRule()
+val smallNumbersRuleBuilder3 = WordRuleBuilder()        //for links and operators
+	.called(smallNumbersRuleName)
+	.inArea(smallNumbersRuleArea)
+	.ignoringAdjusting(Regex(""","""), Regex("""\s"""))
+	.shouldHaveNeighbor(Regex("""\[|\]"""), Regex("""\/"""), Regex("""<|≤|>|≥|=|\+"""),
+						Regex("""\""""))
+	.setDescription("Целые числа от 1 до 9  в тексте работы следует заменять словами за исключением ряда случаев таких как: таблицы, даты, сравнение, формулы, код и др.")
 
+val smallNumbersRuleBuilderHyphenated = WordRuleBuilder() //for hyphenated words
+	.called(smallNumbersRuleName)
+	.inArea(smallNumbersRuleArea)
+	.fromLeft()
+	.inNeighborhood(3)
+	.shouldHaveNumberOfNeighbors(5)
+	.setDescription("Целые числа от 1 до 9  в тексте работы следует заменять словами за исключением ряда случаев таких как: таблицы, даты, сравнение, формулы, код и др.")
+
+val smallNumbersRuleBuilder4 = hyphenatedWordsOnLeft.map { hyphenatedWord ->
+	smallNumbersRuleBuilderHyphenated.shouldHaveNeighbor(*hyphenatedWord)
 }
+	
+val RULES_SMALL_NUMBERS = List<WordRule>(9) { index ->
+	smallNumbersRuleBuilder1Left.word((index + 1).toString()).getRule() or
+	smallNumbersRuleBuilder1Right.word((index + 1).toString()).getRule() or
+	smallNumbersRuleBuilder2.word((index + 1).toString()).fromLeft().getRule() or
+	smallNumbersRuleBuilder2.fromRight().getRule() or
+	smallNumbersRuleBuilder3.word((index + 1).toString()).fromLeft().getRule() or
+	smallNumbersRuleBuilder3.fromRight().getRule() or
+	smallNumbersRuleBuilder4.map { it.word((index + 1).toString()).getRule() }
+	.reduce { acc, cur -> acc or cur}
+}
+
 val RULE_DISALLOWED_WORDS = WordRuleBuilder()
 		.called("слова \"theorem, definition, lemma\" не должны использоваться")
 		.inArea(PDFRegion.EVERYWHERE.except(PDFArea.BIBLIOGRAPHY,PDFArea.TITLE_PAGE))
@@ -541,4 +596,37 @@ val RULE_DOUBLE_SPACE = SymbolRuleBuilder()
 	.called("Два пробела подряд")
 	.inArea(PDFRegion.EVERYWHERE)
 	.shouldNotHaveNeighbor(' ')
+	.getRule()
+
+const val maxNumberOfBrackets = 5
+val RULE_NUMBER_OF_BRACKETS = SentenceRuleBuilder()
+	.called("Предложение с большим количеством скобок")
+	.setDescription("В предложении не рекомендуется использовать больше $maxNumberOfBrackets пар скобок")
+	.disallow { lines ->
+		val results = mutableListOf<Line>()
+		if(splitIntoSentences(lines, ".!?").any 
+		{ sentence -> sentence.count{ it.text.contains('(') } > maxNumberOfBrackets})
+		{ results.addAll(lines) }
+		results.toList()
+	}
+	.getRule()
+
+const val maxPercentageInBrackets = 25
+val RULE_TEXT_IN_BRACKETS = SentenceRuleBuilder()
+	.called("Большое количество текста внутри скобок")
+	.setDescription("Стоит уменьшить количество текста внутри скобок. Рекомендуется помещать в скобки не более $maxPercentageInBrackets% от общего количества слов в предложении")
+	.inArea(PDFRegion.EVERYWHERE.except(PDFArea.BIBLIOGRAPHY))
+	.disallow { lines ->
+		val results = mutableListOf<Line>()
+		if( splitIntoSentences(lines, ".!?").any { sentence -> 
+			val sentenceText = sentence.joinToString(separator = " ") { it.text }
+			val percentInBrackets = Regex("\\(([^)]+)\\)").findAll(sentenceText)
+			.sumBy { words ->
+				words.groupValues[1].split("\\s+".toRegex()).count()
+			}.toDouble() / sentence.size * 100 
+			percentInBrackets > maxPercentageInBrackets
+		})
+		{ results.addAll(lines) }
+		results.toList()
+	}
 	.getRule()
