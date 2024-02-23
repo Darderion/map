@@ -13,7 +13,7 @@ interface RuleListProps {
 }
 const RuleList: React.FC<RuleListProps> = ({ rules, value, onChange, visibility }) => {
   return (
-    <div className="rulesList" style={{ overflowY: 'auto' }}>
+    <div className="rulesList" style={{ maxHeight: '600px', overflowY: 'auto' }}>
       <Accordion
         color="violet"
         variant="filled"

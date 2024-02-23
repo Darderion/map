@@ -1,11 +1,13 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import RuleViolation from "../classes/RuleViolation";
 import Rule from "../classes/Rule"
+import DocumentReport from '../classes/DocumentReport';
 interface FileState {
   selectedItem: any;
   apiUrl: string;
   ruleSet: Rule[];
   files: File[];
+  fullPerort: DocumentReport[];
   currentFile: File | null;
   currentPage: number | 0;
   currentLine: number;
@@ -18,6 +20,7 @@ const initialState: FileState = {
   apiUrl: "http://localhost:8081/api",
   ruleSet: [],
   files: [],
+  fullPerort: [],
   currentFile: null,
   currentPage: -2,
   currentLine: 0,
@@ -39,6 +42,9 @@ const fileSlice = createSlice({
     },
     resetVariable(state) {
       state.currentFile = null;
+    },
+    addReport(state, action: PayloadAction<any>) {
+      state.fullPerort.push(action.payload);
     },
     setCurrentPage(state, action: PayloadAction<number | 0>) {
       state.currentPage = action.payload;
@@ -75,6 +81,7 @@ export const {
   setCurrentPreset,
   setRuleSet,
   setCurrentItem,
+  addReport
 } = fileSlice.actions;
 
 export default fileSlice;

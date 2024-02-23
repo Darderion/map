@@ -12,12 +12,14 @@ import Menu from "./components/Menu/Menu"
 
 import ProcessFile from "./pages/processfile";
 import { setRuleSet } from './reducers/counterReducer';
+import ReportPage from './pages/ReportPage';
 
 interface Rule {
   id: number;
   name: string;
   description: string;
 }
+
 function App(): JSX.Element {
   const replaceLinks = (text: string): string => {
     const linkRegex = /(https?:\/\/[^\s]+)/gi;
@@ -56,18 +58,19 @@ function App(): JSX.Element {
 
   return (
     <Provider store={store}>
-
       <div className="App">
-
         <Router>
           <Menu />
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/home" element={<Home />} />
+            <Route path='/report' element={<ReportPage/>}/>
             <Route path="/about" element={<About />} />
             <Route path="/download" element={<Download />} />
             <Route path="/presets" element={<Presets />} />
-            <Route path='/processFile' element={<ProcessFile />} />
+            <Route path="/processFile" element={<ProcessFile />}>
+              <Route path=":id" element={<ProcessFile />} />
+            </Route>
           </Routes>
         </Router>
       </div>

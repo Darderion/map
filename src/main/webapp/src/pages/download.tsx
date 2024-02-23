@@ -6,7 +6,6 @@ import ListContainer from '../components/ListContainer/ListContainer';
 import FileList from '../components/FileList/FileList'
 import RuleInput from '../components/RuleInput/RuleInput';
 
-
 const Download: React.FC = () => {
   const [files, setFiles] = useState<File[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>('')
@@ -29,6 +28,16 @@ const Download: React.FC = () => {
     setRefreshKey(refreshKey + 1);
   }
 
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    const droppedFiles = Array.from(e.dataTransfer.files);
+    handleFileChange(droppedFiles);
+  };
+
   const buttons = [
     <FileButton multiple
       onChange={handleFileChange}
@@ -41,19 +50,21 @@ const Download: React.FC = () => {
           Добавить файл
         </Button>}
     </FileButton>
-  ]
+  ];
 
   const search = <RuleInput
     value={searchQuery}
     onChange={e => setSearchQuery(e.target.value)}
-  />
+  />;
 
   return (
-    <ListContainer title='Файлы'
-      subtitle = ''
-      buttons={buttons}
-      search={search}
-      list={<FileList files={selectedFiles} remove={removeFile} />} />
+    <div onDragOver={handleDragOver} onDrop={handleDrop}>
+      <ListContainer title='Файлы'
+        subtitle=''
+        buttons={buttons}
+        search={search}
+        list={<FileList files={selectedFiles} remove={removeFile} />} />
+    </div>
   );
 };
 

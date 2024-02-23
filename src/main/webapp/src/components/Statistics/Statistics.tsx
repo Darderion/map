@@ -1,23 +1,33 @@
 import { MantineReactTable, useMantineReactTable } from 'mantine-react-table';
 import React, { useState, useEffect, useMemo } from 'react';
 import axios from 'axios'; 
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Title, RingProgress, ColorSwatch, Text} from '@mantine/core';
 import './Statistics.css'
 import { RootState } from '../../store';
+import { setCurrentFileName, setCurrentPage } from '../../reducers/counterReducer';
 const Statistics = () => {
-  const [wordData, setWordData] = useState<{ number: number; word: string; count: unknown; }[]>([]);
+  const [wordData, setWordData] = useState([]);
   const [pageData, setPageData] = useState([]);
   const [wordCount, setWordCount] = useState(0);
   const [pageCount, setPageCount] = useState(0);
-  const currentFileName = useSelector((state: RootState) => state.file.currentFileName);
+  let currentFileName = useSelector((state: RootState) => state.file.currentFileName);
   const apiUrl = useSelector((state: RootState) => state.file.apiUrl);
   const colors = ['#FF7F50', '#FFD700', '#00FFFF', '#FF00FF', '#00FF00', '#800080', '#FFFF00', '#00CED1', '#FFA500', '#008000'];
-  
+  const dispatch = useDispatch();
+  const pathname = window.location.pathname;
   useEffect(() => {
+    if(currentFileName == null && pathname.endsWith("=share")){
+     
+    const segments = pathname.split('/');
+     currentFileName = segments[segments.length - 1].replace('=share', '');
+     dispatch(setCurrentFileName(currentFileName))
+     dispatch(setCurrentPage(0))
+    }
     axios.get(apiUrl+`/viewPDFStatistic?pdfName=${currentFileName}`)
       .then(res => {
-        const sortedWords:{ number: number; word: string; count: unknown; }[] = Object.entries(res.data.wordsStatistic.topKWords)           
+        const sortedWords:any = Object.entries(res.data.wordsStatistic.topKWords)
+            .sort((a:any, b:any) => b[1] - a[1]) 
             .slice(0, 100)
             .map(([word, count], index) => ({ number: index + 1, word, count }));
         setWordData(sortedWords);
@@ -93,3 +103,7 @@ const Statistics = () => {
 };
 
 export default Statistics;
+
+function dispatch(arg0: any) {
+  throw new Error('Function not implemented.');
+}

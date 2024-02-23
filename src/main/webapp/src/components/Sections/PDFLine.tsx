@@ -1,6 +1,7 @@
 import React from 'react';
 import PDFLine from '../../classes/PDFLine';
-import { Text } from '@mantine/core';
+import {Text} from '@mantine/core';
+import { randomInt } from 'crypto';
 
 interface PDFLinesProps {
   lines: PDFLine[];
@@ -8,35 +9,57 @@ interface PDFLinesProps {
 
 const PDFLines: React.FC<PDFLinesProps> = ({ lines }) => {
   const getColorByArea = (area: string) => {
-    const colors: Record<string, string> = {
-      TITLE_PAGE: '#FF7F50',
-      BIBLIOGRAPHY: '#FFD700',
-      TABLE_OF_CONTENT: '#00FFFF',
-      SECTION: '#FF00FF',
-      FOOTNOTE: '#00FF00',
-      PAGE_INDEX: '#800080',
-      CODE: '#FFFF00',
-    };
-
-    return colors[area];
+    const colors = ['#FF7F50', '#FFD700', '#00FFFF', '#FF00FF', '#00FF00', '#800080', '#FFFF00', '#00CED1', '#FFA500', '#008000'];
+    let index = 0;
+    switch (area){
+        case "TITLE_PAGE": {
+            index = 1;
+            break;
+        }
+        case "BIBLIOGRAPHY": {
+            index = 2;
+            break;
+        }
+        case "TABLE_OF_CONTENT": {
+            index = 3;
+            break;
+        }
+        case "SECTION": {
+            index = 4;
+            break;
+        }
+        case "FOOTNOTE": {
+            index = 5;
+            break;
+        }
+        case "PAGE_INDEX": {
+            index = 6;
+            break;
+        }
+        case "CODE": {
+            index = 7;
+            break;
+        }
+    }
+    return colors[index];
   };
 
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-      {lines.map((line) => (
-        <div
-          style={{
-            backgroundColor: getColorByArea(line.area),
-            width: '100%',
-            padding: '10px',
-            marginTop: '10px',
-            borderRadius: '4px',
-          }}
-        >
-          <Text align="center">{line.content}</Text>
-        </div>
-      ))}
-    </div>
+  return (   
+      <div className='PDFline' style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        {lines.map((line) => (
+          <div           
+            style={{
+              backgroundColor: getColorByArea(line.area),
+              width: '100%',
+              padding: '10px',
+              marginTop: '10px',
+              borderRadius: '4px',
+            }}
+          >
+            <Text align="center">{line.content}</Text>
+          </div>
+        ))}
+      </div>
   );
 };
 

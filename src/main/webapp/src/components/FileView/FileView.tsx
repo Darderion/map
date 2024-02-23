@@ -11,12 +11,19 @@ const FileView: React.FC<FileViewProps> = () => {
   const [pdfData, setPdfData] = useState<BlobPart | null>(null);
   const [firstPagePdfData, setFirstPagePdfData] = useState<ArrayBuffer | null>(null);
 	const [pageInitialized, setPageInitialized] = useState<boolean>(false);
-  const currentPage = useSelector((state: RootState) => state.file.currentPage);
+  let currentPage = useSelector((state: RootState) => state.file.currentPage);
   const currentLine = useSelector((state: RootState) => state.file.currentLine);
   const apiUrl = useSelector((state: RootState) => state.file.apiUrl);
-  const currentFileName = useSelector((state: RootState) => state.file.currentFileName);
+  let currentFileName = useSelector((state: RootState) => state.file.currentFileName);
   pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/legacy/build/pdf.worker.min.js`;
   useEffect(() => {
+    if(currentFileName == null){
+      const pathname = window.location.pathname;
+     
+    const segments = pathname.split('/');
+     currentFileName = segments[segments.length - 1];
+     currentPage = 0
+    }
     const fetchPdfData = async () => {
       const response = await axios.get<ArrayBuffer>(
         apiUrl + `/viewPDFRuleViolations.pdf?pdfName=${currentFileName}&page=${currentPage}&lines=${currentLine}`,
@@ -33,7 +40,7 @@ const FileView: React.FC<FileViewProps> = () => {
 		fetchPdfData();
   }, [currentLine, currentPage]);
   return (
-    <div className="filePage">
+    <div className="filePage">  
       {(pdfData && currentPage > -1)  ? (
         <Document
           file={new Blob([(pdfData || firstPagePdfData)!], { type: 'application/pdf' })}
