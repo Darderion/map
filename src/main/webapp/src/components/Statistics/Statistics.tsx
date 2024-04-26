@@ -41,7 +41,7 @@ const Statistics = () => {
       .catch(err => {
         console.error('Error:', err);
       });
-  }, [currentFileName]); 
+  }, [currentFileName]);
 
   const columns = useMemo(
     () => [
@@ -62,7 +62,7 @@ const Statistics = () => {
   );
   const table = useMantineReactTable({
     columns,
-    data: wordData, 
+    data: wordData,
   });
 
   return (
