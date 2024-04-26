@@ -3,7 +3,7 @@ import RuleViolationsHeader from '../components/RuleViolationsHeader/RuleViolati
 import '../css/processfile.css';
 
 const ProcessFile: React.FC = () => {
-    const tabs: string[] = ['Violations'];
+    const tabs: string[] = ['Нарушения'];
 
     return (
         <div className="ruleViolationsHeader">

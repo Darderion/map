@@ -5,7 +5,7 @@ interface RuleSelectProps {
   options: string[];
   defaultValue: string;
   value: string;
-  onChange: (value: string | null) => void;
+  onChange: (value: string) => void;
 }
 
 const RuleSelect: FC<RuleSelectProps> = ({ options, defaultValue, value, onChange }) => {
@@ -13,7 +13,7 @@ const RuleSelect: FC<RuleSelectProps> = ({ options, defaultValue, value, onChang
     <Select
       value={value}
       defaultValue={defaultValue}
-      label="Сортировать"
+      label="Группировать"
       placeholder="поле"
       data={options}
       onChange={onChange}
