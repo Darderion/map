@@ -6,7 +6,7 @@ import { Title, RingProgress, ColorSwatch, Text} from '@mantine/core';
 import './Statistics.css'
 import { RootState } from '../../store';
 const Statistics = () => {
-  const [wordData, setWordData] = useState<{ number: number; word: string; count: unknown; }[]>([]);
+  const [wordData, setWordData] = useState<{ number: number; word: string; count: number }[]>([]);
   const [pageData, setPageData] = useState([]);
   const [wordCount, setWordCount] = useState(0);
   const [pageCount, setPageCount] = useState(0);
@@ -17,9 +17,9 @@ const Statistics = () => {
   useEffect(() => {
     axios.get(apiUrl+`/viewPDFStatistic?pdfName=${currentFileName}`)
       .then(res => {
-        const sortedWords:{ number: number; word: string; count: unknown; }[] = Object.entries(res.data.wordsStatistic.topKWords)           
-            .slice(0, 100)
-            .map(([word, count], index) => ({ number: index + 1, word, count }));
+        const sortedWords: { number: number; word: string; count: number }[] = Object.entries(res.data.wordsStatistic.topKWords)
+          .slice(0, 100)
+          .map(([word, count]: [string, unknown], index) => ({ number: index + 1, word, count: count as number }));
         setWordData(sortedWords);
         setWordCount(res.data.wordsStatistic.wordCount);
         const pageResults = res.data.pageStatistic.sectionsStatistics.map((item: {
