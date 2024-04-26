@@ -1,0 +1,37 @@
+.aboutPage {
+    margin-top: 50px;
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    font-size: 26px;
+}
+
+.label {
+    font-weight: 700;
+    line-height: 1;
+}
+
+.lead {
+    font-weight: 700;
+    margin: 10px;
+}
+
+.githubButton {
+    padding-top: 15px;
+    padding-bottom: 15px;
+}
+
+  .arrow {
+    font-size: 68px;
+    color: violet;
+    margin-top: 10px;
+  }
+  
+  .down {
+    transform: rotate(90deg);
+  }
+  .left {
+    transform: rotate(180deg);
+  }
+  
+  
