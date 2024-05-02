@@ -5,9 +5,8 @@ import axios from 'axios';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
 
-let lines: PDFLine[] = [];
-
 const Sections: React.FC = () => {
+    let lines: PDFLine[] = [];
     const [lines, setLines] = useState<PDFLine[]>([]);
     const currentFileName = useSelector((state: RootState) => state.file.currentFileName);
     const apiUrl = useSelector((state: RootState) => state.file.apiUrl);
