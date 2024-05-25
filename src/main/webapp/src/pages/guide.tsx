@@ -38,32 +38,22 @@ const GuidePage: React.FC = () => {
                 это инструмент<br /> для проверки студенческих <br />работ
             </Title>
             <div>
-                <Text style={{fontSize: '24px', fontWeight: 'bold', marginBottom: '20px'}}>Ниже приведен демо файл для тестового прогона программы. Также снизу есть пошаговая инструкция.</Text>
+                <Text className='lead'>Ниже приведен демо файл для тестового прогона программы. Также снизу есть пошаговая инструкция.</Text>
             </div>
-            <Button component="a" href={require('../resources/Demo.pdf')} download style={{ marginBottom: '20px' }}>Скачать файл</Button>
-            <div style={{ display: 'flex', flexWrap: 'wrap', height: '70vh' }}>
+            <Button component="a" href={require('../resources/Demo.pdf')} download>Скачать файл</Button>
+            <div style={{ display: 'flex', flexWrap: 'wrap' }}>
                 {steps.map((step, index) => (
-                    <Card
+                    <Card 
+                        className='stepCard'
                         key={index}
                         shadow="sm"
-                        style={{
-                            width: 'calc(33.33% - 20px)',
-                            margin: 10,
-                            height: '600px',
-                            border: '2px solid violet',
-                            borderRadius: 8,
-                            transform: selectedCard === index ? 'rotateY(180deg)' : 'rotateY(0deg)',
-                            transition: 'transform 0.5s ease',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            position: 'relative',
+                        style={{                           
+                            transform: selectedCard === index ? 'rotateY(180deg)' : 'rotateY(0deg)'                                              
                         }}
                         onClick={() => handleCardClick(index)}
                     >
-                        <div style={{ transform: selectedCard === index ? 'rotateY(180deg)' : 'rotateY(0deg)', textAlign: 'center' }}>
-                            <Text style={{ marginBottom: "50px" }}>{step.text}</Text>
+                        <div style={{ transform: selectedCard === index ? 'rotateY(180deg)' : 'rotateY(0deg)'}}>
+                            <Text>{step.text}</Text>
                             {index === arrowDownCard && selectedCard !== index && <div className="arrow down">➜➤</div>}
                             {arrowLeftCards.includes(index) && selectedCard !== index && <div className="arrow left">➜➤</div>}  
                             {selectedCard !== index && arrowRightCards.includes(index) && <div className="arrow right">➜➤</div>}
