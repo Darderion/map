@@ -9,12 +9,13 @@ import sixthStepGif from "../resources/sixthStep.gif"
 import '../css/guide.css';
 const GuidePage: React.FC = () => {
     const [selectedCard, setSelectedCard] = useState<number | null>(null);
-
+    const arrowDownCard = 2;
+    const arrowRightCards = [0,1];
+    const arrowLeftCards = [5,4];
     const steps = [
         { text: 'Для начала вам следует выбрать набор правил. Если вы хотите провести проверку со всеми правилами, тогда игнорируйте этот пункт. Вам следует перейти в пункт "Наборы правил и там выбрать один из существующих наборов или создать свой."', gif: firstStepGif },
         { text: 'После выбора набора правил, вам следует перейти на страницу для загрузки файлов. Здесь надо выбрать файл и начать загрузку. После обработки нажмите на количество ошибок и сможете перейти на обзор файла.', gif: secondStepGif },
         { text: 'Вам откроется страница с тремя полями, в первом идет список ошибок, нажав на которые их можно просмотреть. Также тут возможно фильтровать ошибки по названиям или страницам.', gif: thirdStepGif },
-
         { text: 'Наконец, если среди нарушений вы нашли ошибочное, например, вам кажется, что тут все правильно, а отчет говорит обратное, то стоит отправить нам отчет, нажав на соответствующую кнопку. ', gif: sixthStepGif },
         { text: 'По центру будет поле со страницей, на которой подчеркнута ошибка. Если ошибка занимает больше одной строки, то будут подчеркнуты несколько строк.', gif: fifthStepGif },
         { text: 'Слева будет поле, на котором будут все найденные типы ошибок. Если навести на тип ошибки, то можно увидеть описание данной ошибки. Также рядом написан тип ошибки: "предупреждение" или "ошибка". Предупреждения не так принципиальны, как ошибки.', gif: fourthStepGif },
@@ -63,18 +64,14 @@ const GuidePage: React.FC = () => {
                     >
                         <div style={{ transform: selectedCard === index ? 'rotateY(180deg)' : 'rotateY(0deg)', textAlign: 'center' }}>
                             <Text style={{ marginBottom: "50px" }}>{step.text}</Text>
-                            {index === 2 && selectedCard !== index && <div className="arrow down">➜➤</div>}
-                            {index === 5 && selectedCard !== index && <div className="arrow left">➜➤</div>}
-                            {index === 4 && selectedCard !== index && <div className="arrow left">➜➤</div>}
-                            {selectedCard !== index && index !== 2 && index !== 3 && index !== 4 && index !== 5 && <div className="arrow right">➜➤</div>}
-                            {selectedCard === index && <img src={step.gif} alt={`Step ${index + 1}`} style={{ width: '100%', height: '70%' }} />}
+                            {index === arrowDownCard && selectedCard !== index && <div className="arrow down">➜➤</div>}
+                            {arrowLeftCards.includes(index) && selectedCard !== index && <div className="arrow left">➜➤</div>}  
+                            {selectedCard !== index && arrowRightCards.includes(index) && <div className="arrow right">➜➤</div>}
+                            {selectedCard === index && <img src={step.gif} alt={`Step ${index + 1}`} style={{ width: '100%', height: '70%' }} />}                        
                         </div>
                     </Card>
-
                 ))}
-
             </div>
-
         </div>
     );
 };
