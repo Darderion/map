@@ -21,6 +21,14 @@
     padding-bottom: 15px;
 }
 
+.guide {
+  display: 'flex'; 
+  flex-direction: 'column';
+  justify-content: center;
+  text-align: center;
+  padding: '20px'
+  
+}
   .arrow {
     font-size: 68px;
     color: violet;

@@ -29,7 +29,7 @@ const GuidePage: React.FC = () => {
         }
     };
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '20px' }}>
+        <div className='guide'>
             <Title className="name">
                 Приложение{' '}<br />
                 <Text component="span" color="violet">
@@ -37,8 +37,8 @@ const GuidePage: React.FC = () => {
                 </Text>{' '}<br />-
                 это инструмент<br /> для проверки студенческих <br />работ
             </Title>
-            <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', padding: '20px' }}>
-                <Text style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '20px', maxWidth: '700px' }}>Ниже приведен демо файл для тестового прогона программы. Также снизу есть пошаговая инструкция.</Text>
+            <div>
+                <Text style={{fontSize: '24px', fontWeight: 'bold', marginBottom: '20px'}}>Ниже приведен демо файл для тестового прогона программы. Также снизу есть пошаговая инструкция.</Text>
             </div>
             <Button component="a" href={require('../resources/Demo.pdf')} download style={{ marginBottom: '20px' }}>Скачать файл</Button>
             <div style={{ display: 'flex', flexWrap: 'wrap', height: '70vh' }}>
