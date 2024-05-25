@@ -13,28 +13,28 @@
 }
 
 .aboutPage {
-    margin-top: 50px;
-    display: flex;
-    justify-content: center;
-    text-align: center;
-    font-size: 26px;
+  margin-top: 50px;
+  display: flex;
+  justify-content: center;
+  text-align: center;
+  font-size: 26px;
 }
 
 .label {
   display: 'flex';
   flex-direction:'column';
-  height: '70vh' 
+  height: '70vh'; 
 }
 
 .lead {
   font-size: '24px';
-   font-weight: 'bold';
-    margin-bottom: '20px'
+  font-weight: 'bold';
+  margin-bottom: '20px';
 }
 
 .githubButton {
-    padding-top: 15px;
-    padding-bottom: 15px;
+  padding-top: 15px;
+  padding-bottom: 15px;
 }
 
 .guide {
@@ -45,19 +45,17 @@
   padding: '20px';
   
 }
-
-
-  .arrow {
-    font-size: 68px;
-    color: violet;
-    margin-top: 10px;
+.arrow {
+  font-size: 68px;
+  color: violet;
+  margin-top: 10px;
   }
   
-  .down {
-    transform: rotate(90deg);
+.down {
+  transform: rotate(90deg);
   }
-  .left {
-    transform: rotate(180deg);
+.left {
+  transform: rotate(180deg);
   }
   
   

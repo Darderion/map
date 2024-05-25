@@ -38,7 +38,7 @@ const GuidePage: React.FC = () => {
                 это инструмент<br /> для проверки студенческих <br />работ
             </Title>
             <div>
-                <Text className='lead'>Ниже приведен демо файл для тестового прогона программы. Также снизу есть пошаговая инструкция.</Text>
+                <Text className='description'>Ниже приведен демо файл для тестового прогона программы. Также снизу есть пошаговая инструкция.</Text>
             </div>
             <Button component="a" href={require('../resources/Demo.pdf')} download>Скачать файл</Button>
             <div style={{ display: 'flex', flexWrap: 'wrap' }}>
