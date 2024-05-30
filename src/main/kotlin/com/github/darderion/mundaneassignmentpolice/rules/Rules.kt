@@ -15,7 +15,6 @@ import com.github.darderion.mundaneassignmentpolice.checker.rule.url.then
 import com.github.darderion.mundaneassignmentpolice.checker.rule.word.WordRule
 import com.github.darderion.mundaneassignmentpolice.checker.rule.word.WordRuleBuilder
 import com.github.darderion.mundaneassignmentpolice.checker.rule.word.or
-import com.github.darderion.mundaneassignmentpolice.checker.rule.word.and
 import com.github.darderion.mundaneassignmentpolice.checker.rule.word.splitToWordsAndPunctuations
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFArea
 import com.github.darderion.mundaneassignmentpolice.pdfdocument.PDFDocument
@@ -93,23 +92,11 @@ val RULE_LONG_DASH = SymbolRuleBuilder()
 	.called("Неправильное использование длинного тире")
 	.setDescription("В русском языке оно ставится вместо отсутствующего члена предложения, для указания маршрутов и в ряде других случаев. Подробнее написано тут https://www.vgsa.ru/blogs/mos/80/index.php?special=Y и https://theoryandpractice.ru/posts/18471-dlinnoe-ili-korotkoe-kak-stavit-tire")
 	.inArea(PDFRegion.EVERYWHERE.except(PDFArea.BIBLIOGRAPHY, PDFArea.FOOTNOTE))
-	.getRule() and (SymbolRuleBuilder()
+	.getRule() and SymbolRuleBuilder()
 	.symbol(longDash)
-	.shouldHaveNeighbor(' ')
-	.inArea(PDFRegion.EVERYWHERE.except(PDFArea.BIBLIOGRAPHY, PDFArea.FOOTNOTE))
-	.getRule() or
-	(SymbolRuleBuilder()
-	.symbol(longDash)
-	.fromLeft()
 	.shouldHaveNeighbor(' ')
 	.inArea(PDFRegion.EVERYWHERE.except(PDFArea.BIBLIOGRAPHY, PDFArea.FOOTNOTE))
 	.getRule()
-	and SymbolRuleBuilder()
-	.symbol(longDash)
-	.fromRight()
-	.shouldHaveNeighbor('\n')
-	.inArea(PDFRegion.EVERYWHERE.except(PDFArea.BIBLIOGRAPHY, PDFArea.FOOTNOTE))
-	.getRule()))
 
 val closingQuote = '”'
 val openingQuote = '“'
@@ -143,39 +130,26 @@ val RULE_MULTIPLE_LITLINKS = SymbolRuleBuilder()
 	.setDescription("Несколько ссылок подряд следует оформлять так [0,1], а не [0] [1]")
 	.getRule()
 
-const val bracket = "("
+const val bracket = '('
 
-val ruleBracketsLettersBuilder1 = WordRuleBuilder()
-	.word(bracket)
-	.ignoringAdjusting(Regex("""\s"""))
-	.called("Большая русская буква после скобки")
-	.setDescription("После открывающей круглой скобки следует ставить маленькую букву, если речь идет не о названиях и других сложных случаев")
-	.type(RuleViolationType.Warning)
-	.fromLeft()
-	.shouldNotHaveNeighbor(Regex("""\."""))
-
-val ruleBracketsLettersBuilder2 = WordRuleBuilder()
-	.word(bracket)
-	.ignoringAdjusting(Regex("""\s"""))
-	.called("Большая русская буква после скобки")
-	.setDescription("После открывающей круглой скобки следует ставить маленькую букву, если речь идет не о названиях и других сложных случаев")
-	.type(RuleViolationType.Warning)
-	.fromRight()
-	.shouldNotHaveNeighbor(Regex("""[А-Я][а-я]*"""))
-
-val ruleBracketsLettersBuilder3 = WordRuleBuilder()
-	.word(bracket)
-	.ignoringAdjusting(Regex("""\s"""))
-	.called("Большая русская буква после скобки")
-	.setDescription("После открывающей круглой скобки следует ставить маленькую букву, если речь идет не о названиях и других сложных случаев")
-	.type(RuleViolationType.Warning)
-	.fromRight()
-	.shouldHaveNeighbor(Regex("""[А-Я][а-я]*[А-Я]+[А-Яа-я]*"""))
-
-val RULE_BRACKETS_LETTERS = (ruleBracketsLettersBuilder1.getRule() and 
-	ruleBracketsLettersBuilder2.getRule()) or 
-	(ruleBracketsLettersBuilder1.getRule() and 
-	ruleBracketsLettersBuilder3.getRule())
+val RULE_BRACKETS_LETTERS = List(2) {
+	SymbolRuleBuilder()
+		.symbol(bracket)
+		.ignoringAdjusting(' ')
+		.called("Большая русская буква после скобки")
+		.setDescription("После открывающей круглой скобки следует ставить маленькую букву, если речь идет не о названиях и других сложных случаев")
+		.type(RuleViolationType.Warning)
+}.apply {
+	first()
+		.fromLeft()
+		.shouldNotHaveNeighbor('.')
+	last()
+		.fromRight()
+		.shouldNotHaveNeighbor(*rusCapitalLetters.toCharArray())
+}.map { it.getRule() }
+	.reduce { acc, symbolRule ->
+		acc and symbolRule
+	}
 
 private const val openingBrackets = "([{<"
 private const val closingBrackets = ")]}>"
@@ -556,12 +530,12 @@ val RULE_ORDER_OF_REFERENCES = RegexRuleBuilder()
 		}.map { it.second }
 	}.getRule()
 
-val exclusionsForAbbreviations = arrayOf(Regex("или", RegexOption.IGNORE_CASE), Regex("по", RegexOption.IGNORE_CASE), Regex("не", RegexOption.IGNORE_CASE))
+val exclusionsForAbbreviations = arrayOf(Regex("или", RegexOption.IGNORE_CASE), Regex("по", RegexOption.IGNORE_CASE))
 
 val RULE_VARIOUS_ABBREVIATIONS = RegexRuleBuilder()
 	.called("Использованы различные версии сокращения")
 	.setDescription("Тексте работ (не в ссылках!) часто пишут github, Github и GitHub. При этом, во-первых правильное написание — это GitHub, а во-вторых, в общем случае подобная разнородность смотрится некрасиво. Сейчас правило часто захватывает web-ссылки и потому возможны ложные срабатывания, однако следует проверить все ли из них — ложные (практика показывает что нет)")
-	.regex(Regex("""(?<!\/|[a-zA-Zа-яА-Я])([a-zA-Zа-яА-Я-_]+(?=\s|\n)|[a-zA-Zа-яА-Я]+)"""))
+	.regex(Regex("""[a-zA-Zа-яА-Я]+"""))
 	.inArea(PDFRegion.EVERYWHERE.except(PDFArea.FOOTNOTE, PDFArea.BIBLIOGRAPHY))
 	.disallow { matches ->
 		val abbreviations = hashSetOf<String>()
