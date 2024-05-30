@@ -12,8 +12,9 @@ class SentenceRule (
         val predicates: MutableList<(list: MutableList<Line>) -> List<Line>>,
         type: RuleViolationType,
         area: PDFRegion,
-        name: String
-): Rule(area, name, type) {
+        name: String,
+        description: String
+): Rule(area, name, type, description) {
 
     private val punctuationConclusionSymbols = ".!?”»".toCharArray()
 

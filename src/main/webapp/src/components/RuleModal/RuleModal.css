@@ -1,0 +1,23 @@
+.ruleForm {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    display: none;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.ruleFormContent {
+    padding: 25px;
+    background: white;
+    border-radius: 16px;
+    min-width: 250px;
+    text-align: start;
+}
+
+.ruleForm.active {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

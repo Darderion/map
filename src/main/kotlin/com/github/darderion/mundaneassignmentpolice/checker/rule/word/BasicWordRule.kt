@@ -19,8 +19,9 @@ class BasicWordRule(
 	private val numberOfNeighbors: Int,
 	type: RuleViolationType,
 	area: PDFRegion,
-	name: String
-) : WordRule(word, type, area, name) {
+	name: String,
+	description: String
+) : WordRule(word, type, area, name, description) {
 	override fun isViolated(document: PDFDocument, line: Int, index: Int): Boolean {
 		if (!ignoredIndexes.contains(index)) {
 			val wordIndex = index + splitToWordsAndPunctuations(

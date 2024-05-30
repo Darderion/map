@@ -1,0 +1,21 @@
+.diagramWithTitles {
+    display: flex;
+    align-items: flex-start;
+    margin-top: 16px;
+  }
+  
+  .sectionsList {
+    padding-left: 16px;
+    list-style-type: disc;
+  }
+  
+  .section {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  
+  .swatch {
+    margin-right: 8px;
+    min-width: 25px;
+  }

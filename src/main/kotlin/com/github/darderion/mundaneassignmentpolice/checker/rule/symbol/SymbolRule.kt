@@ -11,8 +11,9 @@ abstract class SymbolRule(
 	val symbol: Char,
 	type: RuleViolationType,
 	area: PDFRegion,
-	name: String
-): Rule(area, name, type) {
+	name: String,
+	description: String
+): Rule(area, name, type, description) {
 	abstract fun isViolated(document: PDFDocument, line: Int, index: Int): Boolean
 
 	override fun process(document: PDFDocument): List<RuleViolation> {

@@ -36,3 +36,13 @@ src/main/webapp/dist/
 src/main/webapp/Dist_local/
 src/main/webapp/node_modules/
 src/main/resources/static
+pnpm-debug.log*
+
+# Editor directories and files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
