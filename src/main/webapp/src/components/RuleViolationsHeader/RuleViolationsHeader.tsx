@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { Container, Tabs } from '@mantine/core';
 import RuleViolationsContent from '../RuleViolationsContent/RuleViolationsContent';
 import Statistics from '../Statistics/Statistics';
+import Sections from '../Sections/Sections';
 
 interface RuleViolationsHeaderProps {
   tabs: string[];
@@ -37,15 +38,18 @@ const RuleViolationsHeader: React.FC<RuleViolationsHeaderProps> = ({ tabs }) => 
         <Tabs
           defaultValue="Нарушения"
           variant="outline"
-          value={tabValue || 'Нарушения'}
+          value={tabValue }
         >
           <Tabs.List>{items}</Tabs.List>
-
           <Tabs.Panel value="Нарушения">
             <RuleViolationsContent />
           </Tabs.Panel>
-
-
+          <Tabs.Panel value="Статистика">
+            <Statistics/>
+          </Tabs.Panel>
+          <Tabs.Panel value="Секции">
+            <Sections/>
+          </Tabs.Panel>
         </Tabs>
       </Container>
     </div>
