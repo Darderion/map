@@ -535,7 +535,7 @@ val exclusionsForAbbreviations = arrayOf(Regex("или", RegexOption.IGNORE_CASE
 val RULE_VARIOUS_ABBREVIATIONS = RegexRuleBuilder()
 	.called("Использованы различные версии сокращения")
 	.setDescription("Тексте работ (не в ссылках!) часто пишут github, Github и GitHub. При этом, во-первых правильное написание — это GitHub, а во-вторых, в общем случае подобная разнородность смотрится некрасиво. Сейчас правило часто захватывает web-ссылки и потому возможны ложные срабатывания, однако следует проверить все ли из них — ложные (практика показывает что нет)")
-	.regex(Regex("""[a-zA-Zа-яА-Я]+"""))
+	.regex(Regex("""[a-zA-Zа-яА-Я\-_\.]+"""))
 	.inArea(PDFRegion.EVERYWHERE.except(PDFArea.FOOTNOTE, PDFArea.BIBLIOGRAPHY))
 	.disallow { matches ->
 		val abbreviations = hashSetOf<String>()
