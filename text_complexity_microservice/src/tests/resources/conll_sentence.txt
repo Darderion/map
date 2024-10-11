@@ -1,0 +1,15 @@
+# text = Обработка текстов на естественном языке — общее направление искусственного интеллекта и математической лингвистики.
+1	Обработка	обработка	NOUN	NOUN	Animacy=Inan|Case=Nom|Gender=Fem|Number=Sing	8	nsubj	_	_
+2	текстов	текст	NOUN	NOUN	Animacy=Inan|Case=Gen|Gender=Masc|Number=Plur	1	nmod	_	_
+3	на	на	ADP	ADP	_	5	case	_	_
+4	естественном	естественный	ADJ	ADJ	Case=Loc|Degree=Pos|Gender=Masc|Number=Sing	5	amod	_	_
+5	языке	язык	NOUN	NOUN	Animacy=Inan|Case=Loc|Gender=Masc|Number=Sing	2	nmod	_	_
+6	—	—	PUNCT	PUNCT	_	1	punct	_	_
+7	общее	общий	ADJ	ADJ	Case=Nom|Degree=Pos|Gender=Neut|Number=Sing	8	amod	_	_
+8	направление	направление	NOUN	NOUN	Animacy=Inan|Case=Nom|Gender=Neut|Number=Sing	0	root	_	_
+9	искусственного	искусственный	ADJ	ADJ	Case=Gen|Degree=Pos|Gender=Masc|Number=Sing	10	amod	_	_
+10	интеллекта	интеллект	NOUN	NOUN	Animacy=Inan|Case=Gen|Gender=Masc|Number=Sing	8	nmod	_	_
+11	и	и	CCONJ	CCONJ	_	13	cc	_	_
+12	математической	математический	ADJ	ADJ	Case=Gen|Degree=Pos|Gender=Fem|Number=Sing	13	amod	_	_
+13	лингвистики	лингвистика	NOUN	NOUN	Animacy=Inan|Case=Gen|Gender=Fem|Number=Sing	10	conj	_	SpaceAfter=No
+14	.	.	PUNCT	PUNCT	_	8	punct	_	SpaceAfter=No
