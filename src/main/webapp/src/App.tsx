@@ -12,6 +12,7 @@ import Menu from "./components/Menu/Menu"
 
 import ProcessFile from "./pages/processfile";
 import { setRuleSet } from './reducers/counterReducer';
+import GuidePage from './pages/guide';
 
 interface Rule {
   id: number;
@@ -64,6 +65,7 @@ function App(): JSX.Element {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/home" element={<Home />} />
+            <Route path="/guide" element={<GuidePage />} />
             <Route path="/about" element={<About />} />
             <Route path="/download" element={<Download />} />
             <Route path="/presets" element={<Presets />} />

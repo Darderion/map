@@ -22,6 +22,7 @@ const Menu = () => {
       >
         <Tabs.List>
           <Tabs.Tab value="Home" onClick={() => navigateTo('/Home')}>Главная</Tabs.Tab>
+          <Tabs.Tab value="Guide" onClick={() => navigateTo('/Guide')}>Инструкция</Tabs.Tab>
           <Tabs.Tab value="About" onClick={() => navigateTo('/About')}>Контакты</Tabs.Tab>
           <Tabs.Tab value="Presets" onClick={() => navigateTo('/Presets')}>Наборы правил</Tabs.Tab>
           <Tabs.Tab value="Download" onClick={() => navigateTo('/Download')}>Загрузка файлов</Tabs.Tab>
