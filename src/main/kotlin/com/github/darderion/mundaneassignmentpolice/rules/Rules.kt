@@ -132,24 +132,37 @@ val RULE_MULTIPLE_LITLINKS = SymbolRuleBuilder()
 
 const val bracket = '('
 
-val RULE_BRACKETS_LETTERS = List(2) {
-	SymbolRuleBuilder()
-		.symbol(bracket)
-		.ignoringAdjusting(' ')
-		.called("Большая русская буква после скобки")
-		.setDescription("После открывающей круглой скобки следует ставить маленькую букву, если речь идет не о названиях и других сложных случаев")
-		.type(RuleViolationType.Warning)
-}.apply {
-	first()
-		.fromLeft()
-		.shouldNotHaveNeighbor('.')
-	last()
-		.fromRight()
-		.shouldNotHaveNeighbor(*rusCapitalLetters.toCharArray())
-}.map { it.getRule() }
-	.reduce { acc, symbolRule ->
-		acc and symbolRule
-	}
+val ruleBracketsLettersBuilder1 = WordRuleBuilder()
+    .word(bracket)
+    .ignoringAdjusting(Regex("""\s"""))
+    .called("Большая русская буква после скобки")
+    .setDescription("После открывающей круглой скобки следует ставить маленькую букву, если речь идет не о названиях и других сложных случаев")
+    .type(RuleViolationType.Warning)
+    .fromLeft()
+    .shouldNotHaveNeighbor(Regex("""\."""))
+
+val ruleBracketsLettersBuilder2 = WordRuleBuilder()
+    .word(bracket)
+    .ignoringAdjusting(Regex("""\s"""))
+    .called("Большая русская буква после скобки")
+    .setDescription("После открывающей круглой скобки следует ставить маленькую букву, если речь идет не о названиях и других сложных случаев")
+    .type(RuleViolationType.Warning)
+    .fromRight()
+    .shouldNotHaveNeighbor(Regex("""[А-Я][а-я]*"""))
+
+val ruleBracketsLettersBuilder3 = WordRuleBuilder()
+    .word(bracket)
+    .ignoringAdjusting(Regex("""\s"""))
+    .called("Большая русская буква после скобки")
+    .setDescription("После открывающей круглой скобки следует ставить маленькую букву, если речь идет не о названиях и других сложных случаев")
+    .type(RuleViolationType.Warning)
+    .fromRight()
+    .shouldHaveNeighbor(Regex("""[А-Я][а-я]*[А-Я]+[А-Яа-я]*"""))
+
+val RULE_BRACKETS_LETTERS = (ruleBracketsLettersBuilder1.getRule() and 
+    ruleBracketsLettersBuilder2.getRule()) or 
+    (ruleBracketsLettersBuilder1.getRule() and 
+    ruleBracketsLettersBuilder3.getRule())
 
 private const val openingBrackets = "([{<"
 private const val closingBrackets = ")]}>"
